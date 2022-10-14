@@ -1,0 +1,4 @@
+Use Network Manager Text user interface
+
+in terminal use: nmtui
+
