@@ -34,11 +34,13 @@
 
 <a name="architecture-of-it-project"></a>
 ## Architecture of IT project 
- Section to be filled with Docker containers details
+ So far an idea would be to use docker containers to realize the project.  
+One container will be dedicated to Telegram aspect, one to Postgres, one to Django Rest Framework and one to CIVICRM.
+This section will be modified along the project regarding the needs and new ideas.
 
 
 <a name="usage"></a>
 ## Usage  
-Launch the docker containers as services: section to be detailed
+Launch the docker containers as services: section to be detailed  
 
 

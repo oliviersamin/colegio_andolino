@@ -1,0 +1,58 @@
+
+"""
+script working for chqt with a bot but not when a bot is in a group
+"""
+from telegram.client import Telegram
+from credentials import API_ID, API_HASH, TOKEN_BOT_ANDOLINA_TEST, DATABASE_ENCRYPTION_KEY
+
+
+TG = Telegram(
+    api_id=API_ID,
+    api_hash=API_HASH,
+    bot_token=TOKEN_BOT_ANDOLINA_TEST,
+    database_encryption_key=DATABASE_ENCRYPTION_KEY,
+)
+
+TYPES = {"text": ["formattedText"], "file": ["messageDocument"]}
+
+
+def select_action_regarding_update(update):
+    """
+    if update contains text message --> action1
+    if update conains file --> action2
+    :param update:
+    :return:
+    """
+    CONTENT = update["message"]["content"]
+    MAP_ACTIONS = {"formattedText": new_message_handler, "messageDocument": receive_text_file_handler, "messageText": new_message_handler}
+    for key, value in MAP_ACTIONS.items():
+        print(key, CONTENT.get("@type"), key == CONTENT.get("@type"))
+        if key == CONTENT.get("@type"):
+            value(update)
+            break
+
+def new_message_handler(update):
+    # we want to process only text messages
+    print("I received a text, I should have a script to run... TBD")
+
+
+def receive_text_file_handler(update):
+    """
+    The bot can receive files?
+    :param update:
+    :return: text message
+    """
+    print("I received a file to process...")
+
+
+def main():
+    try:
+        TG.login()
+        print("successfull login")
+        TG.add_message_handler(select_action_regarding_update)
+        TG.idle()
+
+    except RuntimeError:
+        print("login failed, check the credentials for the bot and the app...")
+
+main()
