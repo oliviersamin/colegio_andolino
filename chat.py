@@ -33,6 +33,7 @@ async def action_for_text_message(update: Update, context: ContextTypes.DEFAULT_
 def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bot's token.
+    print("Chat script running...")
     application = Application.builder().token(TOKEN_BOT_ANDOLINA_TEST).build()
 
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, action_for_text_message))

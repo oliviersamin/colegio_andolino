@@ -41,6 +41,10 @@ This section will be modified along the project regarding the needs and new idea
 
 <a name="usage"></a>
 ## Usage  
-Launch the docker containers as services: section to be detailed  
+When an update is made to the GitHub repo, one makes manually:
+1. the creation of the docker image using the DockerFile
+2. Push this new image to the public dockerHub repo https://hub.docker.com/r/olivierfuerte/colegio_andolina with the command:  
+3. docker push olivierfuerte/colegio_andolina:tagname
+
 
 

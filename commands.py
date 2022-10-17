@@ -42,6 +42,7 @@ class CheckDownloadedFile:
 
     def check(self):
         files = self.get_new_downloaded_files()
+        print(files)
         if len(files) == 1:
             return self.message_reception_1_file
         elif len(files) > 1:
@@ -64,6 +65,7 @@ class ChatBot:
 
 async def main() -> None:
     """Start the non chat commands loop"""
+    print("Commands script running...")
     DownloadedFiles = CheckDownloadedFile()
     Bot = ChatBot(chat_id=CHAT_ID_BOT, token_bot=TOKEN_BOT_ANDOLINA_TEST)
     while True:
