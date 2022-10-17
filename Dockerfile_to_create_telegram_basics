@@ -1,0 +1,5 @@
+FROM image_base_for_telegram:v1.0
+WORKDIR /homa/telegram
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
