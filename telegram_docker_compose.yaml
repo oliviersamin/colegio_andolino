@@ -1,0 +1,22 @@
+version: "3"
+services: 
+  chat:
+    image: telegram_basics:v1.0
+    container_name: telegram_chat
+    command: python chat.py
+    ports:
+      - 5000:5001
+    volumes:
+      - telegram:/home/telegram/Download_temp_folder/
+  commands:
+    image: telegram_basics:v1.0
+    container_name: telegram_commands
+    command: python commands.py
+    ports:
+      - 6000:5002
+    volumes:
+      - telegram:/home/telegram/Download_temp_folder/
+
+volumes:
+  telegram:
+    driver: local
