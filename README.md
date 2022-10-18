@@ -5,6 +5,7 @@
 2. [Technical approach](#technical-approach)
 3. [Architecture of IT project](#architecture-of-it-project)
 4. [Usage](#usage)
+5. [Actual issues](#actual-issues)
 ***
 
 <a name="main-objective-of-this-repo"></a>
@@ -42,9 +43,18 @@ This section will be modified along the project regarding the needs and new idea
 <a name="usage"></a>
 ## Usage  
 When an update is made to the GitHub repo, one makes manually:
-1. the creation of the docker image using the DockerFile
-2. Push this new image to the public dockerHub repo https://hub.docker.com/r/olivierfuerte/colegio_andolina with the command:  
-3. docker push olivierfuerte/colegio_andolina:tagname
+1. the creation of the docker image using the Dockerfile_from_scratch_to_telegram_server_ready file
+2. Use then the docker-compose file telegram.yaml to launch the containers with the following command:
+`docker-compose -f telegram.yaml up chat commands`
 
+<a name="actual-issues"></a>
+## Actual Issues
+1. The program is running in local without using the containers using the following steps:
+   1. on a first tab in the virtual env run `python chat.py`
+   2. on a second tab in the virtual env run `python commands.py`
+   3. The program is running properly
+
+With docker containers, modification must be made to ensure a communication between the 2 scripts probably through
+get and post requests
 
 
