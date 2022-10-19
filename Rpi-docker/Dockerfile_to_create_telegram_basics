@@ -1,4 +1,4 @@
-FROM image_base_for_telegram:v1.0
+FROM base_telegram_server:v1.0
 WORKDIR /home/telegram
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
