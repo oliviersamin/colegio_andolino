@@ -1,10 +1,17 @@
+import requests
+
 from utils.credentials import (
     TOKEN_BOT_ANDOLINA_TEST,
     CHAT_ID_BOT,
-    CHAT_ID_GROUP_COLEGIO_ANDOLINA,
+    CHAT_ID_GROUP_COLEGIO_ANDOLINA
 )
 
-from utils.constants import DOWNLOAD_FOLDER_BASE_PATH, TALK_TO_BOT
+from utils.constants import (
+    DOWNLOAD_FOLDER_BASE_PATH,
+    TALK_TO_BOT,
+    URL_DOCKER_CHAT,
+    URL_DOCKER_COMMANDS
+)
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
@@ -12,7 +19,6 @@ async def select_action_to_perform(update: Update, context: ContextTypes.DEFAULT
     chat_id = update.effective_chat.id
     if (chat_id == CHAT_ID_BOT) & (update.message.caption.startswith(TALK_TO_BOT)):
         await download_document(update, context)
-
 
 async def download_document(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     document = update.effective_message.document
@@ -26,8 +32,6 @@ async def action_for_text_message(update: Update, context: ContextTypes.DEFAULT_
     chat_id = update.effective_chat.id
     if update.message.text.startswith(TALK_TO_BOT):
         await update.message.reply_text("You talk to a bot")
-
-
 
 
 def main() -> None:

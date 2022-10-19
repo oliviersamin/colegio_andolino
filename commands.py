@@ -1,6 +1,7 @@
 import os
 import time
 import asyncio
+import requests
 from telegram import Bot
 
 from utils.credentials import (
@@ -8,7 +9,12 @@ from utils.credentials import (
     CHAT_ID_BOT,
     CHAT_ID_GROUP_COLEGIO_ANDOLINA,
 )
-from utils.constants import DOWNLOAD_FOLDER_BASE_PATH, TALK_TO_BOT
+from utils.constants import (
+    DOWNLOAD_FOLDER_BASE_PATH,
+    TALK_TO_BOT,
+    URL_DOCKER_CHAT,
+    URL_DOCKER_COMMANDS
+)
 
 
 class CheckDownloadedFile:
