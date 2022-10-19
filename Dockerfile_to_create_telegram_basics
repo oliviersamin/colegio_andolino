@@ -1,5 +1,5 @@
 FROM base_image_for_telegram:v1.0
 WORKDIR /home/telegram
-COPY requirements.txt ./
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
