@@ -5,7 +5,7 @@
 2. [Technical approach](#technical-approach)
 3. [Architecture of IT project](#architecture-of-it-project)
 4. [Usage](#usage)
-5. [Actual issues](#actual-issues)
+5. [Manuals](#manuals)
 ***
 
 <a name="main-objective-of-this-repo"></a>
@@ -42,19 +42,18 @@ This section will be modified along the project regarding the needs and new idea
 
 <a name="usage"></a>
 ## Usage  
-When an update is made to the GitHub repo, one makes manually:
-1. the creation of the docker image using the Dockerfile_from_scratch_to_telegram_server_ready file
-2. Use then the docker-compose file telegram.yaml to launch the containers with the following command:
-`docker-compose -f telegram.yaml up chat commands`
+When an update is made to the branch dev, the test can be performed with the following steps:
+1. create a chat with the bot on telegram to perform tests
+2. Get the ID of this chat
+3. in the utils.credentials file modify the value of CHAT_ID_BOT with the chat ID
+4. To create for the first time the docker images and launch the containers use the following command form the root folder of the repo:
+`python utils/create_docker_containers --image=all` It creates two images. The first one is a basis to then create the telegram image. It has been done this way because it takes time to create the first image and when updates are made to the project it is just to the telegram part. It is just saving time when developping.
+5. Report to the corresponding manual section to know how to use the version of the dev release
 
-<a name="actual-issues"></a>
-## Actual Issues
-1. The program is running in local without using the containers using the following steps:
-   1. on a first tab in the virtual env run `python chat.py`
-   2. on a second tab in the virtual env run `python commands.py`
-   3. The program is running properly
-
-With docker containers, modification must be made to ensure a communication between the 2 scripts probably through
-get and post requests
-
+<a name="manuals"></a>
+## Manuals
+1. Release 1 of dev:
+   the features tested are:
+   1. reply automatically to a text message of a user in a chat when the user starts his message with "@bot"
+   2. download automatically a document send by a user when he writes "@bot" into the caption section. A text message is sent in the chat when the file has been downloaded.
 
