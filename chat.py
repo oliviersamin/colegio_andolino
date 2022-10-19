@@ -32,14 +32,6 @@ async def action_for_text_message(update: Update, context: ContextTypes.DEFAULT_
     chat_id = update.effective_chat.id
     if update.message.text.startswith(TALK_TO_BOT):
         await update.message.reply_text("You talk to a bot")
-        response = send_result_download_to_docker_volume()
-        print("data sent: ", response)
-
-
-def send_result_download_to_docker_volume():
-    return requests.POST(
-        URL_DOCKER_CHAT, data={"label": "test"}
-    )
 
 
 def main() -> None:

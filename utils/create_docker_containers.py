@@ -51,6 +51,12 @@ def clean_unknown_images():
         command = "docker rmi -f " + cleaning[0]
         os.system(command)
         cleaning = unknown_image_exists()
+    print("All the unknown images have been cleaned!")
+
+
+def clean_all_stopped_containers():
+    print("cleaning all stopped containers...")
+    os.system("docker rm $(docker ps --filter status=exited -q)")
 
 
 def create_images(image):
@@ -92,8 +98,11 @@ def create_images(image):
 
 def main():
     image = parse_args().image
+    clean_all_stopped_containers()
     clean_unknown_images()
     os.chdir(os.path.dirname(os.path.dirname(CURRENT_FILE_PATH)))
     create_images(image)
 
-main()
+
+if __name__ == "__main__":
+    main()

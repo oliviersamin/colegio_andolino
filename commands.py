@@ -47,8 +47,6 @@ class CheckDownloadedFile:
         return []
 
     def check(self):
-        res = self.retrieve_result_download_to_docker_volume()
-        print("data received = ", res)
         files = self.get_new_downloaded_files()
         print(files)
         if len(files) == 1:
@@ -57,9 +55,6 @@ class CheckDownloadedFile:
             return self.message_reception_several_files
         return ""
 
-    def retrieve_result_download_to_docker_volume(self):
-        response = requests.GET(URL_DOCKER_COMMANDS)
-        print("response = ", response)
 
 class ChatBot:
     def __init__(self, chat_id, token_bot):

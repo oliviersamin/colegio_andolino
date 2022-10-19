@@ -10,6 +10,7 @@ services:
       python chat.py
     volumes:
       - telegram_volume:/home/telegram/Download_temp_folder
+    restart: on-failure
 
   commands:
     image: 
@@ -21,6 +22,9 @@ services:
       python commands.py
     volumes:
       - telegram_volume:/home/telegram/Download_temp_folder
+    depends_on:
+      - chat
+    restart: on-failure
 
 volumes:
   telegram_volume:
