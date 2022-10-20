@@ -45,21 +45,17 @@ class CheckDownloadedFile:
         return []
 
     def delete_files_from_download_folder(self):
-        print("actual directory = ", os.getcwd())
         files = os.listdir(os.curdir)
-        print("files = ", files)
         file_to_keep = "test_file_to_upload.txt"
         commands = []
         for file in files:
-            print("file = ", file)
-        #     if file != file_to_keep:
-        #         commands.append("rm " + file)
-        # for command in commands:
-        #     os.system(command)
+            if file != file_to_keep:
+                commands.append("rm " + "'" + file + "'")
+        for command in commands:
+            os.system(command)
 
     def check(self):
         files = self.get_new_downloaded_files()
-        print(files)
         if len(files) == 1:
             return self.message_reception_1_file
         elif len(files) > 1:
@@ -86,7 +82,9 @@ async def main() -> None:
     print("Commands script running...")
     DownloadedFiles = CheckDownloadedFile()
     Bot = ChatBot(chat_id=CHAT_ID_BOT, token_bot=TOKEN_BOT_ANDOLINA_TEST)
-    DownloadedFiles.delete_files_from_download_folder()
+
+    # Function usefull to empty the download_temp_file in the docker volume except for the test_file
+    # DownloadedFiles.delete_files_from_download_folder()
     while True:
         message = DownloadedFiles.check()
         if message:
