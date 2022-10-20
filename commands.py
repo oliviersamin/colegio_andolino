@@ -2,7 +2,7 @@ import os
 import time
 import asyncio
 import requests
-from telegram import Bot
+from telegram import Bot, Document
 
 from utils.credentials import (
     TOKEN_BOT_ANDOLINA_TEST,
@@ -11,9 +11,7 @@ from utils.credentials import (
 )
 from utils.constants import (
     DOWNLOAD_FOLDER_BASE_PATH,
-    TALK_TO_BOT,
-    URL_DOCKER_CHAT,
-    URL_DOCKER_COMMANDS
+    TEST_FILE_TO_UPLOAD
 )
 
 
@@ -46,6 +44,19 @@ class CheckDownloadedFile:
             self.initial_downloaded_files = self.get_download_directory_files()
         return []
 
+    def delete_files_from_download_folder(self):
+        print("actual directory = ", os.getcwd())
+        files = os.listdir(os.curdir)
+        print("files = ", files)
+        file_to_keep = "test_file_to_upload.txt"
+        commands = []
+        for file in files:
+            print("file = ", file)
+        #     if file != file_to_keep:
+        #         commands.append("rm " + file)
+        # for command in commands:
+        #     os.system(command)
+
     def check(self):
         files = self.get_new_downloaded_files()
         print(files)
@@ -65,8 +76,9 @@ class ChatBot:
     async def send_message(self, message):
         await self.bot.send_message(chat_id=self.chat_id, text=message)
 
-    async def send_document(self, document):
-        await self.bot.send_document(chat_id=self.chat_id, document=document)
+    async def send_document_from_local_storage(self, file_path):
+        file = open(file_path, "rb")
+        await self.bot.send_document(chat_id=self.chat_id, document=file)
 
 
 async def main() -> None:
@@ -74,10 +86,12 @@ async def main() -> None:
     print("Commands script running...")
     DownloadedFiles = CheckDownloadedFile()
     Bot = ChatBot(chat_id=CHAT_ID_BOT, token_bot=TOKEN_BOT_ANDOLINA_TEST)
+    DownloadedFiles.delete_files_from_download_folder()
     while True:
         message = DownloadedFiles.check()
         if message:
             await Bot.send_message(message)
+            await Bot.send_document_from_local_storage(TEST_FILE_TO_UPLOAD)
         time.sleep(1)
 
 
