@@ -6,14 +6,15 @@
 3. [Architecture of IT project](#architecture-of-it-project)
 4. [Usage](#usage)
 5. [Manuals](#manuals)
+6. [Credentials](#credentials)
 ***
 
 <a name="main-objective-of-this-repo"></a>
 ## Main objective of this repo  
 
-1. Help the actual coordinqtor of the school to gain time and be more efficient in his tasks
-2. Help any other Circle of the school in its processess to gain time & efficicency
-3. Findinf technical solutions without asking more money to families
+1. Help the actual coordinator of the school to gain time and be more efficient in his tasks
+2. Help any other Circle of the school in its process to gain time & efficiency
+3. Finding technical solutions without asking more money to families
 
 <a name="technical-approach"></a>
 ## Technical approach
@@ -63,3 +64,12 @@ When an update is made to the branch dev, the test can be performed with the fol
    1. when the user send a document with the same conditions, he receives the same text message and also a document that has been uploaded from local storage.
    This feature has just been added to check that we can upload a document from local storage to the chat.
     
+<a name="credentials"></a>
+## Credentials
+For the Django admin site:
+superuser:
+login = admin
+password = andolina
+
+all users:
+password = passwd_test
