@@ -7,7 +7,7 @@ services:
     ports:
       - 2709:2709
     command:
-      python chat.py
+      python -u chat.py
     volumes:
       - telegram_volume:/home/telegram/Download_temp_folder
     restart: on-failure
@@ -19,7 +19,7 @@ services:
     ports:
       - 2404:2404
     command:
-      python commands.py
+      python -u commands.py
     volumes:
       - telegram_volume:/home/telegram/Download_temp_folder
     depends_on:
