@@ -4,20 +4,19 @@ from v1.constants.models import (
 )
 from .parent import Parent
 
-class Volonteer(models.Model):
+class Group(models.Model):
     """ parent model """
     members = models.ManyToManyField(Parent, related_name='members')
-    work_group = models.CharField(max_length=20, blank=True, null=True, choices=SCHOOL_GROUPS)
-    representative = models.OneToOneField(Parent, related_name='group_rep', on_delete=models.CASCADE)
+    name = models.CharField(max_length=20, blank=True, null=True, choices=SCHOOL_GROUPS)
+    representative = models.ForeignKey(Parent, related_name='group_rep', on_delete=models.CASCADE)
     leader = models.ForeignKey(Parent, related_name='group_leader', on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ['work_group']
-        verbose_name_plural = "Volonteers"
+        ordering = ['name']
+        verbose_name_plural = "Groups"
 
     def __str__(self):
-        displayed = "name: {}".format(self.user.get_full_name())
-        return displayed
+        return self.name
 
     def representative_name(self):
         return self.representative.user.get_full_name()

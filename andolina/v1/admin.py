@@ -1,5 +1,11 @@
 from django.contrib import admin
-from v1.models import Parent, Child, Teacher, Volonteer
+from v1.models import (
+    Parent,
+    Child,
+    Teacher,
+    Group,
+    Document
+)
 from django.contrib import messages
 from rest_framework import filters
 from django.contrib.auth.models import User
@@ -83,16 +89,24 @@ class TeacherAdmin(admin.ModelAdmin):
     list_display = ('last_name', 'first_name', 'pupils')
 
 
-class VolonteerAdmin(admin.ModelAdmin):
-    """ Implemented to use volonteer model from database """
-    search_fields = ['leader', 'representative', 'members', 'work_group']
+class GroupAdmin(admin.ModelAdmin):
+    """ Implemented to use group model from database """
+    search_fields = ['leader', 'representative', 'members', 'name']
     filter_backends = (filters.SearchFilter,)
-    list_filter = ('leader', 'representative', 'members', 'work_group')
-    list_display = ('leader', 'representative', 'group_members', 'work_group')
+    list_filter = ('leader', 'representative', 'members', 'name')
+    list_display = ('leader', 'representative', 'group_members', 'name')
 
+
+class DocumentAdmin(admin.ModelAdmin):
+    """ Implemented to use document model from database """
+    search_fields = ['title', 'creator', 'type', 'date_created', 'type_creation']
+    filter_backends = (filters.SearchFilter,)
+    list_filter = ('title', 'created_by', 'type', 'date_created', 'type_creation')
+    list_display = ('title', 'creator', 'type', 'date_created', 'type_creation')
 
 
 admin.site.register(Parent, ParentAdmin)
 admin.site.register(Child, ChildAdmin)
 admin.site.register(Teacher, TeacherAdmin)
-admin.site.register(Volonteer, VolonteerAdmin)
+admin.site.register(Group, GroupAdmin)
+admin.site.register(Document, DocumentAdmin)

@@ -80,10 +80,22 @@ WSGI_APPLICATION = 'andolina.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'npkpovbz',
+        'USER': 'npkpovbz',
+        'PASSWORD': 'wK39rnr8qQtqZt9BOVLR4ol_WAlffe2A',
+        'HOST': 'lucky.db.elephantsql.com',
+        'PORT': '5432'
     }
 }
 
