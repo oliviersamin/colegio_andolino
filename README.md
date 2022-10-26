@@ -4,9 +4,8 @@
 1. [Main objective of this repo](#main-objective-of-this-repo)
 2. [Technical approach](#technical-approach)
 3. [Architecture of IT project](#architecture-of-it-project)
-4. [Usage](#usage)
-5. [Manuals](#manuals)
-6. [Credentials](#credentials)
+4. [GitHub repo usage](#github-repo-usage)
+5. [Releases](#releases)
 ***
 
 <a name="main-objective-of-this-repo"></a>
@@ -27,49 +26,37 @@
 
 #### Software aspect:
 1. Create a database from the actual data inside the existing excel sheets. 
-2. Use Telegram to communicate from anywhere outside the school to the server to do actions:
-    a. ask it informations (messages)
-    b. send documents to be downloaded & to be processed to be stored in the database
-    c. receive documents that have been generated such as Excel files
-    d. manage permissions regarding the different circles by allowing different actions in different groups of 
-    Telegram in which the biot is always an admin
+2. Use various media of communication:
+   1. Telegram, you can see all the details [here](documentation/Telegram.md)
+   2. Django admin site, you can see all the details [here](documentation/django-server-api.md)
+   3. Other media not defined yet
 
 <a name="architecture-of-it-project"></a>
 ## Architecture of IT project 
- So far an idea would be to use docker containers to realize the project.  
+So far an idea would be to use docker containers to realize the project.  
 One container will be dedicated to Telegram aspect, one to Postgres, one to Django Rest Framework and one to CIVICRM.
 This section will be modified along the project regarding the needs and new ideas.
 
 
-<a name="usage"></a>
-## Usage  
-When an update is made to the branch dev, the test can be performed with the following steps:
-1. create a chat with the bot on telegram to perform tests
-2. Get the ID of this chat
-3. in the utils.credentials file modify the value of CHAT_ID_BOT with the chat ID
-4. To create for the first time the docker images and launch the containers use the following command form the root folder of the repo:  
-`python3.9 utils/create_docker_containers --image=all`   It creates two images.  
-5. The first one is a basis to then create the telegram image. It has been done this way because it takes time to create the first image and when updates are made to the project it is just to the telegram part. It is just saving time when developping.
-6. Report to the corresponding manual section to know how to use the version of the dev release
+<a name="github-repo-usage"></a>
+## GitHub repo usage  
+The several existing branches are for the following usage:
+1. main = production purpose, the final users use it in a daily basis to manage school.
+2. pre-production = stage where all the changes/features are tested by Fernando or any other parent to validate them before going to production (main)
+3. dev = stage where each new feature developped is merged to be tested by the IT group of the school to validate features and changes before going to pre-production
+4. feature/<name-of-feature> branch is made to develop a specific feature before sending it to dev branch. 
+5. test-<name> is a branch created from a feature/<name-of-feature> branch to develop specific details before going to feature/<name-of-feature> branch
 
-<a name="manuals"></a>
-## Manuals
-### 1. Release 1 of dev:
-   #### the features tested are:
+<a name="Releases"></a>
+## releases are made on dev branch
+### 1. Release 1:
+   #### feature/telegram-basics:
    1. reply automatically to a text message of a user in a chat when the user starts his message with "@bot"
    2. download automatically a document send by a user when he writes "@bot" into the caption section. A text message is sent in the chat when the file has been downloaded.
 
-### 2. Release 1.1 of dev:
-   #### the features tested are the same as previous release and one feature has been added: 
-   1. when the user send a document with the same conditions, he receives the same text message and also a document that has been uploaded from local storage.
-   This feature has just been added to check that we can upload a document from local storage to the chat.
-    
-<a name="credentials"></a>
-## Credentials
-For the Django admin site:
-superuser:
-login = admin
-password = andolina
+### 2. Release 1.1:
+   #### feature/telegram-basics:
+1. features from release 1
+2. when the user send a document with the same conditions, he receives the same text message and also a document that has been uploaded from local storage.  
+This feature has just been added to check that we can upload a document from local storage to the chat.
 
-all users:
-password = passwd_test
