@@ -60,3 +60,11 @@ The several existing branches are for the following usage:
 2. when the user send a document with the same conditions, he receives the same text message and also a document that has been uploaded from local storage.  
 This feature has just been added to check that we can upload a document from local storage to the chat.
 
+### 3. Release 1.2:
+   #### feature/django-server-api:
+   1. Same as Release 1.1
+   2. Django admin site first setup to be tested and to be improved
+   3. Database created with models Parent, Child, Teacher, Document, Group
+   4. Database hosted online by ElephantSQL for tests only, 20 MB of free data max
+   5. No API ready
+
