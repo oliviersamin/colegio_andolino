@@ -8,7 +8,7 @@ class Child(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     birth_date = models.DateField()
     age = models.IntegerField(blank=True, null=True)
-    tutor = models.ForeignKey(Teacher, related_name='pupils', on_delete=models.CASCADE)
+    tutor = models.ForeignKey(Teacher, related_name='pupil', on_delete=models.CASCADE)
     date_created = models.DateField(auto_now_add=True, blank=True)
     date_updated = models.DateField(auto_now=True, blank=True)
 
@@ -38,3 +38,6 @@ class Child(models.Model):
 
     def display_user_details(self):
         return self.user.get_full_name()
+
+    def child_id(self):
+        return self.id

@@ -27,3 +27,6 @@ class Group(models.Model):
     def group_members(self):
         members = [member.last_name() + ' ' + member.first_name() for member in self.members.all()]
         return ' - '.join(members)
+
+    def group_id(self):
+        return self.id

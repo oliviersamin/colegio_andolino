@@ -26,10 +26,14 @@
 
 #### Software aspect:
 1. Create a database from the actual data inside the existing excel sheets. 
+   1. So far the database is in test phase so it has been created in a free cloud service.   
+   We will have to think of a resiliant way to store the data (local storage and copy & cloud copy also?)
+   
 2. Use various media of communication:
    1. Telegram, you can see all the details [here](documentation/Telegram.md)
-   2. Django admin site, you can see all the details [here](documentation/django-server-api.md)
-   3. Other media not defined yet
+   2. Django admin site, you can see all the details [here](documentation/django-server.md)
+   3. Django API, you can see all the details [here](documentation/django-api.md)
+   4. Other media not defined yet
 
 <a name="architecture-of-it-project"></a>
 ## Architecture of IT project 

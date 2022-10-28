@@ -26,9 +26,12 @@ class Teacher(models.Model):
         return self.user.last_name
 
     def pupils(self):
-        pupils = self.pupils.all()
+        pupils = self.pupil.all()
         pupils = [pupil.last_name() + ' ' + pupil.first_name() for pupil in pupils]
         return ' - '.join(pupils)
 
     def display_user_details(self):
         return self.user.get_full_name()
+
+    def teacher_id(self):
+        return self.id

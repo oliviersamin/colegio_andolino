@@ -38,6 +38,9 @@ class Parent(models.Model):
     def last_name(self):
         return self.user.last_name
 
+    def parent_id(self):
+        return self.id
+
     def child(self):
         children = [child.last_name() + ' ' + child.first_name() for child in self.children.all()]
         return ' - '.join(children)

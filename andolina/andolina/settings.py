@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure--vs2cdh-i*^*^!_8kn9i@q&-*y2r84exz=&!if&vafvz(cmmjw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '0.0.0.0']
+ALLOWED_HOSTS = ['localhost', '0.0.0.0', '127.0.0.1']
 
 
 # Application definition
@@ -91,9 +91,9 @@ WSGI_APPLICATION = 'andolina.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'npkpovbz',
-        'USER': 'npkpovbz',
-        'PASSWORD': 'wK39rnr8qQtqZt9BOVLR4ol_WAlffe2A',
+        'NAME': 'vnbsyzdz',
+        'USER': 'vnbsyzdz',
+        'PASSWORD': 'G1_Es7uzqBwP0140TMU-RWS2Hxih4FT4',
         'HOST': 'lucky.db.elephantsql.com',
         'PORT': '5432'
     }

@@ -16,7 +16,7 @@ class ParentAdmin(admin.ModelAdmin):
     search_fields = ['user__first_name', 'user__last_name', 'user__email', 'children']
     filter_backends = (filters.SearchFilter,)
     list_filter = ('user__first_name', 'user__last_name', 'user__email', 'children')
-    list_display = ('last_name', 'first_name', 'child', 'school_status', 'mobile', )
+    list_display = ('parent_id', 'last_name', 'first_name', 'child', 'school_status', 'mobile', )
 
     # def get_queryset(self, request):
     #     return super().get_queryset(request)
@@ -78,15 +78,15 @@ class ChildAdmin(admin.ModelAdmin):
     search_fields = ['user.first_name', 'user.last_name', 'birth_date']
     filter_backends = (filters.SearchFilter,)
     list_filter = ('age', 'user')
-    list_display = ('display_user_details', 'get_age', 'parents')
+    list_display = ('child_id', 'display_user_details', 'get_age', 'parents')
 
 
 class TeacherAdmin(admin.ModelAdmin):
     """ Implemented to use teacher model from database """
-    search_fields = ['user.first_name', 'user.last_name', 'pupils']
-    filter_backends = (filters.SearchFilter,)
-    list_filter = ('user__first_name', 'user__last_name', 'user__email', 'pupils')
-    list_display = ('last_name', 'first_name', 'pupils')
+    # search_fields = ['user.first_name', 'user.last_name', 'pupils']
+    # filter_backends = (filters.SearchFilter,)
+    # list_filter = ('user__first_name', 'user__last_name', 'pupils')
+    list_display = ('teacher_id', 'last_name', 'first_name', 'pupils')
 
 
 class GroupAdmin(admin.ModelAdmin):
@@ -94,15 +94,15 @@ class GroupAdmin(admin.ModelAdmin):
     search_fields = ['leader', 'representative', 'members', 'name']
     filter_backends = (filters.SearchFilter,)
     list_filter = ('leader', 'representative', 'members', 'name')
-    list_display = ('leader', 'representative', 'group_members', 'name')
+    list_display = ('group_id', 'leader', 'representative', 'group_members', 'name')
 
 
 class DocumentAdmin(admin.ModelAdmin):
     """ Implemented to use document model from database """
-    search_fields = ['title', 'creator', 'type', 'date_created', 'type_creation']
+    search_fields = ['title', 'addressee', 'type', 'date_created', 'type_creation']
     filter_backends = (filters.SearchFilter,)
-    list_filter = ('title', 'created_by', 'type', 'date_created', 'type_creation')
-    list_display = ('title', 'creator', 'type', 'date_created', 'type_creation')
+    list_filter = ('title', 'recipient', 'type', 'date_created', 'type_creation')
+    list_display = ('document_id', 'title', 'addressee', 'type', 'date_created', 'type_creation')
 
 
 admin.site.register(Parent, ParentAdmin)

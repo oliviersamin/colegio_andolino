@@ -16,7 +16,7 @@ class Document(models.Model):
     """
     title = models.CharField(max_length=50, blank=True, null=True)
     content = models.JSONField()
-    created_by = models.OneToOneField(User, on_delete=models.CASCADE)
+    recipient = models.ForeignKey(User, related_name='document', on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True, blank=True)
     type = models.CharField(max_length=50, blank=True, null=True, choices=DOCUMENT_TYPE)
     type_creation = models.CharField(max_length=50, blank=True, null=True, choices=DOCUMENT_CREATION_TYPE)
@@ -28,5 +28,8 @@ class Document(models.Model):
     def __str__(self):
         return self.title
 
-    def creator(self):
-        return self.created_by.user.get_full_name()
+    def addressee(self):
+        return self.recipient.get_full_name()
+
+    def document_id(self):
+        return self.id
