@@ -1,16 +1,25 @@
 import requests
 import json
-from v1.constants import (
+import time
+from andolina.v1.constants import (
     MODELS,
     OPERATIONS_DB,
+    OPERATIONS_DETAILS,
+    OPERATIONS_LIST,
     BASE_LOCAL_URL,
-    URI_PARENT_LIST,
-    URI_DOCUMENT_LIST,
-    URI_TEACHER_LIST,
-    URI_CHILD_LIST,
-    URI_GROUP_LIST,
+    HEADERS,
+    MAP_URI,
+    ALL_URI,
 )
-
+from samples_api_requests import (
+    GET_USERS,
+    GET_GROUPS,
+    GET_PARENTS,
+    GET_TEACHERS,
+    GET_CHILDREN,
+    GET_DOCUMENTS,
+    POST_USERS,
+)
 """
 url = "https://127.0.0.1:8000/api/clients/"
 
@@ -44,25 +53,63 @@ class Operation:
         """
         dict_operation contains all details on the operation to perform such as
         the model, the CRUD operation, the content of the data to post or put ...
-        format is {'model': <model_name>, 'operation':<CRUD_operation_name>, 'data': <data>}
+        format is {'model': <model_name>, 'operation':<CRUD_operation_name>, 'data': <data>, 'model_id': <model_id>}
         """
         self.model = dict_operation['model']
+        self.model_id = dict_operation['model_id'] if 'model_id' in dict_operation.keys() else ""
         self. operation = dict_operation['operation']
-        self.data = dict_operation['data']
+        self.data = json.dumps(dict_operation['data']) if 'data' in dict_operation.keys() else ""
+        self.url = BASE_LOCAL_URL
+        self.headers = HEADERS
 
-    def __create(self):
-        pass
+    def verify_input(self):
+        """
+        Verify if model corresponds to existing one
+        Verify if operation corresponds to existing one
+        """
+        if self.model  not in MODELS:
+            error = 'ERROR - The possibles models are: \n' + ' - '.join(MODELS)
+        elif self.operation not in OPERATIONS_DB:
+            error = 'ERROR - The possibles operations are: \n' + ' - '.join(OPERATIONS_DB)
+        else:
+            error = ''
+        return error
 
-    def __read(self):
-        pass
+    def verify_data(self):
+        """
+        verify data for POST and PUT operation to use regarding each model
+        """
 
-    def __update(self):
-        pass
-
-    def __delete(self):
-        pass
+    def set_uri(self):
+        if self.model_id:
+            for key, value in MAP_URI.items():
+                if self.model == key:
+                    if self.operation in OPERATIONS_DETAILS:
+                        self.url += value + str(self.model_id)
+        else:
+            for key, value in MAP_URI.items():
+                if self.model == key:
+                    if self.operation in OPERATIONS_LIST:
+                        self.url += value
 
     def execute(self):
         """
-        perform the operation asked after verififcation that model and operation are correct type
+        perform the operation asked after verification that model and operation are correct type
         """
+        if not self.verify_input():
+            self.set_uri()
+            if not self.data:
+                return requests.request(self.operation, self.url, headers=self.headers)
+            else:
+                return requests.request(self.operation, self.url, headers=self.headers, data=self.data)
+        else:
+            return self.verify_input()
+
+
+if __name__ == "__main__":
+    tests = [POST_USERS, GET_DOCUMENTS, GET_CHILDREN, GET_PARENTS, GET_TEACHERS, GET_GROUPS, GET_USERS]
+    for test in tests:
+        print('-' * 50 + str(test) + '-' * 50)
+        response = Operation(test).execute()
+        print('response = ', response.content)
+        time.sleep(2)

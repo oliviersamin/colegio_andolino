@@ -34,18 +34,20 @@
 ## Endpoints
 #### list of all the action to perform, method to use and the associated URI
 
-| ACTION PERFORMED                    | METHOD | URI                                    |  
-|-------------------------------------| ----------- |----------------------------------------| 
-| Get the list of all parents         | GET | api/v1/parents/                        |  
-| Get a specific parent details       | GET | api/v1/parents/{parent_id}             |  
-| Get the list of all children        | GET | api/v1/children/                       |  
-| Get a specific parent child         | GET | api/v1/children/{child_id}             |  
-| Get the list of all teachers        | GET | api/v1/teachers/                       |  
-| Get a specific teacher details      | GET | api/v1/teachers/{teacher_id}           |  
-| Get the list of all school_groups   | GET | api/v1/school_groups/                  |  
-| Get a specific school_group details | GET | api/v1/school_groups/{school_group_id} |  
-| Get the list of all documents       | GET | api/v1/documents/                      |  
-| Get a specific document details     | GET | api/v1/documents/{document_id}         |  
+| ACTION PERFORMED                    | METHOD      | URI                                    |  
+|-------------------------------------|-------------|----------------------------------------| 
+| Get the list of all users           | GET / POST  | api/v1/users/                          |  
+| Get a specific user details         | GET / PUT   | api/v1/users/{user_id}                 |  
+| Get the list of all parents         | GET / POST  | api/v1/parents/                        |  
+| Get a specific parent details       | GET / PUT         | api/v1/parents/{parent_id}             |  
+| Get the list of all children        | GET / POST  | api/v1/children/                       |  
+| Get a specific parent child         | GET / PUT         | api/v1/children/{child_id}             |  
+| Get the list of all teachers        | GET  / POST | api/v1/teachers/                       |  
+| Get a specific teacher details      | GET / PUT         | api/v1/teachers/{teacher_id}           |  
+| Get the list of all school_groups   | GET  / POST | api/v1/school_groups/                  |  
+| Get a specific school_group details | GET / PUT         | api/v1/school_groups/{school_group_id} |  
+| Get the list of all documents       | GET  / POST | api/v1/documents/                      |  
+| Get a specific document details     | GET / PUT         | api/v1/documents/{document_id}         |  
 
 [here](https://documenter.getpostman.com/view/16015714/2s8YK9LR9B) is the Postman documentation with examples
 
