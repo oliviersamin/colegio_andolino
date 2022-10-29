@@ -12,4 +12,4 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
 class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
-        fields = ['title', 'type', 'recipient', 'date_created']
+        fields = ['id', 'title', 'type', 'recipient', 'date_created']

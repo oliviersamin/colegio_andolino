@@ -3,3 +3,4 @@ SCHOOL_GROUPS = [('CdT', 'CdT'), ('Circulo de familia', 'Circulo de familia'), (
 
 DOCUMENT_CREATION_TYPE = [('manual', 'manual'), ('auto', 'auto')]
 DOCUMENT_TYPE = [('bill', 'bill'), ('inscription', 'inscription')]
+

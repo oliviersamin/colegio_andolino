@@ -22,10 +22,12 @@ from v1.views import (
     TeacherViewSet,
     GroupViewSet,
     DocumentViewSet,
+    UserViewSet,
 )
 
 
 router = routers.SimpleRouter()
+router.register('users', UserViewSet, basename='users')
 router.register('parents', ParentViewSet, basename='parents')
 router.register('children', ChildViewSet, basename='children')
 router.register('teachers', TeacherViewSet, basename='teachers')

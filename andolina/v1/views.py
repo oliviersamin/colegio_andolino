@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.models import User
 from .models import (
     Child,
     Parent,
@@ -23,6 +24,8 @@ from .serializers import (
     GroupSerializer,
     DocumentSerializer,
     DocumentDetailSerializer,
+    UserSerializer,
+    UserDetailSerializer,
 )
 
 
@@ -32,6 +35,22 @@ class BlacklistRefreshView(APIView):
         token = RefreshToken(request.data.get('refresh'))
         token.blacklist()
         return Response("Logout performed successfully")
+
+class UserViewSet(ModelViewSet):
+    """ manage all the views related to the user default Django model """
+    # permission_classes = (ClientsPermissions,)
+    # search_fields = ['first_name', 'last_name', 'email']
+    # filter_backends = (filters.SearchFilter,)
+    serializer_class = UserSerializer
+    detail_serializer_class = UserDetailSerializer
+
+    def get_queryset(self):
+        return User.objects.all().order_by('id')
+
+    # def get_serializer_class(self):
+    #     if self.action not in ['list', 'delete']:
+    #         return self.detail_serializer_class
+    #     return super().get_serializer_class()
 
 
 class ParentViewSet(ModelViewSet):
@@ -43,7 +62,7 @@ class ParentViewSet(ModelViewSet):
     detail_serializer_class = ParentDetailSerializer
 
     def get_queryset(self):
-        return Parent.objects.all()
+        return Parent.objects.all().order_by('id')
 
     # def get_serializer_class(self):
     #     if self.action not in ['list', 'delete']:
@@ -60,7 +79,7 @@ class ChildViewSet(ModelViewSet):
     detail_serializer_class = ChildDetailSerializer
 
     def get_queryset(self):
-        return Child.objects.all()
+        return Child.objects.all().order_by('id')
 
     # def get_serializer_class(self):
     #     if self.action not in ['list', 'delete']:
@@ -77,7 +96,7 @@ class TeacherViewSet(ModelViewSet):
     detail_serializer_class = TeacherDetailSerializer
 
     def get_queryset(self):
-        return Teacher.objects.all()
+        return Teacher.objects.all().order_by('id')
 
     # def get_serializer_class(self):
     #     if self.action not in ['list', 'delete']:
@@ -94,7 +113,7 @@ class GroupViewSet(ModelViewSet):
     detail_serializer_class = GroupDetailSerializer
 
     def get_queryset(self):
-        return Group.objects.all()
+        return Group.objects.all().order_by('id')
 
     # def get_serializer_class(self):
     #     if self.action not in ['list', 'delete']:
@@ -111,7 +130,7 @@ class DocumentViewSet(ModelViewSet):
     detail_serializer_class = DocumentDetailSerializer
 
     def get_queryset(self):
-        return Document.objects.all()
+        return Document.objects.all().order_by('id')
 
     # def get_serializer_class(self):
     #     if self.action not in ['list', 'delete']:
