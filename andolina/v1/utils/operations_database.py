@@ -19,6 +19,11 @@ from samples_api_requests import (
     GET_CHILDREN,
     GET_DOCUMENTS,
     POST_USERS,
+    POST_PARENTS,
+    POST_TEACHERS,
+    POST_GROUPS,
+    POST_DOCUMENTS,
+    POST_CHILDREN,
 )
 """
 url = "https://127.0.0.1:8000/api/clients/"
@@ -81,16 +86,14 @@ class Operation:
         """
 
     def set_uri(self):
-        if self.model_id:
-            for key, value in MAP_URI.items():
-                if self.model == key:
-                    if self.operation in OPERATIONS_DETAILS:
-                        self.url += value + str(self.model_id)
-        else:
-            for key, value in MAP_URI.items():
-                if self.model == key:
-                    if self.operation in OPERATIONS_LIST:
-                        self.url += value
+        for key, value in MAP_URI.items():
+            if self.model == key:
+                if (self.operation in OPERATIONS_DETAILS) & (self.model_id):
+                    self.url += value + str(self.model_id)
+                elif (self.operation in OPERATIONS_LIST) & (not self.model_id):
+                    self.url += value
+                else:
+                    pass # TODO: raise an Exception
 
     def execute(self):
         """
@@ -107,8 +110,10 @@ class Operation:
 
 
 if __name__ == "__main__":
-    tests = [POST_USERS, GET_DOCUMENTS, GET_CHILDREN, GET_PARENTS, GET_TEACHERS, GET_GROUPS, GET_USERS]
-    for test in tests:
+    # tests_GET = [GET_DOCUMENTS, GET_CHILDREN, GET_PARENTS, GET_TEACHERS, GET_GROUPS, GET_USERS]
+    # tests_POST = [POST_CHILDREN, POST_DOCUMENTS, POST_GROUPS, POST_TEACHERS, POST_PARENTS, POST_USERS]
+    tests_PUT = []
+    for test in tests_PUT:
         print('-' * 50 + str(test) + '-' * 50)
         response = Operation(test).execute()
         print('response = ', response.content)

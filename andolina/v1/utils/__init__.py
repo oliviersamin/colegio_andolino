@@ -6,6 +6,9 @@ from .samples_api_requests import (
     GET_TEACHERS,
     GET_DOCUMENTS,
     POST_USERS,
+    POST_CHILDREN,
+    POST_PARENTS,
+    POST_TEACHERS,
 )
 
 from .operations_database import Operation
@@ -19,4 +22,8 @@ __all__ = [
     GET_USERS,
     Operation,
     POST_USERS,
+    POST_CHILDREN,
+    POST_PARENTS,
+    POST_TEACHERS,
+    POST_CHILDREN,
 ]
