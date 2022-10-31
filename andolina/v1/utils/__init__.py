@@ -9,6 +9,7 @@ from .samples_api_requests import (
     POST_CHILDREN,
     POST_PARENTS,
     POST_TEACHERS,
+    PUT_USERS,
 )
 
 from .operations_database import Operation
@@ -26,4 +27,5 @@ __all__ = [
     POST_PARENTS,
     POST_TEACHERS,
     POST_CHILDREN,
+    PUT_USERS,
 ]

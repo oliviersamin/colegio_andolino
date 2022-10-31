@@ -24,6 +24,23 @@ from samples_api_requests import (
     POST_GROUPS,
     POST_DOCUMENTS,
     POST_CHILDREN,
+    PUT_USERS,
+    PUT_CHILDREN,
+    PUT_PARENTS,
+    PUT_TEACHERS,
+    PUT_DOCUMENTS,
+    PUT_GROUPS,
+    DELETE_USERS,
+    DELETE_DOCUMENTS,
+    DELETE_CHILDREN,
+    DELETE_TEACHERS,
+    DELETE_PARENTS,
+    DELETE_GROUPS,
+    DELETE_CHILDREN,
+    DELETE_PARENTS,
+    DELETE_TEACHERS,
+    DELETE_DOCUMENTS,
+    DELETE_GROUPS,
 )
 """
 url = "https://127.0.0.1:8000/api/clients/"
@@ -80,16 +97,31 @@ class Operation:
             error = ''
         return error
 
-    def verify_data(self):
+    def is_operation_performed(self) -> bool:
         """
-        verify data for POST and PUT operation to use regarding each model
+        if method is not 'GET' check with that the operation has been performed successfully
+        """
+        if self.operation is not 'GET':
+            pass # TODO: check operation with django query regarding id or data or count of items
+
+    def full_cycle_from_create_to_delete(self):
+        """
+        PUT a raw_input (BREAK) in between steps to let time at user to check in admin interface if everything is ok
+        1. create an instance
+        2. get the specific instance
+        BREAK
+        3. update the instance
+        4. get the specific instance
+        BREAK
+        5. delete the instance
+        6. check instance has been deleted
         """
 
     def set_uri(self):
         for key, value in MAP_URI.items():
             if self.model == key:
                 if (self.operation in OPERATIONS_DETAILS) & (self.model_id):
-                    self.url += value + str(self.model_id)
+                    self.url += value + str(self.model_id) + '/'
                 elif (self.operation in OPERATIONS_LIST) & (not self.model_id):
                     self.url += value
                 else:
@@ -110,11 +142,16 @@ class Operation:
 
 
 if __name__ == "__main__":
-    # tests_GET = [GET_DOCUMENTS, GET_CHILDREN, GET_PARENTS, GET_TEACHERS, GET_GROUPS, GET_USERS]
-    # tests_POST = [POST_CHILDREN, POST_DOCUMENTS, POST_GROUPS, POST_TEACHERS, POST_PARENTS, POST_USERS]
-    tests_PUT = []
-    for test in tests_PUT:
-        print('-' * 50 + str(test) + '-' * 50)
-        response = Operation(test).execute()
-        print('response = ', response.content)
-        time.sleep(2)
+    tests_GET = [GET_DOCUMENTS, GET_CHILDREN, GET_PARENTS, GET_TEACHERS, GET_GROUPS, GET_USERS]
+    tests_POST = [POST_CHILDREN, POST_DOCUMENTS, POST_GROUPS, POST_TEACHERS, POST_PARENTS, POST_USERS]
+    tests_PUT = [PUT_GROUPS, PUT_DOCUMENTS, PUT_TEACHERS, PUT_PARENTS, PUT_USERS, PUT_CHILDREN]
+    tests_DELETE = [DELETE_GROUPS, DELETE_USERS, DELETE_CHILDREN, DELETE_PARENTS, DELETE_TEACHERS, DELETE_DOCUMENTS
+    tests = [tests_PUT, tests_GET, tests_POST, tests_DELETE]
+
+
+    # for test in tests:
+    #     print('-' * 50 + str(test) + '-' * 50)
+    #     response = Operation(test).execute()
+    #     print('code_response = ', response.status_code)
+    #     print('response = ', response.content)
+    #     time.sleep(2)

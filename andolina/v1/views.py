@@ -129,6 +129,14 @@ class DocumentViewSet(ModelViewSet):
     serializer_class = DocumentSerializer
     detail_serializer_class = DocumentDetailSerializer
 
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     return_serializer = self.detail_serializer_class(instance)
+    #     return Response(
+    #         return_serializer.data, status=status.HTTP_201_CREATED, headers=headers
+    #     )
+
     def get_queryset(self):
         return Document.objects.all().order_by('id')
 

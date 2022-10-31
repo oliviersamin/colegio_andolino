@@ -1,7 +1,7 @@
 MODELS = ['User', 'Parent', 'Child', 'Teacher', 'Document', 'Group']
 OPERATIONS_DB = ['POST', 'GET', 'PUT', 'DELETE']
 OPERATIONS_LIST = ['POST', 'GET']
-OPERATIONS_DETAILS = ['GET', 'PUT']
+OPERATIONS_DETAILS = ['GET', 'PUT', 'DELETE']
 
 BASE_LOCAL_URL = 'http://localhost:8000/'
 URI_USER_LIST = 'api/v1/users/'
