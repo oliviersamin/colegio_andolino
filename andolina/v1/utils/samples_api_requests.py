@@ -182,3 +182,31 @@ DELETE_GROUPS = {
     'operation': 'DELETE',
     'data': {}
 }
+
+
+################################# TEST CYCLES ###################################
+
+# POST USER
+POST_USER_TEST = {
+    'model': 'User',
+    'operation': 'POST',
+    'data': {'username': 'user.test6', 'password1': 'passwd_test', 'password2': 'passwd_test'}
+}
+
+# PUT USER
+PUT_USER_TEST = {
+    'model': 'User',
+    'model_id': 'TBD',
+    'operation': 'PUT',
+    'data': {'username': 'user.test.olivier.PUT', 'first_name': 'user', 'last_name': 'test_put', 'groups': [1], 'is_staff': True, 'is_active': True, 'is_superuser': False}
+}
+
+# DELETE USER
+DELETE_USER_TEST = {
+    'model': 'User',
+    'model_id': 'TBD',
+    'operation': 'DELETE',
+    'data': {}
+}
+
+CYCLE_USER = {'POST': POST_USER_TEST, 'PUT': PUT_USER_TEST, 'DELETE': DELETE_USER_TEST}

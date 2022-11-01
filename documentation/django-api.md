@@ -28,7 +28,12 @@
 3. from the root repo:
    1. ``` python andolina/manage.py runserver```
 4. when the server is running go to the several endpoints to perform the CRUD operations needed
-5. Play with the database following the credentials rules when creating new users ( please dont break it!)
+   1. examples of CRUD operations with the file v1.utils.samples_api_requests.py
+      1. modify the file of previous point 
+      2. modify the method check_operations in the file v1.management.commands.operations_database.py (choose the test you want to perform)
+      3. run this script ``` python andolina/manage.py operations_database ```
+5. Play with the database following the credentials rules when creating new users ( please don't break it!)
+
 
 <a name="endpoints"></a>
 ## Endpoints
