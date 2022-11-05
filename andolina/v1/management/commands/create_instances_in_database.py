@@ -7,13 +7,15 @@ from v1.utils import Operation
 from v1.models import(
     Child,
     Parent,
-    Teacher
+    Teacher,
+    Activity,
 )
 
 
 class Command(BaseCommand):
     help = 'create instances into the database'
     USERS_PATH = '/home/olivier/Documents/Projets/Andolina/colegio_andolino/andolina/v1/users.csv'
+    ACTIVITIES_PATH = '/home/olivier/Documents/Projets/Andolina/colegio_andolino/andolina/v1/activities.csv'
     birth_date_format = '%Y-%m-%d'
     children_separator = '-'
     sleeping_time = 1
@@ -120,14 +122,48 @@ class Command(BaseCommand):
         [user.delete() for user in users]
         print('-' * 50 + ' all users deleted ' + '-' * 50)
 
+    def create_activity_from_csv(self, data):
+        price_month = ''
+        is_children = ''
+        for activity in data[1:]:
+            name = activity[0]
+            print('-' * 50 + name + '-' * 50)
+            creator = Parent.objects.get(user__username=activity[1])
+            is_all_year = True if activity[2] == 'yes' else False
+            if activity[3]:
+                price_month = float(activity[3])
+            if activity[4]:
+                is_children = True if activity[4] == 'yes' else False
+            new = Activity()
+            new.name = name
+            new.creator = creator
+            new.is_all_year = is_all_year
+            if is_children:
+                new.is_for_children = is_children
+            if price_month:
+                new.price_per_month = price_month
+            new.save()
+            print('new activity created')
+
+    def delete_all_activities(self):
+        print('-' * 50 + ' delete all activities ' + '-' * 50)
+        activities = Activity.objects.all()
+        [activity.delete() for activity in activities]
+        print('-' * 50 + ' all activities have been deleted' + '-' * 50)
+
     def handle(self, *args, **options):
         #TODO: modify this function to perform all creations at once if needed
         model = options.get('model').lower()
-        data = self.fetch_data_from_csv(self.USERS_PATH)
 
-        if model == 'all':
+        if model == 'users':
+            data = self.fetch_data_from_csv(self.USERS_PATH)
             self.delete_users()
             self.create_user_instance_from_data(data)
             self.create_teacher_from_user(data)
             self.create_child_from_user(data)
             self.create_parent_from_user(data)
+
+        if model == 'activity':
+            data = self.fetch_data_from_csv(self.ACTIVITIES_PATH)
+            self.delete_all_activities()
+            self.create_activity_from_csv(data)
