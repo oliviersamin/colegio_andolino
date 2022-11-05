@@ -18,6 +18,7 @@ class Parent(models.Model):
     groups = models.CharField(max_length=20, blank=True, null=True, choices=SCHOOL_GROUPS)
     school_email = models.EmailField(blank=True, null=True)
     bank_account = models.CharField(max_length=20, blank=True, null=True)
+    is_paying_bills = models.BooleanField(blank=True, null=True, default=False)
     date_start_school = models.DateField(blank=True, null=True)
     date_stop_school = models.DateField(blank=True, null=True)
 
@@ -28,9 +29,9 @@ class Parent(models.Model):
         ordering = ['user__last_name', 'user__first_name']
         verbose_name_plural = "Parents"
 
-    def __str__(self):
-        displayed = "name: {} - children {}".format(self.user.get_full_name(), self.children)
-        return displayed
+    # def __str__(self):
+    #     displayed = "name: {} - children {}".format(self.user.get_full_name(), self.children)
+    #     return displayed
 
     def first_name(self):
         return self.user.first_name

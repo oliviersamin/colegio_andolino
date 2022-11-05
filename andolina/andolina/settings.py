@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'v1',
+    'school_site',
     'rest_framework_simplejwt.token_blacklist',
     'drf_api_logger',
 
@@ -61,7 +62,7 @@ ROOT_URLCONF = 'andolina.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [str(BASE_DIR.joinpath('templates', 'school_site'))],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -80,24 +81,24 @@ WSGI_APPLICATION = 'andolina.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'vnbsyzdz',
-        'USER': 'vnbsyzdz',
-        'PASSWORD': 'G1_Es7uzqBwP0140TMU-RWS2Hxih4FT4',
-        'HOST': 'lucky.db.elephantsql.com',
-        'PORT': '5432'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'njifpame',
+#         'USER': 'njifpame',
+#         'PASSWORD': 'Weg7QPxx4xH0rqz9WWNnggLnZBbAyl5t',
+#         'HOST': 'lucky.db.elephantsql.com',
+#         'PORT': '5432'
+#     }
+# }
 
 
 # Password validation

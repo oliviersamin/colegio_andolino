@@ -7,6 +7,7 @@ from .samples_api_requests import (
     GET_USERS,
     CYCLE_USER,
 )
+from .operations import Operation
 
 __all__ = [
     GET_TEACHERS,
@@ -15,5 +16,6 @@ __all__ = [
     GET_PARENTS,
     GET_GROUPS,
     GET_USERS,
-    CYCLE_USER
+    CYCLE_USER,
+    Operation,
 ]

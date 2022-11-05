@@ -1,0 +1,25 @@
+body {
+  color: black;
+  font-size: 20px;
+}
+
+.table_column_entry {
+    display: flex;
+    flex-direction: row;
+    color: grey;
+}
+
+
+.table_row_entry {
+    display: flex;
+    flex-direction: column;
+    color: darkgoldenrod;
+}
+
+table {
+  border-collapse: collapse;
+}
+th, td {
+  border:1px black solid;
+  padding: 0.25em 0.5em;
+}
