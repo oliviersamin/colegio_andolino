@@ -8,7 +8,8 @@ from school_site.utils import (
 
 
 def table_form(request):
-    form = BaseTable(request.POST or None)
+    # form = BaseTable(request.POST or None)
+    # form =
     if request.method == 'POST':
         boxes = parse_checkboxes(request)
         return redirect('home')

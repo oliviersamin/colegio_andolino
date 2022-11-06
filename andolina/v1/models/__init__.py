@@ -4,6 +4,7 @@ from .teacher import Teacher
 from .school_groups import Group
 from .document import Document
 from .activity import Activity
+from .sheet import Sheet
 
 __all__ = [
     Parent,
@@ -12,4 +13,5 @@ __all__ = [
     Group,
     Document,
     Activity,
+    Sheet,
 ]

@@ -6,6 +6,7 @@ from v1.models import (
     Group,
     Document,
     Activity,
+    Sheet,
 )
 from django.contrib import messages
 from rest_framework import filters
@@ -114,9 +115,18 @@ class ActivityAdmin(admin.ModelAdmin):
     list_display = ('name', 'creator', 'is_for_children', 'is_all_year')
 
 
+class SheetAdmin(admin.ModelAdmin):
+    """ Implemented to use document model from database """
+    search_fields = ['activity', 'year', 'month']
+    filter_backends = (filters.SearchFilter,)
+    list_filter = ('activity', 'year', 'month')
+    list_display = ('activity', 'year', 'month')
+
+
 admin.site.register(Parent, ParentAdmin)
 admin.site.register(Child, ChildAdmin)
 admin.site.register(Teacher, TeacherAdmin)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(Activity, ActivityAdmin)
+admin.site.register(Sheet, SheetAdmin)
