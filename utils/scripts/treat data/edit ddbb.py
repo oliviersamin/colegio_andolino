@@ -1,4 +1,7 @@
-from mimetypes import init
+# Import stdlib
+import os
+
+# Import external requirements
 import pandas as pd
 from sqlalchemy import create_engine
 
@@ -27,6 +30,21 @@ class ModifyDatabase():
         
     
     # Write DataFrame to SQL
+    
+    def read_excel(self, folder:str):
+        
+        
+        
+        for file in os.listdir(folder):
+            filename = os.fsdecode(file)
+            if filename.endswith(".xls") or filename.endswith(".xlsx"): 
+                df = pd.read_excel()
+                continue
+            else:
+                continue
+            
+        df = pd.read_excel()
+        pd.read_
     
     '''
     with engine.connect() as conn:
