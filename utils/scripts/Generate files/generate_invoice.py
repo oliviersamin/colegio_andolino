@@ -6,9 +6,9 @@ from json import dumps, loads
 import os
 
 from pylatex import Document, PageStyle, Head, Foot, MiniPage, \
-    StandAloneGraphic, LongTabu, LargeText, MediumText, \
+    StandAloneGraphic, LongTabu, \
     LineBreak, FootnoteText, Tabular, VerticalSpace, Section, LargeText
-# from pylatex import MultiColumn, Tabu, NewLine, Tabularx, 
+# from pylatex import MultiColumn, Tabu, NewLine, Tabularx,
 # from pylatex import TextColor, simple_page_number, SmallText, LongTable
 from pylatex.utils import bold, NoEscape
 
@@ -230,7 +230,7 @@ def generate_extract() -> list[tuple]:
 
 
 if __name__ == '__main__':
-    data = {'invoice_num': 1, 
+    data = {'invoice_num': 1,
             'date': datetime.now().date(),
             'name': 'Ejemplo Ejemplez Ejemplez',
             'NIF': '123456789B',
