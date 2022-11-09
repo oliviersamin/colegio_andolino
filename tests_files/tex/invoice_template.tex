@@ -60,19 +60,72 @@
 % content definition %
 %%%%%%%%%%%%%%%%%%%%%%
 
-\title{Factura MES}
+\title{%(Title)s
+	  }
 \date{\today }
-\xdef\invoicenum{001}
+\xdef\invoicenum{%(Title)s
+}
+\xdef\associate{%(associate)s
+}
+\xdef\companyname{Colegio Andolina}
 \xdef\companyname{Colegio Andolina}
 \xdef\companyaddress{Camin del Barreo, 203, 33394 Cefontes, Asturias}
 \xdef\companysiren{XXX XXXX XXXX}
-\xdef\companytel{XX\,XX\,XX\,XX\,XX}
+\xdef\companytel{0034\,683\,17\,81\,94}
 \xdef\companyemail{xxx@xxx.xxx}
 \xdef\bankiban{XXXX\,XXXX\,XXXX\,XXXX\,XXXX\,XXXX\,XXXX}
 \xdef\bankbic{XXX\,XXX\,XXX}
-\long\xdef\conditions{write the sell conditions here
 
-on several lines}
+%%%%%%%%%%%%%%%% Unitary costs %%%%%%%%%%%%%%%%
+\xdef\early{Atención temprana}
+\xdef\unit_cost_early{%(unit_cost_early)s
+}
+\xdef\accompaniment{Acompañamiento}
+\xdef\unit_cost_accompaniment{%(unit_cost_accompaniment)s
+}
+\xdef\extracurr1{Extracurricular 1 %(Judo)s
+}
+\xdef\unit_cost_extracurr1{%(unit_cost_extracurr1)s
+}
+\xdef\extracurr2{Extracurricular 2 %(Robotix)s
+}
+\xdef\unit_cost_extracurr2{%(unit_cost_extracurr2)s
+}
+\xdef\extracurr3{Extracurricular 3 %(Ciencia)s
+}
+\xdef\unit_cost_extracurr3{%(unit_cost_extracurr3)s
+}
+\xdef\extracurr4{Extracurricular 4 %(Teatro)s
+}
+\xdef\unit_cost_extracurr4{%(unit_cost_extracurr4)s
+}
+\xdef\dinning{Comedor}
+\xdef\unit_cost_dinning{%(unit_cost_dinning)s
+}
+\xdef\fee{Cuota}
+\xdef\unit_cost_fee{%(unit_cost_fee)s
+}
+\xdef\training{Formaciones}
+\xdef\unit_cost_training{%(unit_cost_training)s
+}
+\xdef\activities{Talleres, actividades y campamentos
+}
+\xdef\unit_cost_activities{%(unit_cost_activities)s
+}
+\xdef\other{Otros
+}
+\xdef\unit_cost_other{%(unit_cost_other)s
+}
+
+%%%%%%%%%%%%%%%% Payment conditions %%%%%%%%%%%%%%%%
+\long\xdef\conditions{A los efectos previstos en la Ley Orgánica 15/1999, de 13 de diciembre, sobre Protección de Datos de Carácter Personal, se le informa que los
+datos personales proporcionados se incorporarán a los ficheros de Colegio Andolina Sociedad Cooperativa Asturiana, con dirección en Camino
+del Barreo, 203, Cefontes (Cabueñes) Gijón C.P. 33394. La finalidad del tratamiento de los datos será la de gestionar los servicios suministrados.
+Usted tiene derecho al acceso, rectificación, cancelación y oposición en los términos previstos en la Ley, que podrá ejercitar mediante escrito
+dirigido al responsable de los mismos en la dirección anteriormente indicada o a la dirección de correo electrónico lopd@colegioandolina.org.}
+
+
+\long\xdef\Andolin\textit{Colegio Andolina Sociedad Cooperativa Asturiana - CIF: F33986522 - Camino del Barreo, 203 Cefontes (Cabueñes) 33394 Gijón Asturias}
 
 \makeatletter
 \let\thetitle\@title
@@ -96,10 +149,23 @@ on several lines}
 \usepackage[headheight=136pt, top=6.5cm]{geometry}
 
 \usepackage{titleps}
-%%%%%%%%%%%%%%%%%%%%%
-% color definitions %
-%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%% COLOR DEFINITIONS %%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% https://tex.stackexchange.com/a/94804
+\usepackage{xcolor,colortbl}
+
+\newcommand{\mc}[2]{\multicolumn{#1}{c}{#2}}
+\definecolor{Gray}{gray}{0.85}
+\definecolor{LightCyan}{rgb}{0.88,1,1}
+%%%%%%%%%%%%%%%%5
+
+\newcolumntype{a}{>{\columncolor{Gray}}p{0.2\textwidth}}
+\newcolumntype{b}{>{\columncolor{white}}c}
+
+% \colorlet{LightRubineRed}{RubineRed!70}
+% \colorlet{Mycolor1}{green!10!orange}
 \colorlet{headcolor}{gray!21}
 \colorlet{tablecolor1}{gray!4}
 \colorlet{tablecolor2}{gray!11}
@@ -112,6 +178,9 @@ on several lines}
 \def\footnotestyle#1{%
   {\textsf{\color{footnotegray}\fontsize{3mm}{0mm}\selectfont #1}}%
 }
+\def\footnotestyle#2{%
+  {\textit{\color{footnotegray}\fontsize{3mm}{0mm}\selectfont #1}}%
+}
 
 % change color of footnote marks
 \makeatletter
@@ -119,9 +188,11 @@ on several lines}
   \parindent 1em\noindent
   \hb@xt@1.8em{%
   \hss\@textsuperscript{\normalfont\color{footnotegray}\@thefnmark}}#1}
-\makeatother
+\makeatother\textbf{Condiciones de pago:} 
 
-% HEADER
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%% HEADER %%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpagestyle{myheader}{
 	\sethead{\scalebox{0.75}{\includegraphics[scale=.6]{andolina-logo.png}}}
 	{\sffamily\large\raisebox{4ex}{
@@ -134,66 +205,39 @@ on several lines}
 \pagestyle{myheader}
 
 \begin{document}
-% PREVIOUS HEADER
-% \parbox[b][2cm][t]{\rightalignment}{{\color{gray!95}\displayFont\fontsize{1.5cm}{1.5cm}\selectfont %
-% \vbox to 1cm{\vss %
-% %
-% \companyname{}%
-% %
-% }}
-% \vskip 3mm%
-% {\fontsize{0.44cm}{0.5cm}%
-% \emph{thank you for your confidence!}%
-% }
-% }%
-% %
-% \parbox[b][2cm][t]{0.35\textwidth}{\ttfamily {%
-% {\color{gray!95}\fontsize{1.5cm}{1.5cm}\selectfont %
-% \vbox to 1cm{\vss \leavevmode \kern -1mm %
-% %
-% Invoice%
-% %
-% }}}}
 
-% \kern -5mm
-
-% \leavevmode\kern \rightalignment \parbox{0.35\textwidth}{\ttfamily N\textsuperscript{o} \invoicenum\\
-% \today }
-
-% \vskip 0.7cm
-
-% \leavevmode\kern \rightalignment\kern -3mm \colorbox{gray!85}{
-%   \kern 1mm\begin{minipage}[t]{0.5\textwidth}
-%     \color{white}
-%     \vskip 2mm
-%     Company \textbf{Foo},\\
-%     Temple Bar,\\
-%     Dublin.\\
-%     \vspace*{-3mm}%
-%   \end{minipage}
-% }
 
 \vspace*{2.3cm}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%% SET TITLE %%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{center}
 {\ttfamily\LARGE \thetitle}
-
 \rule{2cm}{0.25pt}
 \end{center}
 
 \tabulinesep=3mm
-\begin{longtabu} to \textwidth{X[6,l,m]X[3,c,m]X[3,c,m]X[2,r,m]}
-    \taburowcolors 1{headcolor .. headcolor}
-    \rowfont[c]{\bfseries}%
-    concepto & coste unitario & cantidad & coste \tabularnewline
-    \taburowcolors 1{tablecolor1 .. tablecolor2}
-    Cuota mensual/alumno & 325\,€ & 2 & 650\,€\\
-    Atención temprana & 5\,€ & 10 & 250\,€\\
-    My product 3 & 35\,€ & 10 & 350\,€\\
-    My product 4 & 45\,€ & 10 & 450\,€\\
-    \taburowcolors 1{headcolor .. headcolor}\tabulinesep=3mm
-    Total\footnote{\footnotestyle{example of footnote}} & & & \hbox to 0pt{\vbox to 0cm{\kern 0.61cm 1200\,€\vss}\hss}\\[3mm]
-\end{longtabu}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%% SET TABLE %%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}[h]
+\centering
+\begin{tabular}{l | a | b | a }
+\hline
+\rowcolor{LightCyan}
+\mc{1}{concepto} & \mc{1}{coste unitario} & \mc{1}{cantidad} & \mc{1}{coste}\\ 
+\hline
+variable 1 & a & b & c \\ \hline
+variable 2 & a & b & c \\ \hline
+\end{tabular}
+\end{table}
+
+%(tabla)s
+
 
 \vfill
 
@@ -211,6 +255,7 @@ SIREN\,: \companysiren{},\\
 \hbox to 1cm{BIC\,:\hss} \bankbic
 \end{multicols}
 
-\footnotestyle{\textbf{Conditions de paiement:} \conditions }
+\footnotestyle{\conditions }
+\footnotestyle#2{\Andolina }
 
 \end{document}
