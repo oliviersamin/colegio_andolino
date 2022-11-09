@@ -16,7 +16,7 @@
     <content url="file://$MODULE_DIR$">
       <excludePattern pattern=".idea" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.10 (colegio_andolino)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">

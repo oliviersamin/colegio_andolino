@@ -1,0 +1,20 @@
+{% extends 'school_site/base.html' %}
+{% load static %}
+{% block content %}
+{% if user.is_authenticated %}
+{#    {{ activities }}#}
+    {% for item in activities %}
+{#        {{ item }}#}
+        {{ item.child }} activities are:
+    {% for activity in item.activities %}
+        {{ activity }}
+    {% endfor %}
+    {% endfor %}
+    <div id="buttons">
+        <button id="login"><a class="home_buttons" href="{%url 'logout'%}">
+        Logout</a></button>
+    </div>
+{% else %}
+PAGE NOT AVAILABLE
+{% endif %}
+{% endblock %}

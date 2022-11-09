@@ -17,8 +17,7 @@ class Child(models.Model):
         verbose_name_plural = "Children"
 
     def __str__(self):
-        displayed = "name: {}".format(self.user.get_full_name())
-        return displayed
+        return self.user.get_full_name()
 
     def get_age(self):
         delta = (datetime.date.today() - self.birth_date).days

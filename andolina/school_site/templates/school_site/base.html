@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Intranet</title>
+</head>
+<body>
+<div class="banner">
+    {% for item in banner %}
+        <button class="banner_button"><a class="banner_text" href="{% url item.url%}  ">{{ item.title }}</a></button>
+    {% endfor %}
+</div>
+{% block content %}{% endblock %}
+
+</body>
+</html>

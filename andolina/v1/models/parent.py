@@ -15,7 +15,7 @@ class Parent(models.Model):
     address = models.CharField(max_length=200, blank=True, null=True)
     children = models.ManyToManyField(Child, related_name='parent')
     school_status = models.CharField(max_length=20, blank=True, null=True, choices=SCHOOL_STATUS)
-    groups = models.CharField(max_length=20, blank=True, null=True, choices=SCHOOL_GROUPS)
+    # groups = models.CharField(max_length=20, blank=True, null=True, choices=SCHOOL_GROUPS)
     school_email = models.EmailField(blank=True, null=True)
     bank_account = models.CharField(max_length=20, blank=True, null=True)
     is_paying_bills = models.BooleanField(blank=True, null=True, default=False)
@@ -44,3 +44,7 @@ class Parent(models.Model):
     def child(self):
         children = [child.last_name() + ' ' + child.first_name() for child in self.children.all()]
         return ' - '.join(children)
+
+    def groups(self):
+        groups = [group.name for group in self.group.all()]
+        return ' - '.join(groups)

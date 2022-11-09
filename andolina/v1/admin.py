@@ -15,10 +15,10 @@ from django.contrib.auth.models import User
 
 class ParentAdmin(admin.ModelAdmin):
     """ Implemented to use parent model from database """
-    search_fields = ['user__first_name', 'user__last_name', 'user__email', 'children']
+    search_fields = ['user__first_name', 'user__last_name', 'user__email', 'children', 'groups']
     filter_backends = (filters.SearchFilter,)
     list_filter = ('user__first_name', 'user__last_name', 'user__email', 'children')
-    list_display = ('parent_id', 'last_name', 'first_name', 'child', 'school_status', 'mobile', )
+    list_display = ('parent_id', 'last_name', 'first_name', 'child', 'school_status', 'mobile', 'groups')
 
     # def get_queryset(self, request):
     #     return super().get_queryset(request)

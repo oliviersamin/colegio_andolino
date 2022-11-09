@@ -40,6 +40,6 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('api/v1/', include(router.urls)),
     path('api/v1/', include('v1.urls', namespace='v1')),
-    path('', include('school_site.urls', namespace='school_site'))
-
+    path('', include('school_site.urls', namespace='school_site')),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
