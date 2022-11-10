@@ -91,9 +91,9 @@ WSGI_APPLICATION = 'andolina.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'vnbsyzdz',
-        'USER': 'vnbsyzdz',
-        'PASSWORD': 'G1_Es7uzqBwP0140TMU-RWS2Hxih4FT4',
+        'NAME': 'hypwvttg',
+        'USER': 'hypwvttg',
+        'PASSWORD': 'Q22WGFd9Idi_lH2k0UflR14iRe7wxv6X',
         'HOST': 'lucky.db.elephantsql.com',
         'PORT': '5432'
     }
