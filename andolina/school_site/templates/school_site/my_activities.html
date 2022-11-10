@@ -3,9 +3,14 @@
 {% block content %}
 {% if user.is_authenticated %}
 MY ACTIVITIES PAGE FOR EACH USER
+       <form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_ul }}
+    <input type="submit" value="Submit">
+    </form>
+
     <div id="buttons">
-        <button id="login"><a class="home_buttons" href="{%url 'logout'%}">
-        Logout</a></button>
+        <button id="login"><a class="home_buttons" href="{%url 'logout'%}">Logout</a></button>
     </div>
 {% else %}
 PAGE NOT AVAILABLE

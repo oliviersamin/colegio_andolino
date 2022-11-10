@@ -7,7 +7,10 @@ from school_site.utils import (
     children_and_dates,
 )
 from school_site.constants import BANNER
-from school_site.forms import ProfileForm
+from school_site.forms import (
+    ProfileForm,
+    MyActivity,
+)
 from school_site.utils import (
     update_username_with_form,
     set_initial_fields_profile_form,
@@ -116,8 +119,14 @@ class MyActivities(View):
     template_name = 'school_site/my_activities.html'
 
     def get(self, request):
-        context = BANNER
         if request.user.is_authenticated:
+            context = BANNER
+            user = request.user
+            parent = Parent.objects.get(user=user)
+            # dict_initial = set_initial_fields_profile_form(user=user, parent=parent)
+            form = MyActivity(request.POST or None)  # , initial=dict_initial)
+            context['form'] = form
+            context['children'] = parent.child()
             return render(request, self.template_name, context=context)
         return redirect('school_site:home')
 
