@@ -1,7 +1,7 @@
 '''
 Generate invoice
 '''
-from datetime import datetime
+from datetime import date
 from json import dumps, loads
 import os
 
@@ -20,9 +20,11 @@ PRECIO_MAX_TEMPRANA = int(os.getenv('PRECIO_MAX_TEMPRANA', '20'))
 PRECIO_DIA_TEMPRANA = int(os.getenv('PRECIO_DIA_TEMPRANA', '5'))
 EXTRAESCOLARES = loads(os.getenv('EXTRAESCOLARES',
                                  '{"JUDO": 25, "CIENCIA": 20, "TEATRO": 20, "ROBOTIX": 20}'))
-UNIT_PRICES_DICT = {"COUTA": 325,
+UNIT_PRICES_DICT = {"CUOTA": 325,
                     "COMEDOR": 5,
-                    "ATENCION_TEMPRANA": 5,
+                    "COMEDOR_MAX": 25,
+                    "ATENCIÓN_TEMPRANA": 5,
+                    "ATENCIÓN_TEMPRANA_MAX": 25,
                     "JUDO": 25,
                     "CIENCIA": 20,
                     "TEATRO": 20,
@@ -81,7 +83,7 @@ def generate_invoice(**kwargs):
 
     # Header image
     with first_page.create(Head("L")) as header_left:
-        with header_left.create(MiniPage(width=NoEscape(r"0.49\textwidth"),
+        with header_left.create(MiniPage(width=NoEscape(r"0.5\textwidth"),
                                          pos='c')) as logo_wrapper:
             logo_file = os.path.join(os.path.dirname(__file__),
                                      'andolina-logo.png')
@@ -90,7 +92,7 @@ def generate_invoice(**kwargs):
 
     # Add document title
     with first_page.create(Head("R")) as right_header:
-        with right_header.create(MiniPage(width=NoEscape(r"0.4\textwidth"),
+        with right_header.create(MiniPage(width=NoEscape(r"0.5\textwidth"),
                                  pos='c', align='l')) as title_wrapper:
             title_wrapper.append(LargeText(bold(f"Número de factura: {kwargs['invoice_num']}")))
             title_wrapper.append(LineBreak())
@@ -167,7 +169,7 @@ def generate_invoice(**kwargs):
     doc.add_color(name="lightgray", model="gray", description="0.80")
 
     ################################## Generate pdf ###################################
-    doc.generate_pdf(os.path.join(os.path.dirname(__file__),"./complex_report"), clean_tex=False)
+    doc.generate_pdf(os.path.join(os.path.dirname(__file__),f"./{kwargs['invoice_num']}"), clean_tex=True)
 
 
 def generate_extract() -> list[tuple]:
@@ -180,9 +182,9 @@ def generate_extract() -> list[tuple]:
     quantity = [3, 5, 1, 0, 0, 0, 10, 2, "15€", "20€"]
     data = dict(zip(concepts,quantity))
     '''
-    basic_concepts = ["COUTA",
+    basic_concepts = ["CUOTA",
                       "COMEDOR",
-                      "ATENCION_TEMPRANA",
+                      "ATENCIÓN_TEMPRANA",
                       "JUDO",
                       "CIENCIA",
                       "TEATRO",
@@ -190,19 +192,30 @@ def generate_extract() -> list[tuple]:
                       "ACOMPAÑAMIENTO",
                       "FORMACIONES",
                       "TALLERES_ACTIVIDADES_CAMPAMENTOS"]
-    test_quantity = [3, 5, 1, 0, 0, 0, 10, "6€", "15€", "20€"]
+    test_quantity = [3, (5,2), (1,0), 0, 0, 0, 10, "6€", "15€", "20€"]
     use = dict(zip(basic_concepts,test_quantity))
 
     extract = []
     total = 0
     for (concept,quantity) in use.items():
-        if isinstance(quantity,int):
-            if concept.upper() == "COMEDOR" and quantity != 0:
-                subtotal = min(PRECIO_MAX_COMEDOR, quantity*PRECIO_DIA_COMEDOR)
-            elif concept.upper() == "ATENCION_TEMPRANA" and quantity != 0:
-                subtotal = min(PRECIO_MAX_TEMPRANA, quantity*PRECIO_DIA_TEMPRANA)
-            else:
-                subtotal = quantity*UNIT_PRICE[concept]
+        if isinstance(quantity,tuple):
+            subtotal_list = []
+            for child_quantity in quantity:
+                if concept.upper() in ["COMEDOR", "ATENCIÓN_TEMPRANA"] and \
+                   child_quantity != 0:
+                    subtotal_list.append(min(UNIT_PRICE[f'{concept}_MAX'],
+                                         child_quantity*UNIT_PRICE[concept]))
+            subtotal = sum(subtotal_list)
+            extract.append((concept.lower().replace('_',' '),
+                            f"{UNIT_PRICE[concept]:.2f} €",
+                            f"{quantity}",
+                            f"{subtotal:.2f} €"))
+        elif isinstance(quantity,int):
+            if concept.upper() in ["COMEDOR", "ATENCIÓN_TEMPRANA"] and \
+               child_quantity != 0:
+                subtotal.append(min(UNIT_PRICE[f'{concept}_MAX'],
+                                    child_quantity*UNIT_PRICE[concept]))
+            subtotal = quantity*UNIT_PRICE[concept]
             extract.append((concept.lower().replace('_',' '),
                             f"{UNIT_PRICE[concept]:.2f} €",
                             f"{quantity}",
@@ -227,11 +240,20 @@ def generate_extract() -> list[tuple]:
     return extract
 
 
+def get_invoice_num(today: date) -> str:
+    '''
+    Get current invoice number formated
+    Example: FU-2223-001
+    '''
+    current_year_format = today.year%100
+    invoice_num_in_series = 1
+    return f'FU-{current_year_format}{current_year_format+1}-{invoice_num_in_series:03}'
 
 
 if __name__ == '__main__':
-    data = {'invoice_num': 1,
-            'date': datetime.now().date(),
+    invoice_date = date.today()
+    data = {'invoice_num': get_invoice_num(invoice_date),
+            'date': invoice_date.strftime("%d/%m/%y"),
             'name': 'Ejemplo Ejemplez Ejemplez',
             'NIF': '123456789B',
             'adress': 'C/ Dirección. Código Postal, Localidad, Provincia'}
