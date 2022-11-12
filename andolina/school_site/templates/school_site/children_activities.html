@@ -4,16 +4,41 @@
 {% if user.is_authenticated %}
 {#    {{ activities }}#}
     {% for item in activities %}
-{#        {{ item }}#}
         {{ item.child }} activities are:
     {% for activity in item.activities %}
         {{ activity }}
     {% endfor %}
     {% endfor %}
+
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Activities</th>
+            <th>Action</th>
+        </tr>
+        {% for activity in activities %}
+        <tr>
+            <th>{{ activity.child }}</th>
+            <th>
+                <ul>
+                {% for activity in activity.activities %}
+                    <li>{{ activity }}</li>
+                {% endfor %}
+                </ul>
+            </th>
+            <th>
+                <ul>
+                <li><button><a class="home_buttons" href="{%url 'school_site:edit_child' child_id=activity.child.id%}">Modify a child</a></button></li>
+                </ul>
+            </th>
+        </tr>
+        {% endfor %}
+    </table>
+
     <div id="buttons">
-        <button id="login"><a class="home_buttons" href="{%url 'logout'%}">
-        Logout</a></button>
+        <button><a class="home_buttons" href="{%url 'school_site:add_child'%}">Add a child</a></button>
     </div>
+
 {% else %}
 PAGE NOT AVAILABLE
 {% endif %}

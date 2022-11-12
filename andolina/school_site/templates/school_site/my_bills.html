@@ -3,10 +3,6 @@
 {% block content %}
 {% if user.is_authenticated %}
 MY BILLS PAGE FOR EACH USER
-    <div id="buttons">
-        <button id="login"><a class="home_buttons" href="{%url 'logout'%}">
-        Logout</a></button>
-    </div>
 {% else %}
 PAGE NOT AVAILABLE
 {% endif %}

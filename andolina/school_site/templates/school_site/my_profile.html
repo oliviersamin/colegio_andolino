@@ -3,15 +3,14 @@
 {% block content %}
 {% if user.is_authenticated %}
 MY PROFILE PAGE - {{ user.get_full_name }} - {{ children }}
-    <form action="" method="post">
-    {% csrf_token %}
-    {{ form.as_ul }}
-    <input type="submit" value="Submit">
-    </form>
-
+    {% block edit_profile %}{% endblock %}
     <div id="buttons">
-        <button id="login"><a class="home_buttons" href="{%url 'logout'%}">Logout</a></button>
+        <button><a class="home_buttons" href="{%url 'school_site:edit_profile'%}">Edit my profile</a></button>
     </div>
+    <div id="buttons">
+        <button><a class="home_buttons" href="{%url 'password_change'%}">Change my password</a></button>
+    </div>
+
 {% else %}
 PAGE NOT AVAILABLE
 {% endif %}

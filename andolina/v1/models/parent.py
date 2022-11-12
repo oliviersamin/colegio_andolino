@@ -13,7 +13,7 @@ class Parent(models.Model):
     phone = models.CharField(max_length=20, blank=True, null=True)
     mobile = models.CharField(max_length=20, blank=True, null=True)
     address = models.CharField(max_length=200, blank=True, null=True)
-    children = models.ManyToManyField(Child, related_name='parent')
+    children = models.ManyToManyField(Child, blank=True, related_name='parent')
     school_status = models.CharField(max_length=20, blank=True, null=True, choices=SCHOOL_STATUS)
     # groups = models.CharField(max_length=20, blank=True, null=True, choices=SCHOOL_GROUPS)
     school_email = models.EmailField(blank=True, null=True)

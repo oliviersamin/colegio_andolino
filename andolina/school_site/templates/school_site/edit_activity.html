@@ -1,0 +1,17 @@
+{% extends 'school_site/base.html' %}
+{% load static %}
+{% block content %}
+{% if user.is_authenticated %}
+
+    EDIT ACTIVITY PAGE -
+
+   <form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_ul }}
+       {{ form_child.as_ul }}
+    <input type="submit" value="Submit">
+    </form>
+{% else %}
+PAGE NOT AVAILABLE
+{% endif %}
+{% endblock %}

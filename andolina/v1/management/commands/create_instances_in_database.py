@@ -132,14 +132,12 @@ class Command(BaseCommand):
             is_all_year = True if activity[2] == 'yes' else False
             if activity[3]:
                 price_month = float(activity[3])
-            if activity[4]:
-                is_children = True if activity[4] == 'yes' else False
+            public = activity[4]
             new = Activity()
             new.name = name
             new.creator = creator
             new.is_all_year = is_all_year
-            if is_children:
-                new.is_for_children = is_children
+            new.public = public
             if price_month:
                 new.price_per_month = price_month
             new.save()

@@ -109,10 +109,10 @@ class DocumentAdmin(admin.ModelAdmin):
 
 class ActivityAdmin(admin.ModelAdmin):
     """ Implemented to use document model from database """
-    search_fields = ['name', 'creator', 'date', 'is_all_year', 'is_for_children', 'is_for_parents']
+    search_fields = ['name', 'creator', 'date', 'is_all_year', 'public']
     filter_backends = (filters.SearchFilter,)
-    list_filter = ('name', 'creator', 'date', 'is_all_year', 'is_for_children', 'is_for_parents')
-    list_display = ('name', 'creator', 'is_for_children', 'is_all_year')
+    list_filter = ('name', 'creator', 'date', 'is_all_year', 'public')
+    list_display = ('name', 'creator', 'public', 'is_all_year')
 
 
 class SheetAdmin(admin.ModelAdmin):

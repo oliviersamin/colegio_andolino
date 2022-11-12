@@ -1,0 +1,20 @@
+{% extends 'school_site/base.html' %}
+{% load static %}
+{% block content %}
+{% if user.is_authenticated %}
+
+   <form action="" method="post">
+    {% csrf_token %}
+       {% for field in form.non_field_errors %}
+        <div class="errors">
+             {{ field }}
+        </div>
+        {% endfor %}
+    {{ form.as_ul }}
+       {{ form_child.as_ul }}
+    <input type="submit" value="Submit">
+    </form>
+{% else %}
+PAGE NOT AVAILABLE
+{% endif %}
+{% endblock %}

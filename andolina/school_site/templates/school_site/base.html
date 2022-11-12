@@ -1,16 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+<body>
+
+{% if user.is_authenticated %}
+<header>
+    <button class="banner_button"><a class="banner_text" href="{% url 'school_site:dashboard'%}  ">Dashboard</a></button>
+    <button class="banner_button"><a class="banner_text" href="{% url 'school_site:my_profile'%}  ">My profile</a></button>
+    <button class="banner_button"><a class="banner_text" href="{% url 'school_site:children_activities'%}  ">My children</a></button>
+    <button class="banner_button"><a class="banner_text" href="{% url 'school_site:my_activities'%}  ">My contribution</a></button>
+    <button class="banner_button"><a class="banner_text" href="{% url 'school_site:my_bills'%}  ">My bills</a></button>
+    <button class="banner_button"><a class="banner_text" href="{% url 'logout'%}  ">Logout</a></button>
+
+</header>
+    {% block content %}{% endblock %}
+{% else %}
+    PAGE NOT AVAILABLE
+{% endif %}
+</body>
 <head>
     <meta charset="UTF-8">
     <title>Intranet</title>
 </head>
-<body>
-<div class="banner">
-    {% for item in banner %}
-        <button class="banner_button"><a class="banner_text" href="{% url item.url%}  ">{{ item.title }}</a></button>
-    {% endfor %}
-</div>
-{% block content %}{% endblock %}
-
-</body>
 </html>

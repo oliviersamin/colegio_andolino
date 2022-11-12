@@ -3,14 +3,38 @@
 {% block content %}
 {% if user.is_authenticated %}
 MY ACTIVITIES PAGE FOR EACH USER
-       <form action="" method="post">
-    {% csrf_token %}
-    {{ form.as_ul }}
-    <input type="submit" value="Submit">
-    </form>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Public</th>
+            <th>Users</th>
+            <th>Message to the parents</th>
+            <th></th>
+        </tr>
+        {% for activity in my_activities %}
+        <tr>
+            <th>{{ activity.name }}</th>
+            <th>{{ activity.public }}</th>
+            <th>
+            <ul>
+                {% for user in activity.users.all %}
+                    <li>{{ user.get_full_name }}</li>
+                {% endfor %}
+            </ul>
+            </th>
+            <th>{{ activity.comment_for_parent }}</th>
+            <th>
+                <ul>
+                <li><button><a class="home_buttons" href="{%url 'school_site:edit_activity' activity_id=activity.id%}">Edit</a></button></li>
+                </ul>
+            </th>
 
+        </tr>
+        {% endfor %}
+    </table>
+{% block create_my_activity %}{% endblock %}
     <div id="buttons">
-        <button id="login"><a class="home_buttons" href="{%url 'logout'%}">Logout</a></button>
+        <button><a class="home_buttons" href="{%url 'school_site:create_my_activity'%}">Create a new activity</a></button>
     </div>
 {% else %}
 PAGE NOT AVAILABLE

@@ -25,3 +25,5 @@ DOCUMENT_TYPE = [
     (EXTRAESCOLARES, 'EXTRAESCOLARES'),
     (ATENCION_TEMPRANA, 'ATENCIÓN TEMPRANA')
 ]
+
+PUBLIC_ACTIVITY = [('children', 'children'), ('parents', 'parents')]
