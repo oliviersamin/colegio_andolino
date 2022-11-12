@@ -14,6 +14,8 @@ from .form_utils import (
     create_child_from_new_user,
     set_initial_activity_fields,
     save_activity_form_fields,
+    users_and_dates_for_sheet_table,
+    get_current_month_dates_headers,
 )
 
 __all__ = [
@@ -32,4 +34,6 @@ __all__ = [
     create_child_from_new_user,
     set_initial_activity_fields,
     save_activity_form_fields,
+    users_and_dates_for_sheet_table,
+    get_current_month_dates_headers,
 ]

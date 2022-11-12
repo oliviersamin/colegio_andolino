@@ -18,6 +18,7 @@ urlpatterns = [
     path('create-my-activity', views.CreateMyActivity.as_view(), name='create_my_activity'),
     path('edit-activity/<int:activity_id>', views.EditActivity.as_view(), name='edit_activity'),
     path('create-sheet/<int:activity_id>', views.CreateSheet.as_view(), name='create_sheet'),
+    path('edit-sheet/<int:sheet_id>', views.EditSheet.as_view(), name='edit_sheet'),
     path('my-bills', views.MyBills.as_view(), name='my_bills'),
     path('test', views.table_form, name='test_table'),
     # form validation message pages

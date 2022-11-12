@@ -14,7 +14,7 @@ class Sheet(models.Model):
     sheet model
     content looks like = {'on': [<button_name>, <button_name>,...]}
     """
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name='sheet')
     year = models.PositiveSmallIntegerField(blank=True, null=True, choices=get_year_choices())
     month = models.PositiveSmallIntegerField(blank=True, null=True, choices=get_month_choices())
     content = models.JSONField()

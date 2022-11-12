@@ -1,7 +1,8 @@
 from v1.models import Child, Group, Parent
 import datetime
 from django.contrib.auth.models import User
-from v1.models import Child
+from v1.models import Child, Sheet
+import calendar
 
 
 PROFILE_FORM_FIELDS = [
@@ -143,3 +144,30 @@ def create_child_from_new_user(form, user):
     new_child.save()
     return new_child
 
+
+def users_and_dates_for_sheet_table(sheet_id: int) -> dict:
+    sheet = Sheet.objects.get(id=sheet_id)
+    users = User.objects.filter(activities=sheet.activity)
+    headers_column = get_current_month_dates_headers()
+    rows = [{
+        'label': user.get_full_name(),
+        'content': [str(user.id) + '_' + str(i) for i in range(1, len(headers_column['header_days']) + 1)]}
+        for user in users]
+    return headers_column, rows
+
+
+def get_current_month_dates_headers() -> dict:
+    now = datetime.datetime.now()
+    raw = calendar.month(now.year, now.month)
+    raw_splited = raw.split('\n')[1:]
+    raw_splited_cleaned = [line.split(' ') for line in raw_splited]
+    calendar_sheet = [[char for char in line if char] for line in raw_splited_cleaned]
+    calendar_sheet = [line for line in calendar_sheet if line]
+    index = int(calendar_sheet[1][-1])
+    # first_day = calendar_sheet[0][-index]
+    first_week = calendar_sheet[0][-index:]
+    nb_days = int(calendar_sheet[-1][-1])
+    days = first_week + calendar_sheet[0] * 6
+    header_days = days[:nb_days]
+    header_numbers = list(range(1, nb_days + 1))
+    return {'header_days': header_days, 'header_numbers': header_numbers}

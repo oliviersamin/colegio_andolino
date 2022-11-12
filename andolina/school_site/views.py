@@ -7,6 +7,8 @@ from v1.models import Child, Parent, Activity, Sheet
 from school_site.utils import (
     parse_checkboxes,
     children_and_dates,
+    users_and_dates_for_sheet_table,
+    get_current_month_dates_headers,
 )
 from school_site.forms import (
     ProfileForm,
@@ -315,6 +317,34 @@ class CreateSheet(View):
         return redirect('school_site:validation_error')
 
 
+class EditSheet(View):
+    template_name = 'school_site/edit_sheet.html'
+    form = CreateSheetForm
+    #TODO: edit activity name, year and monoth in the template
+    def get(self, request, sheet_id):
+        if request.user.is_authenticated:
+            headers_column, rows = users_and_dates_for_sheet_table(sheet_id)
+            context = {
+                'headers_column': headers_column,
+                'rows': rows,
+                'form': self.form
+            }
+            return render(request, self.template_name, context=context)
+        return redirect('school_site:my_activities')
+
+    def post(self, request, activity_id):
+        form = self.form(request.POST)
+        if form.is_valid():
+            # activity = Activity.objects.get(pk=activity_id)
+            new_sheet = Sheet()
+            new_sheet.year = form.cleaned_data['year']
+            new_sheet.month = form.cleaned_data['month']
+            new_sheet.activity_id = activity_id
+            new_sheet.content = {}
+            new_sheet.save()
+            return redirect('school_site:validation_success')
+        return redirect('school_site:validation_error')
+
 
 class MyBills(View):
     """ access the children's user activities """
@@ -351,7 +381,6 @@ def table_form(request):
     if request.method == 'POST':
         boxes = parse_checkboxes(request)
         return redirect('home')
-
     table_column_headers, table_rows = children_and_dates()
     context = {
         'table_column_headers': table_column_headers,

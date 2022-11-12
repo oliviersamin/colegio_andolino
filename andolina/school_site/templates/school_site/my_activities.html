@@ -1,5 +1,6 @@
 {% extends 'school_site/base.html' %}
 {% load static %}
+{% load my_activities_sheet_buttons %}
 {% block content %}
 {% if user.is_authenticated %}
 MY ACTIVITIES PAGE FOR EACH USER
@@ -17,7 +18,7 @@ MY ACTIVITIES PAGE FOR EACH USER
         </tr>
         {% for activity in my_activities %}
         <tr>
-            <th>{{ activity.name }}</th>
+            <th>{{ activity.name }} - {{ activity.sheet.all.first.id }}</th>
             <th>{{ activity.public }}</th>
             <th>
             <ul>
@@ -30,11 +31,14 @@ MY ACTIVITIES PAGE FOR EACH USER
             <th>
                 <button><a class="home_buttons" href="{%url 'school_site:edit_activity' activity_id=activity.id%}">Edit activity</a></button>
             </th>
+            {% if not activity.id|sheet_exists %}
+                <th>
+                    <button><a class="home_buttons" href="{%url 'school_site:create_sheet' activity_id=activity.id%}">Create sheet</a></button>
+                </th>
+            {% endif %}
+            {% if activity.id|sheet_exists %}
             <th>
-                <button><a class="home_buttons" href="{%url 'school_site:create_sheet' activity_id=activity.id%}">Create sheet</a></button>
-            </th>
-            <th>
-                <button><a class="home_buttons" href="{%url 'school_site:edit_activity' activity_id=activity.id%}">Edit sheet</a></button>
+                <button><a class="home_buttons" href="{%url 'school_site:edit_sheet' sheet_id=activity.sheet.all.first.id %}">Edit sheet</a></button>
             </th>
             <th>
                 <button><a class="home_buttons" href="{%url 'school_site:edit_activity' activity_id=activity.id%}">Delete sheet</a></button>
@@ -42,7 +46,7 @@ MY ACTIVITIES PAGE FOR EACH USER
             <th>
                 <button><a class="home_buttons" href="{%url 'school_site:edit_activity' activity_id=activity.id%}">Validate sheet for payment</a></button>
             </th>
-
+            {% endif %}
         </tr>
         {% endfor %}
     </table>
