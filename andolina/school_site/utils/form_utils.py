@@ -111,6 +111,7 @@ def set_initial_activity_fields(activity: object) -> dict:
             initial[item] = getattr(activity, item)
     return initial
 
+
 def save_activity_form_fields(form, activity: object) -> None:
     for item in dir(activity):
         if item in ACTIVITY_FORM_FIELDS:
@@ -141,3 +142,4 @@ def create_child_from_new_user(form, user):
     new_child.age = age
     new_child.save()
     return new_child
+

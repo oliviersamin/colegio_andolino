@@ -1,0 +1,14 @@
+{% extends 'school_site/base.html' %}
+{% load static %}
+{% block content %}
+{% if user.is_authenticated %}
+CREATE SHEET PAGE FOR ACTIVITY
+   <form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_ul }}
+    <input type="submit" value="Submit">
+    </form>
+{% else %}
+PAGE NOT AVAILABLE
+{% endif %}
+{% endblock %}

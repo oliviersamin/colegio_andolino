@@ -3,7 +3,7 @@ from django.shortcuts import redirect, render
 from django.views import generic, View
 from django.contrib.auth.models import User
 from .forms.double_entry_table import BaseTable
-from v1.models import Child, Parent, Activity
+from v1.models import Child, Parent, Activity, Sheet
 from school_site.utils import (
     parse_checkboxes,
     children_and_dates,
@@ -13,6 +13,7 @@ from school_site.forms import (
     MyActivity,
     AddUserAndChild,
     EditChildForm,
+    CreateSheetForm,
 )
 from school_site.utils import (
     update_username_with_form,
@@ -286,7 +287,33 @@ class EditActivity(View):
             activity = Activity.objects.get(pk=activity_id)
             save_activity_form_fields(form, activity)
             return redirect('school_site:validation_success')
-        return  redirect('school_site:validation_error')
+        return redirect('school_site:validation_error')
+
+
+class CreateSheet(View):
+    template_name = 'school_site/create_sheet.html'
+    form = CreateSheetForm
+
+    def get(self, request, activity_id):
+        if request.user.is_authenticated:
+            context = {}
+            context['form'] = self.form
+            return render(request, self.template_name, context=context)
+        return redirect('school_site:my_activities')
+
+    def post(self, request, activity_id):
+        form = self.form(request.POST)
+        if form.is_valid():
+            # activity = Activity.objects.get(pk=activity_id)
+            new_sheet = Sheet()
+            new_sheet.year = form.cleaned_data['year']
+            new_sheet.month = form.cleaned_data['month']
+            new_sheet.activity_id = activity_id
+            new_sheet.content = {}
+            new_sheet.save()
+            return redirect('school_site:validation_success')
+        return redirect('school_site:validation_error')
+
 
 
 class MyBills(View):

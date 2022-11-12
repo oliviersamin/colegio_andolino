@@ -10,6 +10,10 @@ MY ACTIVITIES PAGE FOR EACH USER
             <th>Users</th>
             <th>Message to the parents</th>
             <th></th>
+            <th></th>
+            <th>Actions</th>
+            <th></th>
+            <th></th>
         </tr>
         {% for activity in my_activities %}
         <tr>
@@ -24,14 +28,28 @@ MY ACTIVITIES PAGE FOR EACH USER
             </th>
             <th>{{ activity.comment_for_parent }}</th>
             <th>
-                <ul>
-                <li><button><a class="home_buttons" href="{%url 'school_site:edit_activity' activity_id=activity.id%}">Edit</a></button></li>
-                </ul>
+                <button><a class="home_buttons" href="{%url 'school_site:edit_activity' activity_id=activity.id%}">Edit activity</a></button>
+            </th>
+            <th>
+                <button><a class="home_buttons" href="{%url 'school_site:create_sheet' activity_id=activity.id%}">Create sheet</a></button>
+            </th>
+            <th>
+                <button><a class="home_buttons" href="{%url 'school_site:edit_activity' activity_id=activity.id%}">Edit sheet</a></button>
+            </th>
+            <th>
+                <button><a class="home_buttons" href="{%url 'school_site:edit_activity' activity_id=activity.id%}">Delete sheet</a></button>
+            </th>
+            <th>
+                <button><a class="home_buttons" href="{%url 'school_site:edit_activity' activity_id=activity.id%}">Validate sheet for payment</a></button>
             </th>
 
         </tr>
         {% endfor %}
     </table>
+
+    <p>ARCHIVES DES MOIS PRECEDENTS (FEUILLES DE PRESENCE...)</p>
+    <p>Formulaire pour choisir l activite et le mois de lannee scolaire en cours</p>
+
 {% block create_my_activity %}{% endblock %}
     <div id="buttons">
         <button><a class="home_buttons" href="{%url 'school_site:create_my_activity'%}">Create a new activity</a></button>

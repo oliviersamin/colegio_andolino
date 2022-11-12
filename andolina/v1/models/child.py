@@ -8,7 +8,7 @@ class Child(models.Model):
     """ parent model """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     birth_date = models.DateField(blank=True, null=True)
-    age = models.IntegerField(blank=True, null=True)
+    age = models.PositiveSmallIntegerField(blank=True, null=True)
     tutor = models.ForeignKey(Teacher, blank=True, null=True, related_name='pupil', on_delete=models.CASCADE)
     date_created = models.DateField(auto_now_add=True, blank=True)
     date_updated = models.DateField(auto_now=True, blank=True)
