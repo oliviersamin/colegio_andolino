@@ -37,6 +37,7 @@ ACTIVITY_FORM_FIELDS = [
     'date'
 ]
 
+SHEET_FORM_FIELDS = ['year', 'month', 'content']
 
 MANY_TO_MANY_FIELDS = ['children', 'group']
 
@@ -171,3 +172,11 @@ def get_current_month_dates_headers() -> dict:
     header_days = days[:nb_days]
     header_numbers = list(range(1, nb_days + 1))
     return {'header_days': header_days, 'header_numbers': header_numbers}
+
+
+def set_initial_sheet_fields(sheet: object) -> dict:
+    initial = {}
+    for item in dir(sheet):
+        if item in SHEET_FORM_FIELDS:
+            initial[item] = getattr(sheet, item)
+    return initial

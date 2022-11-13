@@ -150,7 +150,6 @@ class Command(BaseCommand):
         print('-' * 50 + ' all activities have been deleted' + '-' * 50)
 
     def handle(self, *args, **options):
-        #TODO: modify this function to perform all creations at once if needed
         model = options.get('model').lower()
 
         if model == 'users':

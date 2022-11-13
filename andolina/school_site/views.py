@@ -30,6 +30,7 @@ from school_site.utils import (
     create_child_from_new_user,
     set_initial_activity_fields,
     save_activity_form_fields,
+    set_initial_sheet_fields,
 )
 
 
@@ -187,7 +188,6 @@ class EditChild(View):
         form = EditChildForm(request.POST)
         date_format = '%Y-%m-%d'
         if form.is_valid():
-            #TODO: post for EditChildForm
             child = Child.objects.get(pk=child_id)
             last_names = form.cleaned_data['last_name'].split(' ')
             username = [form.cleaned_data['first_name']] + last_names
@@ -285,7 +285,6 @@ class EditActivity(View):
         form = self.form(request.POST)
         date_format = '%Y-%m-%d'
         if form.is_valid():
-            # #TODO: post for EditChildForm
             activity = Activity.objects.get(pk=activity_id)
             save_activity_form_fields(form, activity)
             return redirect('school_site:validation_success')
@@ -320,28 +319,37 @@ class CreateSheet(View):
 class EditSheet(View):
     template_name = 'school_site/edit_sheet.html'
     form = CreateSheetForm
-    #TODO: edit activity name, year and monoth in the template
+    #TODO: edit activity name, year and monoth in the template & add context with existing buttons turned on
     def get(self, request, sheet_id):
         if request.user.is_authenticated:
             headers_column, rows = users_and_dates_for_sheet_table(sheet_id)
+            sheet = Sheet.objects.get(id=sheet_id)
+            activity = sheet.activity
+            title = 'Presential sheet for '
+            subtitle = activity.name + ' - ' + activity.creator.user.get_full_name() + '/n' + str(sheet.year) + ' - ' + str(sheet.month)
+            dict_initial = set_initial_sheet_fields(sheet)
+            form = self.form(request.POST or None, initial=dict_initial)
             context = {
                 'headers_column': headers_column,
                 'rows': rows,
-                'form': self.form
+                'form': form,
+                'title': title + subtitle,
+                'selected_buttons': dict_initial['content']
             }
             return render(request, self.template_name, context=context)
         return redirect('school_site:my_activities')
 
-    def post(self, request, activity_id):
+    def post(self, request, sheet_id):
         form = self.form(request.POST)
         if form.is_valid():
+            content = parse_checkboxes(request)[2:]
             # activity = Activity.objects.get(pk=activity_id)
-            new_sheet = Sheet()
-            new_sheet.year = form.cleaned_data['year']
-            new_sheet.month = form.cleaned_data['month']
-            new_sheet.activity_id = activity_id
-            new_sheet.content = {}
-            new_sheet.save()
+            sheet = Sheet.objects.get(id=sheet_id)
+            sheet.year = form.cleaned_data['year']
+            sheet.month = form.cleaned_data['month']
+            sheet.activity_id = sheet.activity_id
+            sheet.content = {'on': content}
+            sheet.save()
             return redirect('school_site:validation_success')
         return redirect('school_site:validation_error')
 

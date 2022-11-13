@@ -16,6 +16,7 @@ from .form_utils import (
     save_activity_form_fields,
     users_and_dates_for_sheet_table,
     get_current_month_dates_headers,
+    set_initial_sheet_fields,
 )
 
 __all__ = [
@@ -36,4 +37,5 @@ __all__ = [
     save_activity_form_fields,
     users_and_dates_for_sheet_table,
     get_current_month_dates_headers,
+    set_initial_sheet_fields,
 ]

@@ -1,5 +1,6 @@
 {% extends 'school_site/base.html' %}
 {% load static %}
+{% load utils_form %}
 {% block content %}
 <link rel="stylesheet" href="{% static '/school_site/stylesheets/double_entries_tables.css' %}" type="text/css">
 {% if user.is_authenticated %}
@@ -9,7 +10,7 @@ EDIT SHEET PAGE
     {{ form.as_ul }}
 
         <table>
-          <caption>CHILDREN AND DATES RAW TABLE</caption>
+          <caption> {{ title }} </caption>
           <tr>
             <td></td>
               {% for day in headers_column.header_days %}
@@ -26,7 +27,11 @@ EDIT SHEET PAGE
               <tr>
                 <th scope="row">{{ item.label }}</th>
                   {% for value in item.content %}
-                    <td><input type="checkbox" name={{ value }} />&nbsp;</td>
+                      {% if value|is_checkbutton_selected:selected_buttons %}
+                        <td><input type="checkbox" name={{ value }} checked=True</td>
+                      {% else %}
+                        <td><input type="checkbox" name={{ value }} </td>
+                      {% endif %}
                   {% endfor %}
               </tr>
             {% endfor %}

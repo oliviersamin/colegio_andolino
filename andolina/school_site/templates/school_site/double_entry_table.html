@@ -25,7 +25,8 @@
               <tr>
                 <th scope="row">{{ item.header }}</th>
                   {% for value in item.columns %}
-                    <td><input type="checkbox" name={{ value }} />&nbsp;</td>
+                    <td><input type="checkbox" name={{ value }} </td>
+{#                    <td><input type="checkbox" name={{ value }} />&nbsp;</td>#}
                   {% endfor %}
               </tr>
             {% endfor %}
