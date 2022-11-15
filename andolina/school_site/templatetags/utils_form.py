@@ -17,10 +17,11 @@ def sheet_exists(activity_id):
 
 
 def is_checkbutton_selected(button_name, selected_buttons):
-    if button_name in selected_buttons['on']:
-        return True
+    if selected_buttons:
+        if button_name in selected_buttons['on']:
+            return True
+        return False
     return False
-
 
 def is_public_children(public):
     if public == 'children':

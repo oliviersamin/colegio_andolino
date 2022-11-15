@@ -19,7 +19,7 @@ MY ACTIVITIES PAGE FOR EACH USER
         </tr>
         {% for activity in my_activities %}
         <tr>
-            <th>{{ activity.name }} - {{ activity.sheet.all.first.id }}</th>
+            <th>{{ activity.name }}</th>
             <th>{{ activity.public }}</th>
             <th>
             <ul>
@@ -56,8 +56,11 @@ MY ACTIVITIES PAGE FOR EACH USER
         {% endfor %}
     </table>
 
-    <p>ARCHIVES DES MOIS PRECEDENTS (FEUILLES DE PRESENCE...)</p>
-    <p>Formulaire pour choisir l activite et le mois de lannee scolaire en cours</p>
+    TO DO:
+    <ul>
+    <li>ARCHIVES DES MOIS PRECEDENTS (FEUILLES DE PRESENCE...)</li>
+    <li>Formulaire pour choisir l activite et le mois de lannee scolaire en cours</li>
+    </ul>
 
 {% block create_my_activity %}{% endblock %}
     <div id="buttons">
