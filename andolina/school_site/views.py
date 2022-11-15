@@ -318,7 +318,6 @@ class EditActivityUsers(View):
         return redirect('school_site:validation_error')
 
 
-
 class CreateSheet(View):
     template_name = 'school_site/create_sheet.html'
     form = CreateSheetForm

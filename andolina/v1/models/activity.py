@@ -9,6 +9,8 @@ class Activity(models.Model):
     name = models.CharField(max_length=100, blank=False, null=True, help_text='name of the activity')
     creator = models.ForeignKey(Parent, on_delete=models.CASCADE, related_name='activity', help_text='Parent in charge')
     users = models.ManyToManyField(User, related_name='activities', blank=True)
+    nb_places_available = models.PositiveSmallIntegerField(blank=True, null=True)
+    is_inscription_open = models.BooleanField(blank=True, null=True)
     is_all_year = models.BooleanField(blank=True, null=True)
     date = models.DateField(blank=True, null=True, help_text="date of the activity if it is not perform all year")
     price_per_day = models.FloatField(blank=True, null=True)

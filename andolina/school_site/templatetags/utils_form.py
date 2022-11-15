@@ -23,6 +23,7 @@ def is_checkbutton_selected(button_name, selected_buttons):
         return False
     return False
 
+
 def is_public_children(public):
     if public == 'children':
         return True
@@ -40,6 +41,13 @@ def is_selected_user(user: object, activity: object) -> bool:
     return False
 
 
+def is_inscription_open(activity: object):
+    if activity.is_inscription_open:
+        return True
+    return False
+
+
+register.filter('is_inscription_open', is_inscription_open)
 register.filter('sheet_exists', sheet_exists)
 register.filter('is_checkbutton_selected', is_checkbutton_selected)
 register.filter('is_public_children', is_public_children)

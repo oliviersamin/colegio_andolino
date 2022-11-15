@@ -34,7 +34,9 @@ ACTIVITY_FORM_FIELDS = [
     'public',
     'comment_for_parent',
     'money_earned_by_school',
-    'date'
+    'date',
+    'is_inscription_open',
+    'nb_places_available'
 ]
 
 SHEET_FORM_FIELDS = ['year', 'month', 'content']

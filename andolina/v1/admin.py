@@ -7,6 +7,7 @@ from v1.models import (
     Document,
     Activity,
     Sheet,
+    Archive,
 )
 from django.contrib import messages
 from rest_framework import filters
@@ -123,6 +124,15 @@ class SheetAdmin(admin.ModelAdmin):
     list_display = ('activity', 'year', 'month')
 
 
+class ArchiveAdmin(admin.ModelAdmin):
+    """ Implemented to use document model from database """
+    search_fields = ['type', 'year', 'month', 'name']
+    filter_backends = (filters.SearchFilter,)
+    list_filter = ('type', 'year', 'month', 'name')
+    list_display = ('type', 'year', 'month', 'name')
+
+
+admin.site.register(Archive, ArchiveAdmin)
 admin.site.register(Parent, ParentAdmin)
 admin.site.register(Child, ChildAdmin)
 admin.site.register(Teacher, TeacherAdmin)

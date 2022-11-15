@@ -3,7 +3,7 @@
 {% load utils_form %}
 {% block content %}
 {% if user.is_authenticated %}
-MY ACTIVITIES PAGE FOR EACH USER
+MY ACTIVITIES PAGE FOR EACH USER - {{ activity }}
     <table>
         <tr>
             <th>Name</th>
@@ -32,9 +32,11 @@ MY ACTIVITIES PAGE FOR EACH USER
             <th>
                 <button><a class="home_buttons" href="{% url 'school_site:edit_activity' activity_id=activity.id %}">Edit activity</a></button>
             </th>
+        {% if activity|is_inscription_open %}
             <th>
                 <button><a class="home_buttons" href="{% url 'school_site:edit_activity_users' activity_id=activity.id %}">Edit activity users</a></button>
             </th>
+        {% endif %}
             {% if not activity.id|sheet_exists %}
                 <th>
                     <button><a class="home_buttons" href="{% url 'school_site:create_sheet' activity_id=activity.id %}">Create sheet</a></button>
@@ -58,7 +60,8 @@ MY ACTIVITIES PAGE FOR EACH USER
 
     TO DO:
     <ul>
-    <li>ARCHIVES DES MOIS PRECEDENTS (FEUILLES DE PRESENCE...)</li>
+    <li>ARCHIVES DES MOIS PRECEDENTS (FEUILLES DE PARTICIPATION...)</li>
+        <li>creation automatique des archives chaque mois. Les utilisateurs envoient leur feuilles dans l archive du mois correspondant</li>
     <li>Formulaire pour choisir l activite et le mois de lannee scolaire en cours</li>
     </ul>
 
