@@ -1,0 +1,10 @@
+{% extends 'school_site/base.html' %}
+{% load static %}
+{% load utils_form %}
+{% block content %}
+{% if user.is_authenticated %}
+DELETE SHEET PAGE
+{% else %}
+PAGE NOT AVAILABLE
+{% endif %}
+{% endblock %}

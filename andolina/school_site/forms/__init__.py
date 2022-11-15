@@ -3,6 +3,7 @@ from .my_activities import  MyActivity
 from .add_child import AddUserAndChild
 from .edit_child import EditChildForm
 from .create_sheet import CreateSheetForm
+from .edit_activity_users import EditActivityUsers
 
 __all__ = [
     ProfileForm,
@@ -10,4 +11,5 @@ __all__ = [
     AddUserAndChild,
     EditChildForm,
     CreateSheetForm,
+    EditActivityUsers,
 ]

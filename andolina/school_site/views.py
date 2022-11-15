@@ -4,19 +4,23 @@ from django.views import generic, View
 from django.contrib.auth.models import User
 from .forms.double_entry_table import BaseTable
 from v1.models import Child, Parent, Activity, Sheet
+
 from school_site.utils import (
     parse_checkboxes,
     children_and_dates,
     users_and_dates_for_sheet_table,
     get_current_month_dates_headers,
 )
+
 from school_site.forms import (
     ProfileForm,
     MyActivity,
     AddUserAndChild,
     EditChildForm,
     CreateSheetForm,
+    EditActivityUsers,
 )
+
 from school_site.utils import (
     update_username_with_form,
     set_initial_fields_profile_form,
@@ -81,7 +85,7 @@ class EditProfile(View):
             context['form'] = form
             context['children'] = parent.child()
             return render(request, self.template_name, context=context)
-        return redirect('school_site:my_profile')
+        return redirect('school_site:home')
 
     def post(self, request):
         form = ProfileForm(request.POST)
@@ -139,7 +143,7 @@ class ChildrenActivities(View):
             # context['my_children'] = children
             context['activities'] = [{'child': child, 'activities': child.user.activities.all()} for child in children]
             return render(request, self.template_name, context=context)
-        return redirect('school_site:er')
+        return redirect('school_site:home')
 
 
 class AddChild(View):
@@ -151,7 +155,7 @@ class AddChild(View):
             context = {}
             context['form'] = self.form
             return render(request, self.template_name, context=context)
-        return redirect('school_site:add_child')
+        return redirect('school_site:home')
 
     def post(self, request):
         form = AddUserAndChild(request.POST)
@@ -182,7 +186,7 @@ class EditChild(View):
             context['form'] = form
             context['child'] = child
             return render(request, self.template_name, context=context)
-        return redirect('school_site:children_activities')
+        return redirect('school_site:home')
 
     def post(self, request, child_id):
         form = EditChildForm(request.POST)
@@ -208,24 +212,6 @@ class EditChild(View):
                     return redirect('school_site:validation_success')
                 return redirect('school_site:children_activities')
         return redirect('school_site:validation_error')
-            # new_user = User()
-            # last_names = form.cleaned_data['last_name'].split(' ')
-            # username = [form.cleaned_data['first_name']] + last_names
-            # username = '.'.join(username)
-            # new_user.username = username
-            # new_user.first_name = form.cleaned_data['first_name']
-            # new_user.last_name = form.cleaned_data['last_name']
-            # new_user.save()
-            # new_child = Child()
-            # new_child.user_id = User.objects.get(username=username).id
-            # new_child.birth_date = form.cleaned_data['birth_date']
-            # now = datetime.datetime.now()
-            # age = (now - new_child.birth_date).days
-            # age = int(age/365.25)
-            # new_child.age = age
-            # new_child.save()
-            # if new_child.birth_date:
-            #     new_child
 
 
 class CreateMyActivity(View):
@@ -240,7 +226,7 @@ class CreateMyActivity(View):
             form = self.form
             context['form'] = form
             return render(request, self.template_name, context=context)
-        return redirect('school_site:my_activities')
+        return redirect('school_site:home')
 
     def post(self, request):
         form = MyActivity(request.POST)
@@ -248,7 +234,8 @@ class CreateMyActivity(View):
             activity = form.save(commit=False)
             activity.creator = Parent.objects.get(user=request.user)
             activity.save()
-            return redirect('school_site:my_activities')
+            return redirect('school_site:validation_success')
+        return redirect('school_site:validation_error')
 
 
 class MyActivities(View):
@@ -279,7 +266,7 @@ class EditActivity(View):
             context['form'] = form
             context['activity'] = activity
             return render(request, self.template_name, context=context)
-        return redirect('school_site:my_activities')
+        return redirect('school_site:home')
 
     def post(self, request, activity_id):
         form = self.form(request.POST)
@@ -291,6 +278,47 @@ class EditActivity(View):
         return redirect('school_site:validation_error')
 
 
+class EditActivityUsers(View):
+    template_name = 'school_site/edit_activity_users.html'
+    form = EditActivityUsers
+
+    def get(self, request, activity_id):
+        if request.user.is_authenticated:
+            user = request.user
+            activity = Activity.objects.get(pk=activity_id)
+            context = {
+                'parents': Parent.objects.all(),
+                'children': Child.objects.all(),
+                'activity': activity
+            }
+            # dict_initial = set_initial_activity_users_fields(activity=activity, public=activity.public)
+            form = self.form(request.POST or None)  # , initial=dict_initial)
+            context['form'] = self.form
+            context['activity'] = activity
+            return render(request, self.template_name, context=context)
+        return redirect('school_site:home')
+
+    def post(self, request, activity_id):
+        form = self.form(request.POST)
+        date_format = '%Y-%m-%d'
+        if form.is_valid():
+            activity = Activity.objects.get(pk=activity_id)
+            if activity.public == 'parents':
+                parents_id = []
+                for parent in form.cleaned_data['parents']:
+                    parents_id.append(parent.user.id)
+                activity.users.set(parents_id)
+            else:
+                children_id = []
+                for child in form.cleaned_data['children']:
+                    children_id.append(child.user.id)
+                activity.users.set(children_id)
+            activity.save()
+            return redirect('school_site:validation_success')
+        return redirect('school_site:validation_error')
+
+
+
 class CreateSheet(View):
     template_name = 'school_site/create_sheet.html'
     form = CreateSheetForm
@@ -300,7 +328,7 @@ class CreateSheet(View):
             context = {}
             context['form'] = self.form
             return render(request, self.template_name, context=context)
-        return redirect('school_site:my_activities')
+        return redirect('school_site:home')
 
     def post(self, request, activity_id):
         form = self.form(request.POST)
@@ -319,7 +347,6 @@ class CreateSheet(View):
 class EditSheet(View):
     template_name = 'school_site/edit_sheet.html'
     form = CreateSheetForm
-    #TODO: edit activity name, year and monoth in the template & add context with existing buttons turned on
     def get(self, request, sheet_id):
         if request.user.is_authenticated:
             headers_column, rows = users_and_dates_for_sheet_table(sheet_id)
@@ -337,7 +364,7 @@ class EditSheet(View):
                 'selected_buttons': dict_initial['content']
             }
             return render(request, self.template_name, context=context)
-        return redirect('school_site:my_activities')
+        return redirect('school_site:home')
 
     def post(self, request, sheet_id):
         form = self.form(request.POST)
@@ -352,6 +379,69 @@ class EditSheet(View):
             sheet.save()
             return redirect('school_site:validation_success')
         return redirect('school_site:validation_error')
+
+
+class AddUsersToActivity(View):
+    template_name = 'school_site/add_users_to_activity.html'
+    form = CreateSheetForm
+
+    def get(self, request, sheet_id):
+        if request.user.is_authenticated:
+            headers_column, rows = users_and_dates_for_sheet_table(sheet_id)
+            sheet = Sheet.objects.get(id=sheet_id)
+            activity = sheet.activity
+            title = 'Presential sheet for '
+            subtitle = activity.name + ' - ' + activity.creator.user.get_full_name() + '/n' + str(sheet.year) + ' - ' + str(sheet.month)
+            dict_initial = set_initial_sheet_fields(sheet)
+            form = self.form(request.POST or None, initial=dict_initial)
+            context = {
+                'headers_column': headers_column,
+                'rows': rows,
+                'form': form,
+                'title': title + subtitle,
+                'selected_buttons': dict_initial['content']
+            }
+            return render(request, self.template_name, context=context)
+        return redirect('school_site:home')
+
+    def post(self, request, sheet_id):
+        form = self.form(request.POST)
+        if form.is_valid():
+            content = parse_checkboxes(request)[2:]
+            # activity = Activity.objects.get(pk=activity_id)
+            sheet = Sheet.objects.get(id=sheet_id)
+            sheet.year = form.cleaned_data['year']
+            sheet.month = form.cleaned_data['month']
+            sheet.activity_id = sheet.activity_id
+            sheet.content = {'on': content}
+            sheet.save()
+            return redirect('school_site:validation_success')
+        return redirect('school_site:validation_error')
+
+
+class AskDeleteSheet(View):
+    template_name = 'school_site/ask_delete_sheet.html'
+
+    def get(self, request, sheet_id):
+        if request.user.is_authenticated:
+            context = {
+                'sheet_id': sheet_id
+            }
+            return render(request, self.template_name, context=context)
+        return redirect('school_site:home')
+
+
+class DeleteSheet(View):
+    def get(self, request, sheet_id):
+        if request.user.is_authenticated:
+            try:
+                sheet = Sheet.objects.get(pk=sheet_id)
+                sheet.delete()
+                return redirect('school_site:validation_success')
+            except Exception as e:
+                print(e)
+                return redirect('school_site:validation_error')
+        return redirect('school_site:home')
 
 
 class MyBills(View):

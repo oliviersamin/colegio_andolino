@@ -1,0 +1,41 @@
+{% extends 'school_site/base.html' %}
+{% load static %}
+{% load utils_form %}
+{% block content %}
+{% if user.is_authenticated %}
+
+    EDIT ACTIVITY USERS PAGE -
+
+   <form action="" method="post">
+    {% csrf_token %}
+{#    {{ form.as_ul }}#}
+{#       {{ form_child.as_ul }}#}
+   {% if not activity.public|is_public_children %}
+   <label for="parents">Parents </label>
+    <select name="parents" id="parents" multiple>
+        {% for parent in parents %}
+            {% if parent|is_selected_user:activity %}
+              <option value={{ parent.id }} selected >{{parent}} </option>
+            {% else %}
+              <option value={{ parent.id }}>{{parent}}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+    {% else %}
+   <label for="children">Children </label>
+    <select name="children" id="children" multiple>
+        {% for child in children %}
+            {% if child|is_selected_user:activity %}
+            <option value={{ child.id }} selected >{{child}}</option>
+            {% else %}
+            <option value={{ child.id }}>{{child}}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+       {% endif %}
+       <input type="submit" value="Submit">
+    </form>
+{% else %}
+PAGE NOT AVAILABLE
+{% endif %}
+{% endblock %}

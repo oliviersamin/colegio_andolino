@@ -15,6 +15,7 @@ MY ACTIVITIES PAGE FOR EACH USER
             <th>Actions</th>
             <th></th>
             <th></th>
+            <th></th>
         </tr>
         {% for activity in my_activities %}
         <tr>
@@ -29,23 +30,27 @@ MY ACTIVITIES PAGE FOR EACH USER
             </th>
             <th>{{ activity.comment_for_parent }}</th>
             <th>
-                <button><a class="home_buttons" href="{%url 'school_site:edit_activity' activity_id=activity.id%}">Edit activity</a></button>
+                <button><a class="home_buttons" href="{% url 'school_site:edit_activity' activity_id=activity.id %}">Edit activity</a></button>
+            </th>
+            <th>
+                <button><a class="home_buttons" href="{% url 'school_site:edit_activity_users' activity_id=activity.id %}">Edit activity users</a></button>
             </th>
             {% if not activity.id|sheet_exists %}
                 <th>
-                    <button><a class="home_buttons" href="{%url 'school_site:create_sheet' activity_id=activity.id%}">Create sheet</a></button>
+                    <button><a class="home_buttons" href="{% url 'school_site:create_sheet' activity_id=activity.id %}">Create sheet</a></button>
                 </th>
             {% endif %}
             {% if activity.id|sheet_exists %}
             <th>
-                <button><a class="home_buttons" href="{%url 'school_site:edit_sheet' sheet_id=activity.sheet.all.first.id %}">Edit sheet</a></button>
+                <button><a class="home_buttons" href="{% url 'school_site:edit_sheet' sheet_id=activity.sheet.all.first.id %}">Edit sheet</a></button>
             </th>
             <th>
-                <button><a class="home_buttons" href="{%url 'school_site:edit_activity' activity_id=activity.id%}">Delete sheet</a></button>
+                <button><a class="home_buttons" href="{% url 'school_site:edit_activity' activity_id=activity.id %}">Validate sheet for payment</a></button>
             </th>
-            <th>
-                <button><a class="home_buttons" href="{%url 'school_site:edit_activity' activity_id=activity.id%}">Validate sheet for payment</a></button>
-            </th>
+                <th></th>
+                <th>
+                    <button><a class="home_buttons" href="{% url 'school_site:ask_delete_sheet' sheet_id=activity.sheet.all.first.id %}">Delete sheet</a></button>
+                </th>
             {% endif %}
         </tr>
         {% endfor %}

@@ -17,8 +17,11 @@ urlpatterns = [
     path('my-activities', views.MyActivities.as_view(), name='my_activities'),
     path('create-my-activity', views.CreateMyActivity.as_view(), name='create_my_activity'),
     path('edit-activity/<int:activity_id>', views.EditActivity.as_view(), name='edit_activity'),
+    path('edit-activity-users/<int:activity_id>', views.EditActivityUsers.as_view(), name='edit_activity_users'),
     path('create-sheet/<int:activity_id>', views.CreateSheet.as_view(), name='create_sheet'),
     path('edit-sheet/<int:sheet_id>', views.EditSheet.as_view(), name='edit_sheet'),
+    path('ask-delete-sheet/<int:sheet_id>', views.AskDeleteSheet.as_view(), name='ask_delete_sheet'),
+    path('delete-sheet/<int:sheet_id>', views.DeleteSheet.as_view(), name='delete_sheet'),
     path('my-bills', views.MyBills.as_view(), name='my_bills'),
     path('test', views.table_form, name='test_table'),
     # form validation message pages

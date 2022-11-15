@@ -1,5 +1,4 @@
 from django import forms
-from v1.models import Sheet
 
 
 class CreateSheetForm(forms.Form):
