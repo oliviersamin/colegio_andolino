@@ -65,10 +65,64 @@ MY ACTIVITIES PAGE FOR EACH USER - {{ activity }}
     <li>Formulaire pour choisir l activite et le mois de lannee scolaire en cours</li>
     </ul>
 
-{% block create_my_activity %}{% endblock %}
     <div id="buttons">
         <button><a class="home_buttons" href="{%url 'school_site:create_my_activity'%}">Create a new activity</a></button>
     </div>
+
+    {% block create_my_activity %}{% endblock %}
+
+    <div id="archives">
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Year</th>
+            <th>Month</th>
+            <th></th>
+            <th></th>
+            <th>Actions</th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        {% for archive in archives %}
+        <tr>
+            <th>{{ archive.name }}</th>
+            <th>{{ archive.type }}</th>
+            <th>{{ archive.year }}</th>
+            <th>{{ archive.month }}</th>
+            <th>
+                <button><a class="home_buttons" href="{% url 'school_site:edit_archive' archive_id=archive.id %}">Edit activity</a></button>
+            </th>
+        {% if activity|is_inscription_open %}
+            <th>
+                <button><a class="home_buttons" href="{% url 'school_site:edit_activity_users' activity_id=activity.id %}">Edit activity users</a></button>
+            </th>
+        {% endif %}
+            {% if not activity.id|sheet_exists %}
+                <th>
+                    <button><a class="home_buttons" href="{% url 'school_site:create_sheet' activity_id=activity.id %}">Create sheet</a></button>
+                </th>
+            {% endif %}
+            {% if activity.id|sheet_exists %}
+            <th>
+                <button><a class="home_buttons" href="{% url 'school_site:edit_sheet' sheet_id=activity.sheet.all.first.id %}">Edit sheet</a></button>
+            </th>
+            <th>
+                <button><a class="home_buttons" href="{% url 'school_site:edit_activity' activity_id=activity.id %}">Validate sheet for payment</a></button>
+            </th>
+                <th></th>
+                <th>
+                    <button><a class="home_buttons" href="{% url 'school_site:ask_delete_sheet' sheet_id=activity.sheet.all.first.id %}">Delete sheet</a></button>
+                </th>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    </div>
+
+
 {% else %}
 PAGE NOT AVAILABLE
 {% endif %}

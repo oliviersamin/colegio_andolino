@@ -1,7 +1,7 @@
 from v1.models import Child, Group, Parent
 import datetime
 from django.contrib.auth.models import User
-from v1.models import Child, Sheet
+from v1.models import Child, Sheet, Archive
 import calendar
 
 
@@ -182,3 +182,22 @@ def set_initial_sheet_fields(sheet: object) -> dict:
         if item in SHEET_FORM_FIELDS:
             initial[item] = getattr(sheet, item)
     return initial
+
+
+def create_archive():
+    if not month_archive_exists():
+        name = 'archive_'
+        name + str(now.year) + '_' + str(now.month)
+        new_archive = Archive()
+        new_archive.name = name
+        new_archive.year = now.year
+        new_archive.month = now.month
+        new_archive.save()
+
+
+def month_archive_exists():
+    now = datetime.datetime.now()
+    archive = Archive.objects.filter(year=now.year).filter(month=now.month).first()
+    return True if archive else False
+
+

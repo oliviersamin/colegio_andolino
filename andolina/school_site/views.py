@@ -3,7 +3,7 @@ from django.shortcuts import redirect, render
 from django.views import generic, View
 from django.contrib.auth.models import User
 from .forms.double_entry_table import BaseTable
-from v1.models import Child, Parent, Activity, Sheet
+from v1.models import Child, Parent, Activity, Sheet, External
 
 from school_site.utils import (
     parse_checkboxes,
@@ -214,6 +214,19 @@ class EditChild(View):
         return redirect('school_site:validation_error')
 
 
+class MyActivities(View):
+    """ access the user activities """
+    template_name = 'school_site/my_activities.html'
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            context = {}
+            queryset = Activity.objects.filter(creator=request.user)
+            context['my_activities'] = queryset
+            return render(request, self.template_name, context=context)
+        return redirect('school_site:home')
+
+
 class CreateMyActivity(View):
     template_name = 'school_site/create_my_activity.html'
     form = MyActivity
@@ -223,7 +236,7 @@ class CreateMyActivity(View):
             context = {}
             user = request.user
             # parent = Parent.objects.get(user=user)
-            form = self.form
+            form = self.form(request.POST or None)
             context['form'] = form
             return render(request, self.template_name, context=context)
         return redirect('school_site:home')
@@ -232,24 +245,10 @@ class CreateMyActivity(View):
         form = MyActivity(request.POST)
         if form.is_valid():
             activity = form.save(commit=False)
-            activity.creator = Parent.objects.get(user=request.user)
+            activity.creator = request.user
             activity.save()
             return redirect('school_site:validation_success')
         return redirect('school_site:validation_error')
-
-
-class MyActivities(View):
-    """ access the user activities """
-    template_name = 'school_site/my_activities.html'
-
-    def get(self, request):
-        if request.user.is_authenticated:
-            context = {}
-            parent = Parent.objects.get(user=request.user)
-            queryset = Activity.objects.filter(creator=parent)
-            context['my_activities'] = queryset
-            return render(request, self.template_name, context=context)
-        return redirect('school_site:home')
 
 
 class EditActivity(View):
@@ -318,34 +317,10 @@ class EditActivityUsers(View):
         return redirect('school_site:validation_error')
 
 
-class CreateSheet(View):
-    template_name = 'school_site/create_sheet.html'
+class AddUsersToActivity(View):
+    template_name = 'school_site/add_users_to_activity.html'
     form = CreateSheetForm
 
-    def get(self, request, activity_id):
-        if request.user.is_authenticated:
-            context = {}
-            context['form'] = self.form
-            return render(request, self.template_name, context=context)
-        return redirect('school_site:home')
-
-    def post(self, request, activity_id):
-        form = self.form(request.POST)
-        if form.is_valid():
-            # activity = Activity.objects.get(pk=activity_id)
-            new_sheet = Sheet()
-            new_sheet.year = form.cleaned_data['year']
-            new_sheet.month = form.cleaned_data['month']
-            new_sheet.activity_id = activity_id
-            new_sheet.content = {}
-            new_sheet.save()
-            return redirect('school_site:validation_success')
-        return redirect('school_site:validation_error')
-
-
-class EditSheet(View):
-    template_name = 'school_site/edit_sheet.html'
-    form = CreateSheetForm
     def get(self, request, sheet_id):
         if request.user.is_authenticated:
             headers_column, rows = users_and_dates_for_sheet_table(sheet_id)
@@ -380,24 +355,52 @@ class EditSheet(View):
         return redirect('school_site:validation_error')
 
 
-class AddUsersToActivity(View):
-    template_name = 'school_site/add_users_to_activity.html'
+class CreateSheet(View):
+    template_name = 'school_site/create_sheet.html'
     form = CreateSheetForm
 
+    def get(self, request, activity_id):
+        if request.user.is_authenticated:
+            context = {}
+            context['form'] = self.form
+            return render(request, self.template_name, context=context)
+        return redirect('school_site:home')
+
+    def post(self, request, activity_id):
+        form = self.form(request.POST)
+        if form.is_valid():
+            # activity = Activity.objects.get(pk=activity_id)
+            new_sheet = Sheet()
+            new_sheet.year = form.cleaned_data['year']
+            new_sheet.month = form.cleaned_data['month']
+            new_sheet.activity_id = activity_id
+            new_sheet.content = {}
+            new_sheet.save()
+            return redirect('school_site:validation_success')
+        return redirect('school_site:validation_error')
+
+
+class EditSheet(View):
+    template_name = 'school_site/edit_sheet.html'
+    form = CreateSheetForm
     def get(self, request, sheet_id):
         if request.user.is_authenticated:
             headers_column, rows = users_and_dates_for_sheet_table(sheet_id)
             sheet = Sheet.objects.get(id=sheet_id)
             activity = sheet.activity
-            title = 'Presential sheet for '
-            subtitle = activity.name + ' - ' + activity.creator.user.get_full_name() + '/n' + str(sheet.year) + ' - ' + str(sheet.month)
+            title = 'Activity: {} - Creator: {} - Year: {} - Month: {}'.format(
+                activity.name,
+                activity.creator.get_full_name(),
+                sheet.year,
+                sheet.month
+            )
             dict_initial = set_initial_sheet_fields(sheet)
             form = self.form(request.POST or None, initial=dict_initial)
             context = {
                 'headers_column': headers_column,
                 'rows': rows,
                 'form': form,
-                'title': title + subtitle,
+                'title': title,
                 'selected_buttons': dict_initial['content']
             }
             return render(request, self.template_name, context=context)
@@ -470,18 +473,3 @@ class ValidationFormError(View):
         if request.user.is_authenticated:
             return render(request, self.template_name, context=context)
         return redirect('school_site:home')
-
-
-def table_form(request):
-    # form = BaseTable(request.POST or None)
-    # form =
-    if request.method == 'POST':
-        boxes = parse_checkboxes(request)
-        return redirect('home')
-    table_column_headers, table_rows = children_and_dates()
-    context = {
-        'table_column_headers': table_column_headers,
-        'table_rows': table_rows,
-    }
-
-    return render(request, 'school_site/double_entry_table.html', context)

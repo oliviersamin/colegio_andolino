@@ -6,6 +6,8 @@ from .document import Document
 from .activity import Activity
 from .sheet import Sheet
 from .archive import Archive
+from .external import External
+
 
 __all__ = [
     Parent,
@@ -16,4 +18,5 @@ __all__ = [
     Activity,
     Sheet,
     Archive,
+    External,
 ]

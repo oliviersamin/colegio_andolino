@@ -1,3 +1,4 @@
+{% load permissions %}
 <!DOCTYPE html>
 <html lang="en">
 <body>
@@ -5,10 +6,14 @@
 {% if user.is_authenticated %}
 <header>
     <button class="banner_button"><a class="banner_text" href="{% url 'school_site:dashboard'%}  ">Dashboard</a></button>
-    <button class="banner_button"><a class="banner_text" href="{% url 'school_site:my_profile'%}  ">My profile</a></button>
-    <button class="banner_button"><a class="banner_text" href="{% url 'school_site:children_activities'%}  ">My children</a></button>
+    {% if not user|is_external %}
+        <button class="banner_button"><a class="banner_text" href="{% url 'school_site:my_profile'%}  ">My profile</a></button>
+        <button class="banner_button"><a class="banner_text" href="{% url 'school_site:children_activities'%}  ">My children</a></button>
+    {% endif %}
     <button class="banner_button"><a class="banner_text" href="{% url 'school_site:my_activities'%}  ">My contribution</a></button>
-    <button class="banner_button"><a class="banner_text" href="{% url 'school_site:my_bills'%}  ">My bills</a></button>
+    {% if not user|is_external %}
+        <button class="banner_button"><a class="banner_text" href="{% url 'school_site:my_bills'%}  ">My bills</a></button>
+    {% endif %}
     <button class="banner_button"><a class="banner_text" href="{% url 'logout'%}  ">Logout</a></button>
 
 </header>

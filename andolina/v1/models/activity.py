@@ -1,13 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import User
-from . import Parent
+# from . import Parent, External
 from v1.constants import PUBLIC_ACTIVITY
 
 
 class Activity(models.Model):
     """ activity model """
     name = models.CharField(max_length=100, blank=False, null=True, help_text='name of the activity')
-    creator = models.ForeignKey(Parent, on_delete=models.CASCADE, related_name='activity', help_text='Parent in charge')
+    creator = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='activity',
+        help_text='Adult in charge',
+        blank=True,
+        null=True
+    )
     users = models.ManyToManyField(User, related_name='activities', blank=True)
     nb_places_available = models.PositiveSmallIntegerField(blank=True, null=True)
     is_inscription_open = models.BooleanField(blank=True, null=True)
@@ -20,7 +27,7 @@ class Activity(models.Model):
     comment_for_parent = models.TextField(blank=True, null=True)
 
     class Meta:
-        ordering = ['name', 'creator']
+        ordering = ['name', 'public', 'is_inscription_open']
         verbose_name_plural = "Activities"
 
     def __str__(self):
