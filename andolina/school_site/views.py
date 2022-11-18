@@ -3,7 +3,7 @@ from django.shortcuts import redirect, render
 from django.views import generic, View
 from django.contrib.auth.models import User
 from .forms.double_entry_table import BaseTable
-from v1.models import Child, Parent, Activity, Sheet, External
+from v1.models import Child, Parent, Activity, Sheet, External, Archive
 
 from school_site.utils import (
     parse_checkboxes,
@@ -369,7 +369,11 @@ class CreateSheet(View):
     def post(self, request, activity_id):
         form = self.form(request.POST)
         if form.is_valid():
-            # activity = Activity.objects.get(pk=activity_id)
+            # validation to be sure no other sheet has already been created and saved for this activity year and month
+            existing_sheet = Sheet.objects.filter(
+                year=form.cleaned_data['year']).filter(
+                month=form.cleaned_data['month']).filter(activity_id=activity_id).first()
+            # creation of the new sheet
             new_sheet = Sheet()
             new_sheet.year = form.cleaned_data['year']
             new_sheet.month = form.cleaned_data['month']
@@ -419,6 +423,53 @@ class EditSheet(View):
             sheet.save()
             return redirect('school_site:validation_success')
         return redirect('school_site:validation_error')
+
+
+class AskValidateSheet(View):
+    template_name = 'school_site/ask_validate_sheet.html'
+
+    def get(self, request, sheet_id):
+        if request.user.is_authenticated:
+            headers_column, rows = users_and_dates_for_sheet_table(sheet_id)
+            sheet = Sheet.objects.get(id=sheet_id)
+            activity = sheet.activity
+            title = 'Activity: {} - Creator: {} - Year: {} - Month: {}'.format(
+                activity.name,
+                activity.creator.get_full_name(),
+                sheet.year,
+                sheet.month
+            )
+            dict_initial = set_initial_sheet_fields(sheet)
+            context = {'sheet_id': sheet_id}
+            return render(request, self.template_name, context=context)
+        return redirect('school_site:home')
+
+
+class ValidateSheet(View):
+    def get(self, request, sheet_id):
+        """
+        1. is archive with month & year of the sheet existing
+            a. if not create one
+        2. add this sheet the corresponding archive
+
+        """
+        if request.user.is_authenticated:
+            sheet = Sheet.objects.get(id=sheet_id)
+            try:
+                archive = Archive.objects.filter(year=sheet.year).filter(month=sheet.month).first()
+                if not archive:
+                    archive = Archive()
+                    archive.year = sheet.year
+                    archive.month = sheet.month
+                    archive.save()
+                sheet.archive.add(archive)
+                sheet.is_archived = True
+                sheet.save()
+                return redirect('school_site:validation_success')
+            except Exception as e:
+                print(e)
+                return redirect('school_site:validation_error')
+        return redirect('school_site:home')
 
 
 class AskDeleteSheet(View):

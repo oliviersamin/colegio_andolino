@@ -13,11 +13,11 @@ class Archive(models.Model):
     type = models.CharField(max_length=40, blank=True, null=True, choices=TYPE_CHOICES)
     year = models.PositiveSmallIntegerField(blank=True, null=True, choices=YEAR_CHOICES)
     month = models.PositiveSmallIntegerField(blank=True, null=True, choices=MONTH_CHOICES)
-    content = models.JSONField(blank=True, null=True, help_text='all the saved models are going here')
+    sheets = models.ForeignKey('v1.Sheet', related_name='archive', on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         ordering = ['type', 'year', 'month', 'name']
         verbose_name_plural = "Archives"
 
     def __str__(self):
-        return self.name + '-' + str(self.year) + '-' + str(self.month)
+        return str(self.year) + '-' + str(self.month)

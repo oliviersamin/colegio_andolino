@@ -3,7 +3,7 @@
 {% load utils_form %}
 {% block content %}
 {% if user.is_authenticated %}
-MY ACTIVITIES PAGE FOR EACH USER - {{ activity }}
+MY ACTIVITIES PAGE FOR EACH USER
     <table>
         <tr>
             <th>Name</th>
@@ -38,16 +38,22 @@ MY ACTIVITIES PAGE FOR EACH USER - {{ activity }}
             </th>
         {% endif %}
             {% if not activity.id|sheet_exists %}
-                <th>
-                    <button><a class="home_buttons" href="{% url 'school_site:create_sheet' activity_id=activity.id %}">Create sheet</a></button>
-                </th>
+                {% if activity.sheet.all.first.id|is_monthly_sheet_archived %}
+                    <th>
+                        <button disabled> Create sheet</button>
+                    </th>
+                {% else %}
+                    <th>
+                        <button><a disabled class="home_buttons" href="{% url 'school_site:create_sheet' activity_id=activity.id %}">Create sheet</a></button>
+                    </th>
+                {% endif %}
             {% endif %}
             {% if activity.id|sheet_exists %}
             <th>
                 <button><a class="home_buttons" href="{% url 'school_site:edit_sheet' sheet_id=activity.sheet.all.first.id %}">Edit sheet</a></button>
             </th>
             <th>
-                <button><a class="home_buttons" href="{% url 'school_site:edit_activity' activity_id=activity.id %}">Validate sheet for payment</a></button>
+                <button><a class="home_buttons" href="{% url 'school_site:ask_validate_sheet' sheet_id=activity.sheet.all.first.id %}">Validate sheet</a></button>
             </th>
                 <th></th>
                 <th>
@@ -94,28 +100,6 @@ MY ACTIVITIES PAGE FOR EACH USER - {{ activity }}
             <th>
                 <button><a class="home_buttons" href="{% url 'school_site:edit_archive' archive_id=archive.id %}">Edit activity</a></button>
             </th>
-        {% if activity|is_inscription_open %}
-            <th>
-                <button><a class="home_buttons" href="{% url 'school_site:edit_activity_users' activity_id=activity.id %}">Edit activity users</a></button>
-            </th>
-        {% endif %}
-            {% if not activity.id|sheet_exists %}
-                <th>
-                    <button><a class="home_buttons" href="{% url 'school_site:create_sheet' activity_id=activity.id %}">Create sheet</a></button>
-                </th>
-            {% endif %}
-            {% if activity.id|sheet_exists %}
-            <th>
-                <button><a class="home_buttons" href="{% url 'school_site:edit_sheet' sheet_id=activity.sheet.all.first.id %}">Edit sheet</a></button>
-            </th>
-            <th>
-                <button><a class="home_buttons" href="{% url 'school_site:edit_activity' activity_id=activity.id %}">Validate sheet for payment</a></button>
-            </th>
-                <th></th>
-                <th>
-                    <button><a class="home_buttons" href="{% url 'school_site:ask_delete_sheet' sheet_id=activity.sheet.all.first.id %}">Delete sheet</a></button>
-                </th>
-            {% endif %}
         </tr>
         {% endfor %}
     </table>

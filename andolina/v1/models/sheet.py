@@ -18,6 +18,7 @@ class Sheet(models.Model):
     year = models.PositiveSmallIntegerField(blank=True, null=True, choices=get_year_choices())
     month = models.PositiveSmallIntegerField(blank=True, null=True, choices=get_month_choices())
     content = models.JSONField()
+    is_archived = models.BooleanField(default=False, null=True)
 
 
     class Meta:
