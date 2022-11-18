@@ -1,0 +1,110 @@
+\documentclass{article}%
+\usepackage[T1]{fontenc}%
+\usepackage[utf8]{inputenc}%
+\usepackage{lmodern}%
+\usepackage{textcomp}%
+\usepackage{lastpage}%
+\usepackage{geometry}%
+\geometry{head=40pt,margin=0.5in,bottom=1.6in,includeheadfoot=True}%
+\usepackage{color}%
+\usepackage{longtable}%
+\usepackage{tabu}%
+\usepackage[table]{xcolor}%
+\usepackage{fancyhdr}%
+\usepackage{ragged2e}%
+\usepackage{graphicx}%
+\usepackage{xcolor}%
+%
+\fancypagestyle{firstpage}{%
+\renewcommand{\headrulewidth}{0pt}%
+\renewcommand{\footrulewidth}{0pt}%
+\fancyhead{%
+}%
+\fancyfoot{%
+}%
+\fancyhead[L]{%
+\begin{minipage}[c]{0.5\textwidth}%
+\includegraphics[width=200px]{/home/migtrabajo/programming/personal/colegio_andolino/utils/scripts/Generate files/andolina-logo.png}%
+\end{minipage}%
+}%
+\fancyhead[R]{%
+\begin{minipage}[c]{0.5\textwidth}%
+\flushleft%
+\begin{Large}%
+\textbf{Número de factura: FU{-}2223{-}002}%
+\end{Large}%
+\linebreak%
+\linebreak%
+\textcolor{black}{%
+\begin{Large}%
+\textbf{Fecha: 18/11/22}%
+\end{Large}%
+}%
+\end{minipage}%
+}%
+\fancyfoot[L]{%
+\begin{footnotesize}%
+A los efectos previstos en la Ley Orgánica 15/1999, de 13 de diciembre, sobre Protección de Datos de Carácter Personal, se le informa que los datos personales proporcionados se incorporarán a los ficheros de Colegio Andolina Sociedad Cooperativa Asturiana, con dirección en Camino del Barreo, 203 Cefontes (Cabueñes) 33394 Gijón Asturias. La finalidad del tratamiento de los datos será la de gestionar los servicios suministrados. Usted tiene derecho al acceso, rectificación, cancelación y oposición en los términos previstos en la Ley, que podrá ejercitar mediante escrito dirigido al responsable de los mismos en la dirección anteriormente indicada o a la dirección de correo electrónico lopd@colegioandolina.org.\newline%
+\newline%
+\newline%
+Colegio Andolina Sociedad Cooperativa Asturiana {-} CIF: F33986522 {-} Camino del Barreo, 203 Cefontes (Cabueñes) 33394 Gijón Asturias.%
+\end{footnotesize}%
+}%
+}%
+\definecolor{lightgray}{gray}{0.80}%
+%
+\begin{document}%
+\normalsize%
+\vspace*{8ex}%
+\renewcommand{\arraystretch}{1.5}%
+\begin{tabular}{l|l}%
+\textbf{Nombre:}&Ejemplo Ejemplez Ejemplez\\%
+\hline%
+\textbf{NIF:}&123456789B\\%
+\hline%
+\textbf{Dirección:}&C/ Dirección. Código Postal, Localidad, Provincia\\%
+\hline%
+\end{tabular}%
+\vspace*{8ex}%
+\renewcommand{\arraystretch}{1.5}%
+\begin{longtabu}{X[3l] X[c] X[c] X[c]}%
+\rowcolor{lightgray}%
+\textbf{concepto}&\textbf{precio unitario}&\textbf{cantidad}&\textbf{subtotal}\\%
+&&&\\%
+\hline%
+cuota&325.00 €&3&975.00 €\\%
+\hline%
+comedor&5.00 €&(5, 2)&35.00 €\\%
+\hline%
+atención temprana&5.00 €&(1, 0)&5.00 €\\%
+\hline%
+judo&25.00 €&0&0.00 €\\%
+\hline%
+ciencia&20.00 €&0&0.00 €\\%
+\hline%
+teatro&20.00 €&0&0.00 €\\%
+\hline%
+robotix&20.00 €&10&200.00 €\\%
+\hline%
+acompañamiento&&&6.00 €\\%
+\hline%
+formaciones&&&15.00 €\\%
+\hline%
+talleres actividades campamentos&&&20.00 €\\%
+\hline%
+\textbf{Base Imponible}&&&\textbf{1256.00 €}\\%
+\hline%
+\textbf{IVA (exento)}&&&\textbf{0.00 €}\\%
+\hline%
+\textbf{Total}&&&\textbf{1256.00 €}\\%
+\vspace*{10ex}%
+\end{longtabu}%
+\section*{}%
+\label{sec:}%
+FORMA DE PAGO: Domiciliación Bancaria\newline%
+%
+Exención de IVA según el 20.9 de la Ley 37/1992 de 28 de diciembre.
+
+%
+\pagestyle{firstpage}%
+\end{document}
