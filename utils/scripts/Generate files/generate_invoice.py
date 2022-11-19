@@ -1,5 +1,5 @@
 '''
-Generate pdf files with pylatex 
+Generate pdf files with pylatex
 for invoices or detailed extracts.
 '''
 # import stdlib
@@ -19,18 +19,22 @@ from pylatex import (Document, Foot, FootnoteText, Head, LargeText, LineBreak,
                      Tabular, VerticalSpace, TextColor)
 from pylatex.utils import NoEscape, bold, dumps_list
 
-###########################################################################
-########################## ENVIRONMENT VARIABLES ##########################
-###########################################################################
-
-############################# Billing concepts ############################
+"""
+ENVIRONMENT VARIABLES
+"""
+# Billing concepts
 PRECIO_MAX_COMEDOR = int(os.getenv('PRECIO_MAX_COMEDOR', '20'))
 PRECIO_DIA_COMEDOR = int(os.getenv('PRECIO_DIA_COMEDOR', '5'))
 PRECIO_MAX_TEMPRANA = int(os.getenv('PRECIO_MAX_TEMPRANA', '20'))
 PRECIO_DIA_TEMPRANA = int(os.getenv('PRECIO_DIA_TEMPRANA', '5'))
 EXTRAESCOLARES = jloads(os.getenv('EXTRAESCOLARES',
-                                 '{"JUDO": 25, "CIENCIA": 20, "TEATRO": 20, "ROBOTIX": 20}'))
-ACTIVIDADES_ESCOLARES = ['COLEGIO', 'ATENCIÓN TEMPRANA', 'COMEDOR']
+                                  ('{"JUDO": 25,'
+                                   '"CIENCIA": 20,'
+                                   '"TEATRO": 20,'
+                                   '"ROBOTIX": 20}')))
+ACTIVIDADES_ESCOLARES = ['COLEGIO',
+                         'ATENCIÓN TEMPRANA',
+                         'COMEDOR']
 ACTIVIDADES = ACTIVIDADES_ESCOLARES
 ACTIVIDADES.extend(EXTRAESCOLARES.keys())
 UNIT_PRICES_DICT = {"CUOTA": 325,
@@ -45,62 +49,74 @@ UNIT_PRICES_DICT = {"CUOTA": 325,
 UNIT_PRICE = jloads(os.getenv('UNIT_PRICE',
                               jdumps(UNIT_PRICES_DICT)))
 
-########################### Information Strings ###########################
+# Information Strings
 COLEGIO_NOMBRE = os.getenv("COLEGIO_NOMBRE",
                            "Colegio Andolina Sociedad Cooperativa Asturiana")
 COLEGIO_CIF = os.getenv("COLEGIO_NOMBRE",
                         "F33986522")
 COLEGIO_DIRECCION = os.getenv("COLEGIO_DIRECCION",
-                              "Camino del Barreo, 203 Cefontes (Cabueñes) 33394 Gijón Asturias.")
+                              ("Camino del Barreo, 203"
+                               "Cefontes (Cabueñes) 33394 Gijón Asturias."))
 COLEGIO_DATOS = os.getenv("COLEGIO_DATOS",
-                          f'{COLEGIO_NOMBRE} - CIF: {COLEGIO_CIF} - {COLEGIO_DIRECCION}')
+                          f'{COLEGIO_NOMBRE} - CIF:'
+                          f'{COLEGIO_CIF} - {COLEGIO_DIRECCION}')
 EXEMPTION = os.getenv("EXEMPTION",
-                      "Exención de IVA según el 20.9 de la Ley 37/1992 de 28 de diciembre.")
+                      ("Exención de IVA según el 20.9 de la Ley 37/1992"
+                       "de 28 de diciembre."))
 LOPD = os.getenv("LOPD",
-                 "A los efectos previstos en la Ley Orgánica 15/1999, de 13 de diciembre, " +
-                 "sobre Protección de Datos de Carácter Personal, se le informa que los " +
-                 "datos personales proporcionados se incorporarán a los ficheros de " +
-                 "Colegio Andolina Sociedad Cooperativa Asturiana, " +
-                 f"con dirección en {COLEGIO_DIRECCION} " +
-                 "La finalidad del tratamiento de los datos será " +
-                 "la de gestionar los servicios suministrados. " +
-                 "Usted tiene derecho al acceso, rectificación, cancelación y " +
-                 "oposición en los términos previstos en la Ley, " +
-                 "que podrá ejercitar mediante escrito " +
-                 "dirigido al responsable de los mismos en la dirección anteriormente indicada " +
-                 "o a la dirección de correo electrónico lopd@colegioandolina.org.")
+                 ("A los efectos previstos en la Ley Orgánica 15/1999, "
+                  "de 13 de diciembre, "
+                  "sobre Protección de Datos de Carácter Personal, "
+                  "se le informa que los datos personales proporcionados "
+                  "se incorporarán a los ficheros de "
+                  "Colegio Andolina Sociedad Cooperativa Asturiana, "
+                  f"con dirección en {COLEGIO_DIRECCION} "
+                  "La finalidad del tratamiento de los datos será "
+                  "la de gestionar los servicios suministrados. "
+                  "Usted tiene derecho al acceso, rectificación, "
+                  "cancelación y "
+                  "oposición en los términos previstos en la Ley, "
+                  "que podrá ejercitar mediante escrito "
+                  "dirigido al responsable de los mismos "
+                  "en la dirección anteriormente indicada "
+                  "o a la dirección de correo electrónico "
+                  "lopd@colegioandolina.org."))
 
 
-COLORS = ["black", 
-          "blue", 
-          "brown", # "cyan", "darkgray", "gray",
-          "green", # "lightgray", "lime", "magenta", "olive", 
-          "orange", # "pink", 
-          "purple", 
-          "red", 
-          "teal", 
-          "violet", # "white", 
+COLORS = ["black",
+          "blue",
+          "brown",  # "cyan", "darkgray", "gray",
+          "green",  # "lightgray", "lime", "magenta", "olive",
+          "orange",  # "pink",
+          "purple",
+          "red",
+          "teal",
+          "violet",  # "white",
           "yellow"]
-activities_colors_dict = dict(zip(ACTIVIDADES,COLORS))
+activities_colors_dict = dict(zip(ACTIVIDADES, COLORS))
 
 
 class PdfGeneration():
-    def __init__(self, 
-                 series: str='FU',
-                 invoice_num_start: int=0,
-                 associate_data: list[dict]=[{'name': 'Ejemplo Ejemplez'}],
-                 child_data: list[dict]=[{}]) -> None:
+    def __init__(self,
+                 series: str = 'FU',
+                 invoice_num_start: int = 0,
+                 associate_data: list[dict] = [{'name': 'Ejemplo Ejemplez'}],
+                 child_data: list[dict] = [{}]) -> None:
         """This class generates different kinds of pdf documents using pylatex
 
         Args:
             series (str, optional): invoice series. Defaults to 'FU'.
-            invoice_num_start (int, optional): which invoice number to start with. Defaults to 0.
-            associate_data (_type_, optional): a list of dicts for each associate. Migrating to dataclass. 
-                                               Defaults to [{'name': 'Ejemplo Ejemplez'}].
-            child_data (list[dict], optional): each element corresponds to a dict with the children represented by
-                                               a single associate. The dict has the children as keys and the values
-                                               are dicts activities - attendance.
-                                               Migrating to dataclass. Defaults to [{}].
+            invoice_num_start (int, optional): invoice number to start with.
+                                               Defaults to 0.
+            associate_data (list[dict], optional): each dict represents
+                an associate.
+                Migrating to dataclass.
+                Defaults to [{'name': 'Ejemplo Ejemplez'}].
+            child_data (list[dict], optional): each element corresponds to a
+                dict with the children represented by a single associate.
+                The dict has the children as keys and the values
+                are dicts activities - attendance.
+                Migrating to dataclass. Defaults to [{}].
         """
 
         # Document Geometry Options
@@ -122,40 +138,40 @@ class PdfGeneration():
         self.invoice_date = date.today()
         self.year = self.invoice_date.year
         self.month = self.invoice_date.month
-        current_year_formated = self.year%100
-        self.current_academic_year = f"{current_year_formated}{current_year_formated+1}"
+        current_year_formated = self.year % 100
+        self.current_academic_year = (f"{current_year_formated}"
+                                      f"{current_year_formated + 1}")
 
         # extract data
-        self.initial_month_skip, self.num_monthdays = calendar.monthrange(self.year,self.month)
-        self.current_calendar = calendar.Calendar()
-        self.matrix_calendar = [[x if x != 0 else '' 
-                                 for x in week] 
-                                for week in self.current_calendar.monthdayscalendar(self.year,
-                                                                                    self.month)]
+        self.initial_skip, self.num_monthdays = calendar.monthrange(self.year,
+                                                                    self.month)
+        cal = calendar.Calendar()
+        self.matrix_calendar = [[x if x != 0 else ''
+                                 for x in week]
+                                for week in cal.monthdayscalendar(self.year,
+                                                                  self.month)]
         self.matrix_rows_calendar = np.concatenate((np.array([''] * len(self.matrix_calendar),
-                                                             dtype="object")[:,None],
+                                                             dtype="object")[:, None],
                                                     self.matrix_calendar),
-                                                    axis=1)
-        self.final_month_skip = 7 * len(self.matrix_calendar) - (self.initial_month_skip + self.num_monthdays)
-        self.initial_month_skip_list = [''] * self.initial_month_skip
+                                                   axis=1)
+        self.final_month_skip = 7 * len(self.matrix_calendar) - (self.initial_skip + self.num_monthdays)
+        self.initial_skip_list = [''] * self.initial_skip
         self.final_month_skip_list = [''] * self.final_month_skip
-        locale.setlocale(locale.LC_TIME, 
+        locale.setlocale(locale.LC_TIME,
                          'es_ES.UTF-8')
         self.week_days = list(calendar.day_name)
         self.week_days_row = list(chain([''],
                                         self.week_days))
-        self.assigned_colors = [activities_colors_dict[activity.upper()] 
+        self.assigned_colors = [activities_colors_dict[activity.upper()]
                                 for activity in ACTIVIDADES]
-
 
     def generate_all_detailed_extracts(self):
         """
         Generate a lis of detailed extracts
         """
         for associate in self.associates_data:
-            self.generate_single_detailed_extract(associate_data = associate,
-                                                  kids_data = self.childs_data[associate['name']])
-
+            self.generate_single_detailed_extract(associate_data=associate,
+                                                  kids_data=self.childs_data[associate['name']])
 
     def generate_single_detailed_extract(self,
                                          associate_data,
@@ -165,7 +181,8 @@ class PdfGeneration():
 
         Args:
             associate_data (_type_): the data of an associate
-            kids_data (_type_): the dict of kids with values dict activities - attendance.
+            kids_data (_type_): the dict of kids with values
+                dict activities - attendance.
         """
         self.current_associate_data = associate_data
         self.current_child_data = kids_data
@@ -175,11 +192,10 @@ class PdfGeneration():
         self.generate_footer()
         self.generate_associate_table()
         self.doc.preamble.append(self.first_page)
-        
-        self.generate_detailed_calendar()
-        
-        self.generate_file(mode='extract')
 
+        self.generate_detailed_calendar()
+
+        self.generate_file(mode='extract')
 
     def generate_detailed_calendar(self):
         """
@@ -187,14 +203,14 @@ class PdfGeneration():
         according to kids assistance.
         """
         child_attendance_matrices_dict = self.get_child_attendance_rows()
-        
+
         calendar_tabu_spec = f'| X[2c] | {(7*"X[3c] | ")[:-1]}'
         with self.doc.create(LongTabu(calendar_tabu_spec,
                                       row_height=1.5)) as extract_table:
             extract_table.add_hline()
             extract_table.add_row(self.week_days_row,
-                               mapper=bold,
-                               color="black")
+                                  mapper=bold,
+                                  color="black")
 
             for i, week in enumerate(self.matrix_rows_calendar):
                 extract_table.add_hline()
@@ -215,7 +231,6 @@ class PdfGeneration():
 
         # self.doc.append(VerticalSpace('8ex'))
 
-
     def get_child_attendance_rows(self) -> dict:
         """
         Generate a dict of attendance.
@@ -229,32 +244,30 @@ class PdfGeneration():
             where each value is a concatenation of
             assistance colored characters.
         """
-        E = [np.reshape(np.array(list(chain(self.initial_month_skip_list,
+        E = [np.reshape(np.array(list(chain(self.initial_skip_list,
                                             [list(map(TextColor,
-                                                      *(self.assigned_colors,daily_attendance)))
+                                                      *(self.assigned_colors, daily_attendance)))
                                              for daily_attendance in zip(*activities_dict.values())],
                                             self.final_month_skip_list)),
                                  dtype=object),
-                        (len(self.matrix_calendar),7)) 
+                        (len(self.matrix_calendar), 7))
              for activities_dict in child_data.values()]
-        
-        attendance_rows_list = [np.concatenate((np.array([child]*len(self.matrix_calendar),
-                                                         dtype="object")[:,None],
-                                                monthly_attendance),
-                                                axis=1) 
-                                for child,monthly_attendance in zip(child_data.keys(),E)]
 
-        child_attendance_matrices_dict = dict(zip(child_data.keys(),attendance_rows_list))
+        attendance_rows_list = [np.concatenate((np.array([child]*len(self.matrix_calendar),
+                                                         dtype="object")[:, None],
+                                                monthly_attendance),
+                                               axis=1)
+                                for child, monthly_attendance in zip(child_data.keys(), E)]
+
+        child_attendance_matrices_dict = dict(zip(child_data.keys(), attendance_rows_list))
 
         return child_attendance_matrices_dict
-
 
     def generate_set_invoices(self):
         for associate_data in self.associates_data:
             self.generate_invoice(associate_data)
-        
 
-    def generate_invoice(self, 
+    def generate_invoice(self,
                          associate_data):
         """Generate invoice from associate data.
 
@@ -268,13 +281,12 @@ class PdfGeneration():
         self.generate_footer()
         self.generate_associate_table()
         self.doc.preamble.append(self.first_page)
-        
-        self.generate_invoice_table()
-        
-        self.generate_additional_details()
-        
-        self.generate_file(mode='invoice')
 
+        self.generate_invoice_table()
+
+        self.generate_additional_details()
+
+        self.generate_file(mode='invoice')
 
     def generate_header(self):
         """
@@ -287,24 +299,24 @@ class PdfGeneration():
         # Header image
         with self.first_page.create(Head("L")) as header_left:
             with header_left.create(MiniPage(width=NoEscape(r"0.5\textwidth"),
-                                            pos='c')) as logo_wrapper:
+                                             pos='c')) as logo_wrapper:
                 logo_file = os.path.join(os.path.dirname(__file__),
-                                        'andolina-logo.png')
+                                         'andolina-logo.png')
                 logo_wrapper.append(StandAloneGraphic(image_options="width=200px",
-                                    filename=logo_file))
+                                                      filename=logo_file))
 
         self.generate_invoice_id()
         # Add document title
         with self.first_page.create(Head("R")) as right_header:
             with right_header.create(MiniPage(width=NoEscape(r"0.5\textwidth"),
-                                    pos='c', align='l')) as title_wrapper:
+                                              pos='c', align='l')) as title_wrapper:
                 title_wrapper.append(LargeText(bold(f"Número de factura: {self.current_associate_data['invoice_num']}")))
                 title_wrapper.append(LineBreak())
                 title_wrapper.append(LineBreak())
-                title_wrapper.append(TextColor('black',LargeText(bold(f"Fecha: {self.current_associate_data['date']}"))))
+                title_wrapper.append(TextColor('black',
+                                               LargeText(bold(f"Fecha: {self.current_associate_data['date']}"))))
 
         self.doc.append(VerticalSpace('8ex'))
-
 
     def generate_invoice_id(self) -> str:
         '''
@@ -315,14 +327,12 @@ class PdfGeneration():
         self.current_invoice_num += 1
         self.current_associate_data['date'] = self.invoice_date.strftime("%d/%m/%y")
 
-
     def generate_footer(self):
         """
         Generate footer. For the time being, with LOPD & School adress
         """
         with self.first_page.create(Foot("L")) as footer:
             footer.append(FootnoteText(f"{LOPD}\n\n\n{COLEGIO_DATOS}"))
-
 
     def generate_associate_table(self):
         """
@@ -339,19 +349,18 @@ class PdfGeneration():
 
         self.doc.append(VerticalSpace('8ex'))
 
-
     def generate_invoice_table(self):
         """
         Generate a table with the extract for current invoice
         """
         with self.doc.create(LongTabu("X[3l] X[c] X[c] X[c]",
-                                    row_height=1.5)) as invoice_table:
+                                      row_height=1.5)) as invoice_table:
             invoice_table.add_row(["concepto",
-                                "precio unitario",
-                                "cantidad",
-                                "subtotal"],
-                            mapper=bold,
-                            color="lightgray")
+                                   "precio unitario",
+                                   "cantidad",
+                                   "subtotal"],
+                                  mapper=bold,
+                                  color="lightgray")
             invoice_table.add_empty_row()
 
             extract_final = self.generate_extract()
@@ -361,38 +370,36 @@ class PdfGeneration():
 
             self.doc.append(VerticalSpace('10ex'))
 
-
     def generate_additional_details(self):
         """
         Add details. For now, payment formula & IVA exemption.
         """
-        with self.doc.create(Section('',numbering=False)):
+        with self.doc.create(Section('', numbering=False)):
             self.doc.append("FORMA DE PAGO: Domiciliación Bancaria\n")
             self.doc.append("Exención de IVA según el 20.9 de la Ley 37/1992 de 28 de diciembre.")
 
-
     def generate_file(self,
-                      filename:str='test',
-                      mode:str='invoice'):
+                      filename: str = 'test',
+                      mode: str = 'invoice'):
         """Generate pdf file
 
         Args:
             filename (str, optional): _description_. Defaults to 'test'.
-            mode (str, optional): Defines if it must generate an invoice or a detailed extract. 
-                                  Defaults to 'invoice'.
+            mode (str, optional): Defines if it must generate
+                an invoice or a detailed extract.
+                Defaults to 'invoice'.
         """
-        ################################### Format page ###################################
+        # Format page
         self.doc.change_document_style("firstpage")
         self.doc.add_color(name="lightgray", model="gray", description="0.80")
 
-        ################################## Generate pdf ###################################
+        # Generate pdf
         file = f"./{self.current_associate_data['invoice_num']}" if mode == 'invoice' else \
                f"./{self.current_associate_data['invoice_num']}_extract" if mode == 'extract' else \
                filename
         self.doc.generate_pdf(os.path.join(os.path.dirname(__file__),
                                            file),
                               clean_tex=True)
-
 
     def generate_extract(self) -> list[tuple]:
         """
@@ -420,38 +427,37 @@ class PdfGeneration():
                           "ACOMPAÑAMIENTO",
                           "FORMACIONES",
                           "TALLERES_ACTIVIDADES_CAMPAMENTOS"]
-        test_quantity = [3, (5,2), (1,0), 0, 0, 0, 10, "6€", "15€", "20€"]
-        use = dict(zip(basic_concepts,test_quantity))
+        test_quantity = [3, (5, 2), (1, 0), 0, 0, 0, 10, "6€", "15€", "20€"]
+        use = dict(zip(basic_concepts,
+                       test_quantity))
 
         extract = []
         total = 0
-        for (concept,quantity) in use.items():
-            if isinstance(quantity,tuple):
+        for (concept, quantity) in use.items():
+            if isinstance(quantity, tuple):
                 subtotal_list = []
                 for child_quantity in quantity:
-                    if concept.upper() in ["COMEDOR", "ATENCIÓN_TEMPRANA"] and \
-                    child_quantity != 0:
+                    if concept.upper() in ["COMEDOR", "ATENCIÓN_TEMPRANA"] and child_quantity != 0:
                         subtotal_list.append(min(UNIT_PRICE[f'{concept}_MAX'],
-                                            child_quantity*UNIT_PRICE[concept]))
+                                                 child_quantity*UNIT_PRICE[concept]))
                 subtotal = sum(subtotal_list)
-                extract.append((concept.lower().replace('_',' '),
+                extract.append((concept.lower().replace('_', ' '),
                                 f"{UNIT_PRICE[concept]:.2f} €",
                                 f"{quantity}",
                                 f"{subtotal:.2f} €"))
-            elif isinstance(quantity,int):
-                if concept.upper() in ["COMEDOR", "ATENCIÓN_TEMPRANA"] and \
-                child_quantity != 0:
+            elif isinstance(quantity, int):
+                if concept.upper() in ["COMEDOR", "ATENCIÓN_TEMPRANA"] and child_quantity != 0:
                     subtotal.append(min(UNIT_PRICE[f'{concept}_MAX'],
                                         child_quantity*UNIT_PRICE[concept]))
                 subtotal = quantity*UNIT_PRICE[concept]
-                extract.append((concept.lower().replace('_',' '),
+                extract.append((concept.lower().replace('_', ' '),
                                 f"{UNIT_PRICE[concept]:.2f} €",
                                 f"{quantity}",
                                 f"{subtotal:.2f} €"))
 
-            elif isinstance(quantity,str):
+            elif isinstance(quantity, str):
                 subtotal = int(quantity[:-1])
-                extract.append((concept.lower().replace('_',' '),
+                extract.append((concept.lower().replace('_', ' '),
                                 "",
                                 "",
                                 f"{subtotal:.2f} €"))
@@ -459,9 +465,9 @@ class PdfGeneration():
             if subtotal != 0:
                 total += subtotal
 
-        extract_tax = [(bold("Base Imponible"),"","",bold(f"{total:.2f} €")),
-                    (bold("IVA (exento)"),"","",bold(f"{0:.2f} €")),
-                    (bold("Total"),"","",bold(f"{total:.2f} €"))]
+        extract_tax = [(bold("Base Imponible"), "", "", bold(f"{total:.2f} €")),
+                       (bold("IVA (exento)"), "", "", bold(f"{0:.2f} €")),
+                       (bold("Total"), "", "", bold(f"{total:.2f} €"))]
         extract.extend(extract_tax)
 
         return extract
@@ -475,17 +481,19 @@ class Associate:
     name: str
     NIF: str
     adress: str
-    id: str=''
+    id: str = ''
+
 
 @dataclass
 class Student:
     """
     A class for students
-    
+
     Args:
         name (str): First name of student
         associate (str): Legal representative, cooperative member
-        attendance (dict): keys -> activities, values -> list[str] representing the attendance to activity
+        attendance (dict): keys -> activities, values -> list[str]
+            representing the attendance to activity
     """
     name: str
     associate: str
@@ -496,7 +504,7 @@ class Student:
 class Children:
     """
     A class for students
-    
+
     Args:
         associate (str): Legal representative, cooperative member
         children (list[Student]): List of Student represented by associate
@@ -507,23 +515,26 @@ class Children:
 
 if __name__ == '__main__':
     # invoice_date = date.today()
-    data = {#'invoice_num': get_invoice_num(invoice_date),
-            #'date': invoice_date.strftime("%d/%m/%y"),
+    data = {  # 'invoice_num': get_invoice_num(invoice_date),
+              # 'date': invoice_date.strftime("%d/%m/%y"),
             'name': 'Ejemplo Ejemplez Ejemplez',
             'NIF': '123456789B',
             'adress': 'C/ Dirección. Código Postal, Localidad, Provincia'}
 
     # generate_invoice(**data)
-    instance = PdfGeneration(invoice_num_start=2,associate_data=[data,data])
+    instance = PdfGeneration(invoice_num_start=2,
+                             associate_data=[data, data])
     from random import choices
     child_data = {
-        'Asier': dict(zip(ACTIVIDADES,[choices(['x',''],k=instance.num_monthdays) for act in ACTIVIDADES])),
-        'Mike': {
-            'comedor': choices(['x',''],k=instance.num_monthdays),
-            'judo': choices(['x',''],k=instance.num_monthdays)
-        },
+        'Asier': dict(zip(ACTIVIDADES, [choices(['x', ''],
+                                                k=instance.num_monthdays)
+                                        for act in ACTIVIDADES])),
+        'Mike': dict(zip(ACTIVIDADES, [choices(['x', ''],
+                                               k=instance.num_monthdays)
+                                       for act in ACTIVIDADES])),
     }
     instance.childs_data = child_data
-    
+
     instance.generate_set_invoices()
-    instance.generate_single_detailed_extract(data,child_data)
+    instance.generate_single_detailed_extract(data,
+                                              child_data)
