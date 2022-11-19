@@ -1,23 +1,23 @@
 '''
-Generate invoice
+Generate pdf files with pylatex 
+for invoices or detailed extracts.
 '''
+# import stdlib
 import calendar
 from datetime import date
 from dataclasses import dataclass
 from itertools import chain
-from functools import partial
 from json import dumps as jdumps
 from json import loads as jloads
 import locale
 import os
 
+# import external libs
+import numpy as np
 from pylatex import (Document, Foot, FootnoteText, Head, LargeText, LineBreak,
                      LongTabu, MiniPage, PageStyle, Section, StandAloneGraphic,
                      Tabular, VerticalSpace, TextColor)
-# from pylatex import MultiColumn, Tabu, NewLine, Tabularx,
-# from pylatex import TextColor, simple_page_number, SmallText, LongTable
 from pylatex.utils import NoEscape, bold, dumps_list
-import numpy as np
 
 ###########################################################################
 ########################## ENVIRONMENT VARIABLES ##########################
@@ -71,27 +71,39 @@ LOPD = os.getenv("LOPD",
                  "o a la dirección de correo electrónico lopd@colegioandolina.org.")
 
 
-COLORS = ["black", "blue", "brown", "cyan", "darkgray", "gray",
-          "green", "lightgray", "lime", "magenta", "olive", "orange",
-          "pink", "purple", "red", "teal", "violet", "white", "yellow"]
-assign_colors = dict(zip(ACTIVIDADES,COLORS))
+COLORS = ["black", 
+          "blue", 
+          "brown", # "cyan", "darkgray", "gray",
+          "green", # "lightgray", "lime", "magenta", "olive", 
+          "orange", # "pink", 
+          "purple", 
+          "red", 
+          "teal", 
+          "violet", # "white", 
+          "yellow"]
+activities_colors_dict = dict(zip(ACTIVIDADES,COLORS))
+
 
 class PdfGeneration():
-
     def __init__(self, 
                  series: str='FU',
                  invoice_num_start: int=0,
                  associate_data: list[dict]=[{'name': 'Ejemplo Ejemplez'}],
                  child_data: list[dict]=[{}]) -> None:
-        """
-        This class generates different kinds of pdf documents using pylatex
+        """This class generates different kinds of pdf documents using pylatex
 
         Args:
-            mode (str, optional): invoice, details. Defaults to 'invoice'.
+            series (str, optional): invoice series. Defaults to 'FU'.
+            invoice_num_start (int, optional): which invoice number to start with. Defaults to 0.
+            associate_data (_type_, optional): a list of dicts for each associate. Migrating to dataclass. 
+                                               Defaults to [{'name': 'Ejemplo Ejemplez'}].
+            child_data (list[dict], optional): each element corresponds to a dict with the children represented by
+                                               a single associate. The dict has the children as keys and the values
+                                               are dicts activities - attendance.
+                                               Migrating to dataclass. Defaults to [{}].
         """
-        ###################################################################################
-        ############################ Document Geometry Options ############################
-        ###################################################################################
+
+        # Document Geometry Options
         self.geometry_options = {
             "head": "40pt",
             "margin": "0.5in",
@@ -116,35 +128,44 @@ class PdfGeneration():
         # extract data
         self.initial_month_skip, self.num_monthdays = calendar.monthrange(self.year,self.month)
         self.current_calendar = calendar.Calendar()
-        self.matrix_calendar = [[x if x != 0 else '' for x in week] for week in self.current_calendar.monthdayscalendar(self.year, self.month)]
-        self.matrix_rows_calendar = np.concatenate((np.array(['']*len(self.matrix_calendar))[:,None],
+        self.matrix_calendar = [[x if x != 0 else '' 
+                                 for x in week] 
+                                for week in self.current_calendar.monthdayscalendar(self.year,
+                                                                                    self.month)]
+        self.matrix_rows_calendar = np.concatenate((np.array([''] * len(self.matrix_calendar),
+                                                             dtype="object")[:,None],
                                                     self.matrix_calendar),
-                                                   axis=1)
-        self.final_month_skip = 7*len(self.matrix_calendar) - (self.initial_month_skip + self.num_monthdays)
-        self.initial_month_skip_list = ['']*self.initial_month_skip
-        self.final_month_skip_list = ['']*self.final_month_skip
-        locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+                                                    axis=1)
+        self.final_month_skip = 7 * len(self.matrix_calendar) - (self.initial_month_skip + self.num_monthdays)
+        self.initial_month_skip_list = [''] * self.initial_month_skip
+        self.final_month_skip_list = [''] * self.final_month_skip
+        locale.setlocale(locale.LC_TIME, 
+                         'es_ES.UTF-8')
         self.week_days = list(calendar.day_name)
-        self.week_days_row = list(chain([''],self.week_days))
-        self.assigned_colors = [assign_colors[activity.upper()] for activity in ACTIVIDADES]
+        self.week_days_row = list(chain([''],
+                                        self.week_days))
+        self.assigned_colors = [activities_colors_dict[activity.upper()] 
+                                for activity in ACTIVIDADES]
 
 
-    def generate_set_detailed_extracts(self):
+    def generate_all_detailed_extracts(self):
         """
         Generate a lis of detailed extracts
         """
         for associate in self.associates_data:
-            self.generate_detailed_extract(associate_data=associate,
-                                           kids_data=self.childs_data[associate['name']])
-            # self.current_associate_data = current_associate_data
-            # for children_data in self.childs_data:
-            #     self.generate_detailed_extract(children_data)
+            self.generate_single_detailed_extract(associate_data = associate,
+                                                  kids_data = self.childs_data[associate['name']])
 
 
-    def generate_detailed_extract(self,associate_data,kids_data):
-        """
-        Generate a detailed extract with a calendar and
+    def generate_single_detailed_extract(self,
+                                         associate_data,
+                                         kids_data):
+        """Generate a detailed extract with a calendar and
         legend for each child assistance to every activity.
+
+        Args:
+            associate_data (_type_): the data of an associate
+            kids_data (_type_): the dict of kids with values dict activities - attendance.
         """
         self.current_associate_data = associate_data
         self.current_child_data = kids_data
@@ -157,8 +178,6 @@ class PdfGeneration():
         
         self.generate_detailed_calendar()
         
-        # self.generate_additional_details()
-        
         self.generate_file(mode='extract')
 
 
@@ -169,7 +188,7 @@ class PdfGeneration():
         """
         child_attendance_matrices_dict = self.get_child_attendance_rows()
         
-        calendar_tabu_spec = f'| X[l] | {(7*"X[c] | ")[:-1]}'
+        calendar_tabu_spec = f'| X[2c] | {(7*"X[3c] | ")[:-1]}'
         with self.doc.create(LongTabu(calendar_tabu_spec,
                                       row_height=1.5)) as extract_table:
             extract_table.add_hline()
@@ -177,7 +196,7 @@ class PdfGeneration():
                                mapper=bold,
                                color="black")
 
-            for i,week in enumerate(self.matrix_rows_calendar):
+            for i, week in enumerate(self.matrix_rows_calendar):
                 extract_table.add_hline()
                 extract_table.add_row(week)
                 extract_table.add_hline()
@@ -187,33 +206,43 @@ class PdfGeneration():
                 extract_table.add_hline()
             extract_table.add_hline()
 
-        self.doc.append(VerticalSpace('8ex'))
+        with self.doc.create(LongTabu(" X[c] | X[7l] ",
+                                      row_height=1)) as legend_table:
+            for activity, color in activities_colors_dict.items():
+                legend_table.add_row([TextColor(color,
+                                                'x'),
+                                      activity])
+
+        # self.doc.append(VerticalSpace('8ex'))
 
 
-    def get_child_attendance_rows(self):
+    def get_child_attendance_rows(self) -> dict:
         """
-        Generate a dict of attendance
-
-        Args:
-            shape (tuple): the shape of the month (num_weeks,7)
+        Generate a dict of attendance.
+        This method is a bit obscure in order to improve efficiency:
+        for each kid, we want to generate a monthly row (see monthdayscalendar)
+        attendance TeX object.
 
         Returns:
             dict: dict with childs as keys and
             values a list of len num days of month
             where each value is a concatenation of
-            assistance colored characters
+            assistance colored characters.
         """
-        E = [np.reshape(list(chain(self.initial_month_skip_list,
-                                   [list(map(TextColor,
-                                             *(self.assigned_colors,daily_attendance)))
-                                    for daily_attendance in zip(*activities_dict.values())],
-                                   self.final_month_skip_list)),
+        E = [np.reshape(np.array(list(chain(self.initial_month_skip_list,
+                                            [list(map(TextColor,
+                                                      *(self.assigned_colors,daily_attendance)))
+                                             for daily_attendance in zip(*activities_dict.values())],
+                                            self.final_month_skip_list)),
+                                 dtype=object),
                         (len(self.matrix_calendar),7)) 
              for activities_dict in child_data.values()]
-
-        attendance_rows_list = [np.concatenate((np.array([child]*len(self.matrix_calendar))[:,None],
+        
+        attendance_rows_list = [np.concatenate((np.array([child]*len(self.matrix_calendar),
+                                                         dtype="object")[:,None],
                                                 monthly_attendance),
-                                               axis=1) for child,monthly_attendance in zip(child_data.keys(),E)]
+                                                axis=1) 
+                                for child,monthly_attendance in zip(child_data.keys(),E)]
 
         child_attendance_matrices_dict = dict(zip(child_data.keys(),attendance_rows_list))
 
@@ -221,13 +250,16 @@ class PdfGeneration():
 
 
     def generate_set_invoices(self):
-        for i,associate_data in enumerate(self.associates_data):
+        for associate_data in self.associates_data:
             self.generate_invoice(associate_data)
         
 
-    def generate_invoice(self, associate_data):
-        """
-        Generate invoice from associate data.
+    def generate_invoice(self, 
+                         associate_data):
+        """Generate invoice from associate data.
+
+        Args:
+            associate_data (_type_): Generate an invoice for current associate.
         """
         self.current_associate_data = associate_data
 
@@ -273,6 +305,7 @@ class PdfGeneration():
 
         self.doc.append(VerticalSpace('8ex'))
 
+
     def generate_invoice_id(self) -> str:
         '''
         Get current invoice number formated
@@ -293,10 +326,10 @@ class PdfGeneration():
 
     def generate_associate_table(self):
         """
-        Add associate information
+        Add associate information to file as table
         """
         with self.doc.create(Tabular('l|l',
-                                     row_height=1.5)) as associate_table:
+                                     row_height=1.2)) as associate_table:
             associate_table.add_row([bold("Nombre:"), self.current_associate_data['name']])
             associate_table.add_hline()
             associate_table.add_row([bold("NIF:"), self.current_associate_data['NIF']])
@@ -338,13 +371,15 @@ class PdfGeneration():
             self.doc.append("Exención de IVA según el 20.9 de la Ley 37/1992 de 28 de diciembre.")
 
 
-    def generate_file(self,filename:str='test',mode:str='invoice'):
+    def generate_file(self,
+                      filename:str='test',
+                      mode:str='invoice'):
         """Generate pdf file
 
         Args:
             filename (str, optional): _description_. Defaults to 'test'.
             mode (str, optional): Defines if it must generate an invoice or a detailed extract. 
-            Defaults to 'invoice'.
+                                  Defaults to 'invoice'.
         """
         ################################### Format page ###################################
         self.doc.change_document_style("firstpage")
@@ -356,7 +391,7 @@ class PdfGeneration():
                filename
         self.doc.generate_pdf(os.path.join(os.path.dirname(__file__),
                                            file),
-                              clean_tex=False)
+                              clean_tex=True)
 
 
     def generate_extract(self) -> list[tuple]:
@@ -482,10 +517,7 @@ if __name__ == '__main__':
     instance = PdfGeneration(invoice_num_start=2,associate_data=[data,data])
     from random import choices
     child_data = {
-        'Asier': {
-            'comedor': choices(['x',''],k=instance.num_monthdays),
-            'judo': choices(['x',''],k=instance.num_monthdays)
-        },
+        'Asier': dict(zip(ACTIVIDADES,[choices(['x',''],k=instance.num_monthdays) for act in ACTIVIDADES])),
         'Mike': {
             'comedor': choices(['x',''],k=instance.num_monthdays),
             'judo': choices(['x',''],k=instance.num_monthdays)
@@ -494,4 +526,4 @@ if __name__ == '__main__':
     instance.childs_data = child_data
     
     instance.generate_set_invoices()
-    instance.generate_detailed_extract(data,child_data)
+    instance.generate_single_detailed_extract(data,child_data)
