@@ -1,0 +1,9 @@
+{% extends 'school_site/base.html' %}
+{% load static %}
+{% block content %}
+{% if user.is_authenticated %}
+MY BILLS PAGE FOR EACH USER
+{% else %}
+PAGE NOT AVAILABLE
+{% endif %}
+{% endblock %}

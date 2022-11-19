@@ -1,0 +1,47 @@
+{% extends 'school_site/base.html' %}
+{% load static %}
+{% load utils_form %}
+{% block content %}
+<link rel="stylesheet" href="{% static '/school_site/stylesheets/double_entries_tables.css' %}" type="text/css">
+{% if user.is_authenticated %}
+EDIT SHEET PAGE
+   <form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_ul }}
+
+        <table>
+          <caption> {{ title }} </caption>
+          <tr>
+            <td></td>
+              {% for day in headers_column.header_days %}
+                <th scope="col">{{ day }}</th>
+              {% endfor %}
+          </tr>
+            <tr>
+                <td></td>
+                {% for date in headers_column.header_numbers %}
+                    <th scope="col">{{ date }}</th>
+                {% endfor %}
+            </tr>
+            {% for item in rows %}
+              <tr>
+                <th scope="row">{{ item.label }}</th>
+                  {% for value in item.content %}
+                      {% if value|is_checkbutton_selected:selected_buttons %}
+                        <td><input type="checkbox" name={{ value }} checked=True</td>
+                      {% else %}
+                        <td><input type="checkbox" name={{ value }} </td>
+                      {% endif %}
+                  {% endfor %}
+              </tr>
+            {% endfor %}
+        </table>
+
+    <input type="submit" value="Submit">
+    </form>
+
+
+{% else %}
+PAGE NOT AVAILABLE
+{% endif %}
+{% endblock %}

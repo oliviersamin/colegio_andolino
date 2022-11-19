@@ -1,0 +1,9 @@
+{% extends 'school_site/base.html' %}
+{% load static %}
+{% block content %}
+{% if user.is_authenticated %}
+ERROR PAGE - THERE WAS EN ERROR DURING THE PROCESS
+{% else %}
+PAGE NOT AVAILABLE
+{% endif %}
+{% endblock %}

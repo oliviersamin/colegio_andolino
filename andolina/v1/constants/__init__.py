@@ -3,6 +3,7 @@ from .models import (
     SCHOOL_STATUS,
     DOCUMENT_CREATION_TYPE,
     DOCUMENT_TYPE,
+    PUBLIC_ACTIVITY,
 )
 
 from .api import (

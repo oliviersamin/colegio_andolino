@@ -1,0 +1,22 @@
+{% extends 'school_site/base.html' %}
+{% load static %}
+{% block content %}
+{% if user.is_authenticated %}
+MY PROFILE PAGE - {{ user.get_full_name }} - {{ children }}
+    <ul>TO ADD:
+        <li>User activities </li>
+    </ul>
+
+
+    {% block edit_profile %}{% endblock %}
+    <div id="buttons">
+        <button><a class="home_buttons" href="{%url 'school_site:edit_profile'%}">Edit my profile</a></button>
+    </div>
+    <div id="buttons">
+        <button><a class="home_buttons" href="{%url 'password_change'%}">Change my password</a></button>
+    </div>
+
+{% else %}
+PAGE NOT AVAILABLE
+{% endif %}
+{% endblock %}

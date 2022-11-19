@@ -127,3 +127,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/andolina/v1/migrations/0011_external.py
+/andolina/v1/migrations/0012_alter_activity_options_remove_activity_creator_and_more.py
+/andolina/v1/migrations/0013_remove_activity_creator_external_and_more.py
+/andolina/v1/migrations/0014_remove_archive_content_archive_sheets_and_more.py
+/andolina/v1/migrations/0015_sheet_is_archived.py

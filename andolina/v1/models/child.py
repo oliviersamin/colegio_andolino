@@ -3,12 +3,13 @@ from django.contrib.auth.models import User
 import datetime
 from .teacher import Teacher
 
+
 class Child(models.Model):
     """ parent model """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    birth_date = models.DateField()
-    age = models.IntegerField(blank=True, null=True)
-    tutor = models.ForeignKey(Teacher, related_name='pupil', on_delete=models.CASCADE)
+    birth_date = models.DateField(blank=True, null=True)
+    age = models.PositiveSmallIntegerField(blank=True, null=True)
+    tutor = models.ForeignKey(Teacher, blank=True, null=True, related_name='pupil', on_delete=models.CASCADE)
     date_created = models.DateField(auto_now_add=True, blank=True)
     date_updated = models.DateField(auto_now=True, blank=True)
 
@@ -17,12 +18,15 @@ class Child(models.Model):
         verbose_name_plural = "Children"
 
     def __str__(self):
-        displayed = "name: {}".format(self.user.get_full_name())
-        return displayed
+        return self.user.get_full_name()
 
     def get_age(self):
-        delta = (datetime.date.today() - self.birth_date).days
-        self.age = int(delta/365.25)
+        try:
+            delta = (datetime.date.today() - self.birth_date).days
+            self.age = int(delta/365.25)
+        except Exception as e:
+            print(e)
+
         return self.age
 
     def first_name(self):

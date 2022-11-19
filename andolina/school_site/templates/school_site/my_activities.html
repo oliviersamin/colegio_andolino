@@ -1,0 +1,113 @@
+{% extends 'school_site/base.html' %}
+{% load static %}
+{% load utils_form %}
+{% block content %}
+{% if user.is_authenticated %}
+MY ACTIVITIES PAGE FOR EACH USER
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Public</th>
+            <th>Users</th>
+            <th>Message to the parents</th>
+            <th></th>
+            <th></th>
+            <th>Actions</th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        {% for activity in my_activities %}
+        <tr>
+            <th>{{ activity.name }}</th>
+            <th>{{ activity.public }}</th>
+            <th>
+            <ul>
+                {% for user in activity.users.all %}
+                    <li>{{ user.get_full_name }}</li>
+                {% endfor %}
+            </ul>
+            </th>
+            <th>{{ activity.comment_for_parent }}</th>
+            <th>
+                <button><a class="home_buttons" href="{% url 'school_site:edit_activity' activity_id=activity.id %}">Edit activity</a></button>
+            </th>
+        {% if activity|is_inscription_open %}
+            <th>
+                <button><a class="home_buttons" href="{% url 'school_site:edit_activity_users' activity_id=activity.id %}">Edit activity users</a></button>
+            </th>
+        {% endif %}
+            {% if not activity.id|sheet_exists %}
+                {% if activity.sheet.all.first.id|is_monthly_sheet_archived %}
+                    <th>
+                        <button disabled> Create sheet</button>
+                    </th>
+                {% else %}
+                    <th>
+                        <button><a disabled class="home_buttons" href="{% url 'school_site:create_sheet' activity_id=activity.id %}">Create sheet</a></button>
+                    </th>
+                {% endif %}
+            {% endif %}
+            {% if activity.id|sheet_exists %}
+            <th>
+                <button><a class="home_buttons" href="{% url 'school_site:edit_sheet' sheet_id=activity.sheet.all.first.id %}">Edit sheet</a></button>
+            </th>
+            <th>
+                <button><a class="home_buttons" href="{% url 'school_site:ask_validate_sheet' sheet_id=activity.sheet.all.first.id %}">Validate sheet</a></button>
+            </th>
+                <th></th>
+                <th>
+                    <button><a class="home_buttons" href="{% url 'school_site:ask_delete_sheet' sheet_id=activity.sheet.all.first.id %}">Delete sheet</a></button>
+                </th>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    TO DO:
+    <ul>
+    <li>ARCHIVES DES MOIS PRECEDENTS (FEUILLES DE PARTICIPATION...)</li>
+        <li>creation automatique des archives chaque mois. Les utilisateurs envoient leur feuilles dans l archive du mois correspondant</li>
+    <li>Formulaire pour choisir l activite et le mois de lannee scolaire en cours</li>
+    </ul>
+
+    <div id="buttons">
+        <button><a class="home_buttons" href="{%url 'school_site:create_my_activity'%}">Create a new activity</a></button>
+    </div>
+
+    {% block create_my_activity %}{% endblock %}
+
+    <div id="archives">
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Year</th>
+            <th>Month</th>
+            <th></th>
+            <th></th>
+            <th>Actions</th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        {% for archive in archives %}
+        <tr>
+            <th>{{ archive.name }}</th>
+            <th>{{ archive.type }}</th>
+            <th>{{ archive.year }}</th>
+            <th>{{ archive.month }}</th>
+            <th>
+                <button><a class="home_buttons" href="{% url 'school_site:edit_archive' archive_id=archive.id %}">Edit activity</a></button>
+            </th>
+        </tr>
+        {% endfor %}
+    </table>
+
+    </div>
+
+
+{% else %}
+PAGE NOT AVAILABLE
+{% endif %}
+{% endblock %}
