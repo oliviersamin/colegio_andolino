@@ -10,6 +10,7 @@ from v1.constants.models import (
 class Parent(models.Model):
     """ parent model """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    partner = models.ForeignKey('v1.Parent', on_delete=models.CASCADE, help_text='wife/husband of the user', blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
     mobile = models.CharField(max_length=20, blank=True, null=True)
     address = models.CharField(max_length=200, blank=True, null=True)

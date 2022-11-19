@@ -19,6 +19,8 @@ class Sheet(models.Model):
     month = models.PositiveSmallIntegerField(blank=True, null=True, choices=get_month_choices())
     content = models.JSONField()
     is_archived = models.BooleanField(default=False, null=True)
+    archive = models.ForeignKey('v1.Archive', related_name='sheets', on_delete=models.CASCADE, blank=True, null=True)
+
 
 
     class Meta:

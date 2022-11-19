@@ -2,15 +2,13 @@ from django.urls import path, include
 from . import views
 
 
-app_name = 'school_site'
-
 urlpatterns = [
     # home page before login
     path('', views.Home.as_view(), name='home'),
     # pages after login
+    path('dashboard', views.Dashboard.as_view(), name='dashboard'),
     path('my-profile', views.MyProfile.as_view(), name='my_profile'),
     path('my-profile/edit', views.EditProfile.as_view(), name='edit_profile'),
-    path('dashboard', views.Dashboard.as_view(), name='dashboard'),
     path('my-children-activities', views.ChildrenActivities.as_view(), name='children_activities'),
     path('add-child', views.AddChild.as_view(), name='add_child'),
     path('edit-child/<int:child_id>', views.EditChild.as_view(), name='edit_child'),
@@ -30,3 +28,5 @@ urlpatterns = [
     path('error', views.ValidationFormError.as_view(), name='validation_error'),
 
 ]
+app_name = 'school_site'
+

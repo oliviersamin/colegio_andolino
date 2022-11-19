@@ -7,7 +7,6 @@ from v1.models import Child, Parent, Activity, Sheet, External, Archive
 
 from school_site.utils import (
     parse_checkboxes,
-    children_and_dates,
     users_and_dates_for_sheet_table,
     get_current_month_dates_headers,
 )
@@ -462,7 +461,7 @@ class ValidateSheet(View):
                     archive.year = sheet.year
                     archive.month = sheet.month
                     archive.save()
-                sheet.archive.add(archive)
+                sheet.archive = archive
                 sheet.is_archived = True
                 sheet.save()
                 return redirect('school_site:validation_success')

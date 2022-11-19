@@ -13,7 +13,6 @@ class Archive(models.Model):
     type = models.CharField(max_length=40, blank=True, null=True, choices=TYPE_CHOICES)
     year = models.PositiveSmallIntegerField(blank=True, null=True, choices=YEAR_CHOICES)
     month = models.PositiveSmallIntegerField(blank=True, null=True, choices=MONTH_CHOICES)
-    sheets = models.ForeignKey('v1.Sheet', related_name='archive', on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         ordering = ['type', 'year', 'month', 'name']
