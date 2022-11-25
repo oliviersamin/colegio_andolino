@@ -34,6 +34,7 @@ from school_site.utils import (
     set_initial_activity_fields,
     save_activity_form_fields,
     set_initial_sheet_fields,
+    get_activities_for_actual_school_year,
 )
 
 
@@ -372,14 +373,16 @@ class CreateSheet(View):
             existing_sheet = Sheet.objects.filter(
                 year=form.cleaned_data['year']).filter(
                 month=form.cleaned_data['month']).filter(activity_id=activity_id).first()
-            # creation of the new sheet
-            new_sheet = Sheet()
-            new_sheet.year = form.cleaned_data['year']
-            new_sheet.month = form.cleaned_data['month']
-            new_sheet.activity_id = activity_id
-            new_sheet.content = {}
-            new_sheet.save()
-            return redirect('school_site:validation_success')
+            if not existing_sheet:
+                # creation of the new sheet
+                new_sheet = Sheet()
+                new_sheet.year = form.cleaned_data['year']
+                new_sheet.month = form.cleaned_data['month']
+                new_sheet.activity_id = activity_id
+                new_sheet.content = {}
+                new_sheet.save()
+                return redirect('school_site:validation_success')
+            return redirect('school_site:validation_error')
         return redirect('school_site:validation_error')
 
 
@@ -501,10 +504,39 @@ class MyBills(View):
     template_name = 'school_site/my_bills.html'
 
     def get(self, request):
-        context = {}
+        #TODO: 1. for the request.user get all the activities he has attended or his children or his partner
+        # 2. retireve all the data from the sheets archived and format them in the input format of Miguel
+        """
+        For the GET method info I need are:
+        1. for each member of the family (parent, parent.partner and children) all the activities they are user
+        for the whole school year
+        """
         if request.user.is_authenticated:
+            context = {}
+            user_activities = get_activities_for_actual_school_year(request.user)
+            parent = Parent.objects.get(user=request.user)
+            partner_activities = get_activities_for_actual_school_year(parent.partner.user)
+            children_activities = [get_activities_for_actual_school_year(child.user) for child in parent.children.all()]
+            activities = Activity.objects.all()
             return render(request, self.template_name, context=context)
         return redirect('school_site:home')
+
+    def post(self, request):
+        """
+        For now the output format of the POST method will be:
+        [{
+        'user': 'Olivier',
+        'activities': [{
+                        'name': 'judo',
+                        'year': 2022,
+                        'month': 11,
+                        'participation_dates': [1, 3, 6, 28]
+                        }, {'name': 'musica', 'year': 2022, 'month': 11, ....}, ...]
+        },
+        'user': 'Paula',
+        'activities': [{ ... }]}, ....]
+        """
+        pass
 
 
 class ValidationFormSuccess(View):

@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 # from . import Parent, External
 from v1.constants import PUBLIC_ACTIVITY
+from school_site.constants import PERMISSION_ACTIVITY_CHOICES
 
 
 class Activity(models.Model):
@@ -25,6 +26,7 @@ class Activity(models.Model):
     money_earned_by_school = models.FloatField(blank=True, null=True)
     public = models.CharField(max_length=40, choices=PUBLIC_ACTIVITY, blank=True, null=True)
     comment_for_parent = models.TextField(blank=True, null=True)
+    edit_permission = models.CharField(max_length=40, choices=PERMISSION_ACTIVITY_CHOICES, blank=True, null=True)
 
     class Meta:
         ordering = ['name', 'public', 'is_inscription_open']

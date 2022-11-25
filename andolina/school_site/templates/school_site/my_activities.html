@@ -32,33 +32,33 @@ MY ACTIVITIES PAGE FOR EACH USER
             <th>
                 <button><a class="home_buttons" href="{% url 'school_site:edit_activity' activity_id=activity.id %}">Edit activity</a></button>
             </th>
-        {% if activity|is_inscription_open %}
-            <th>
-                <button><a class="home_buttons" href="{% url 'school_site:edit_activity_users' activity_id=activity.id %}">Edit activity users</a></button>
-            </th>
-        {% endif %}
-            {% if not activity.id|sheet_exists %}
-                {% if activity.sheet.all.first.id|is_monthly_sheet_archived %}
-                    <th>
-                        <button disabled> Create sheet</button>
-                    </th>
-                {% else %}
-                    <th>
-                        <button><a disabled class="home_buttons" href="{% url 'school_site:create_sheet' activity_id=activity.id %}">Create sheet</a></button>
-                    </th>
-                {% endif %}
+            {% if activity|is_inscription_open %}
+                <th>
+                    <button><a class="home_buttons" href="{% url 'school_site:edit_activity_users' activity_id=activity.id %}">Edit activity users</a></button>
+                </th>
             {% endif %}
-            {% if activity.id|sheet_exists %}
-            <th>
-                <button><a class="home_buttons" href="{% url 'school_site:edit_sheet' sheet_id=activity.sheet.all.first.id %}">Edit sheet</a></button>
-            </th>
-            <th>
-                <button><a class="home_buttons" href="{% url 'school_site:ask_validate_sheet' sheet_id=activity.sheet.all.first.id %}">Validate sheet</a></button>
-            </th>
+            {% if activity.sheet.all|are_all_sheets_created %}
+                <th>
+                    <button disabled> Create sheet</button>
+                </th>
+            {% else %}
+                <th>
+                    <button><a class="home_buttons" href="{% url 'school_site:create_sheet' activity_id=activity.id %}">Create sheet</a></button>
+                </th>
+            {% endif %}
+            {% if activity.id|is_past_or_present_sheet %}
+                {% with activity.id|is_oldest_sheet as oldest_sheet_id %}
+                <th>
+                    <button><a class="home_buttons" href="{% url 'school_site:edit_sheet' sheet_id=oldest_sheet_id %}">Edit sheet</a></button>
+                </th>
+                <th>
+                    <button><a class="home_buttons" href="{% url 'school_site:ask_validate_sheet' sheet_id=oldest_sheet_id %}">Validate sheet</a></button>
+                </th>
                 <th></th>
                 <th>
-                    <button><a class="home_buttons" href="{% url 'school_site:ask_delete_sheet' sheet_id=activity.sheet.all.first.id %}">Delete sheet</a></button>
+                    <button><a class="home_buttons" href="{% url 'school_site:ask_delete_sheet' sheet_id=oldest_sheet_id %}">Delete sheet</a></button>
                 </th>
+                {% endwith %}
             {% endif %}
         </tr>
         {% endfor %}
@@ -66,6 +66,8 @@ MY ACTIVITIES PAGE FOR EACH USER
 
     TO DO:
     <ul>
+    <li>Create all sheets we want (past and futur months) and edit/save only past sheets not archived</li>
+        <li>if several past sheets not archived, always edit /save the oldest one</li>
     <li>ARCHIVES DES MOIS PRECEDENTS (FEUILLES DE PARTICIPATION...)</li>
         <li>creation automatique des archives chaque mois. Les utilisateurs envoient leur feuilles dans l archive du mois correspondant</li>
     <li>Formulaire pour choisir l activite et le mois de lannee scolaire en cours</li>

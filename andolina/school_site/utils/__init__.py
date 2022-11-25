@@ -17,6 +17,8 @@ from .form_utils import (
     get_current_month_dates_headers,
     set_initial_sheet_fields,
 )
+from .common import get_activities_for_actual_school_year
+
 
 __all__ = [
     PROFILE_FORM_FIELDS,
@@ -36,4 +38,5 @@ __all__ = [
     users_and_dates_for_sheet_table,
     get_current_month_dates_headers,
     set_initial_sheet_fields,
+    get_activities_for_actual_school_year,
 ]
