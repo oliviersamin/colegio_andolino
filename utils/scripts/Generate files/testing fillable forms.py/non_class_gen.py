@@ -1,12 +1,55 @@
+'''
+Generate pdf files with pylatex
+for invoices or detailed extracts.
+'''
+# import stdlib
+import calendar
 from datetime import date
+from dataclasses import dataclass
+from itertools import chain
+from json import dumps as jdumps
+from json import loads as jloads
+import locale
 import os
 
+# import external libs
+import numpy as np
 from pylatex import (Command, Document, Foot, FootnoteText, Head, HugeText, LargeText, LineBreak,
                      LongTabu, MiniPage, NoEscape, Package, PageStyle, Section, StandAloneGraphic, Subsection,
                      Tabular, VerticalSpace, TextColor)
 from pylatex.utils import NoEscape, bold, dumps_list
 from pylatex.base_classes import Environment
 
+
+"""
+ENVIRONMENT VARIABLES
+"""
+# Billing concepts
+PRECIO_MAX_COMEDOR = int(os.getenv('PRECIO_MAX_COMEDOR', '20'))
+PRECIO_DIA_COMEDOR = int(os.getenv('PRECIO_DIA_COMEDOR', '5'))
+PRECIO_MAX_TEMPRANA = int(os.getenv('PRECIO_MAX_TEMPRANA', '20'))
+PRECIO_DIA_TEMPRANA = int(os.getenv('PRECIO_DIA_TEMPRANA', '5'))
+EXTRAESCOLARES = jloads(os.getenv('EXTRAESCOLARES',
+                                  ('{"JUDO": 25,'
+                                   '"CIENCIA": 20,'
+                                   '"TEATRO": 20,'
+                                   '"ROBOTIX": 20}')))
+ACTIVIDADES_ESCOLARES = ['COLEGIO',
+                         'ATENCIÓN TEMPRANA',
+                         'COMEDOR']
+ACTIVIDADES = ACTIVIDADES_ESCOLARES
+ACTIVIDADES.extend(EXTRAESCOLARES.keys())
+UNIT_PRICES_DICT = {"CUOTA": 325,
+                    "COMEDOR": 5,
+                    "COMEDOR_MAX": 25,
+                    "ATENCIÓN_TEMPRANA": 5,
+                    "ATENCIÓN_TEMPRANA_MAX": 25,
+                    "JUDO": 25,
+                    "CIENCIA": 20,
+                    "TEATRO": 20,
+                    "ROBOTIX": 20}
+UNIT_PRICE = jloads(os.getenv('UNIT_PRICE',
+                              jdumps(UNIT_PRICES_DICT)))
 CASES = os.getenv('CASES',
                   ['invoice',
                    'extract',
@@ -16,7 +59,8 @@ CASES = os.getenv('CASES',
                    'image posting',
                    'school outings',
                    'health report',])
-"""case 'invoice':
+"""
+case 'invoice':
 case 'extract':
 case 'enrollment':
 case 'direct debit':
@@ -38,7 +82,7 @@ COLEGIO_TELEFONO = os.getenv("COLEGIO_TELEFONO",
 COLEGIO_DPO = os.getenv("COLEGIO_DPO",
                         "lopd@colegioandolina.org")
 COLEGIO_DATOS = os.getenv("COLEGIO_DATOS",
-                          f'{COLEGIO_NOMBRE} - CIF:'
+                          f'{COLEGIO_NOMBRE} - CIF: '
                           f'{COLEGIO_CIF} - {COLEGIO_DIRECCION}; '
                           f'contacto DPO: {COLEGIO_DPO}.')
 CLAUSULA_PROT_DATOS = ("Te informamos de la incorporación de tus datos "
@@ -223,8 +267,19 @@ INFO_DATOS_MEDICOS = os.getenv('INFO_DATOS_MEDICOS',
                                "y los consideramos fundamentales para su salud "
                                "y su correcto desarrollo educativo. "
                                "Esta información, como el resto aportada en la solicitud de matrícula, "
-                               "tienen la consideración de confidenciales."
-)
+                               "tienen la consideración de confidenciales.")
+
+COLORS = ["black",
+          "blue",
+          "brown",  # "cyan", "darkgray", "gray",
+          "green",  # "lightgray", "lime", "magenta", "olive",
+          "orange",  # "pink",
+          "purple",
+          "red",
+          "teal",
+          "violet",  # "white",
+          "yellow"]
+activities_colors_dict = dict(zip(ACTIVIDADES, COLORS))
 
 class Form(Environment):
     """A class to wrap hyperref's form environment."""
@@ -240,6 +295,61 @@ class Form(Environment):
 class PdfGen():
     def __init__(self, mode:str) -> None:
         self.mode = mode
+        # Document Geometry Options
+        self.geometry_options = {
+            "head": "40pt",
+            "margin": "0.5in",
+            "bottom": "1.6in",
+            "includeheadfoot": True
+        }
+
+    def generate_files(self):
+        match self.mode:
+            case 'invoice':
+                for associate_data in self.associates_data:
+                    self.generate_invoice(associate_data)
+            case 'extract':
+                for associate in self.associates_data:
+                    self.generate_single_detailed_extract(associate_data=associate,
+                                                        kids_data=self.childs_data[associate['name']])
+            case _:
+                self.fill_file()
+            # case 'enrollment':
+            # case 'direct debit':
+            # case 'LOPD':
+            # case 'image posting':
+            # case 'school outings':
+            # case 'health report':
+
+    def fill_file(self):
+        self.header()
+        self.footer()
+        self.doc.preamble.append(self.first_page)
+        self.body()
+        self.generate_file()
+
+    def generate_file(self,
+                      filename: str = 'test',
+                      mode: str = 'invoice'):
+        """Generate pdf file
+
+        Args:
+            filename (str, optional): _description_. Defaults to 'test'.
+            mode (str, optional): Defines if it must generate
+                an invoice or a detailed extract.
+                Defaults to 'invoice'.
+        """
+        # Format page
+        self.doc.change_document_style("firstpage")
+        self.doc.add_color(name="lightgray", model="gray", description="0.80")
+
+        # Generate pdf
+        file = f"./{self.current_associate_data['invoice_num']}" if mode == 'invoice' else \
+               f"./{self.current_associate_data['invoice_num']}_extract" if mode == 'extract' else \
+               filename
+        self.doc.generate_pdf(os.path.join(os.path.dirname(__file__),
+                                           file),
+                              clean_tex=True)
 
     def header(self,) -> None:
         """
@@ -263,35 +373,45 @@ class PdfGen():
                 # Add document title
                 with self.first_page.create(Head("R")) as right_header:
                     with right_header.create(MiniPage(width=NoEscape(r"0.5\textwidth"),
-                                                    pos='c', align='l')) as title_wrapper:
+                                                      pos='c',
+                                                      align='l')) as title_wrapper:
                         self.generate_invoice_id()
                         title_wrapper.append(LargeText(bold(f"Número de factura: {self.current_associate_data['invoice_num']}")))
                         title_wrapper.append(LineBreak())
                         title_wrapper.append(LineBreak())
-                        title_wrapper.append(TextColor('black',
-                                                    LargeText(bold(f"Fecha: {self.current_associate_data['date']}"))))
+                        title_wrapper.append(LargeText(bold(f"Fecha: {self.current_associate_data['date']}")))
             case 'extract':
-                pass
+                # Add document title
+                with self.first_page.create(Head("R")) as right_header:
+                    with right_header.create(MiniPage(width=NoEscape(r"0.5\textwidth"),
+                                                      pos='c',
+                                                      align='l')) as title_wrapper:
+                        self.generate_invoice_id()
+                        title_wrapper.append(LargeText(bold(f"Extracto de factura: {self.current_associate_data['invoice_num']}")))
+                        title_wrapper.append(LineBreak())
+                        title_wrapper.append(LineBreak())
+                        title_wrapper.append(LargeText(bold(f"Fecha: {self.current_associate_data['date']}")))
             case 'enrollment':
                 with self.first_page.create(Head("R")) as right_header:
                     with right_header.create(MiniPage(width=NoEscape(r"0.5\textwidth"),
-                                                    pos='c', align='l')) as title_wrapper:
-                        self.generate_invoice_id()
+                                                      pos='c',
+                                                      align='l')) as title_wrapper:
                         title_wrapper.append(HugeText(bold("Impreso de Matrícula")))
                         title_wrapper.append(LineBreak())
                         title_wrapper.append(LineBreak())
                         with title_wrapper.create(Form()):
                             title_wrapper.append(Command('noindent'))
                             title_wrapper.append(Command('TextField',
-                                               options=[NoEscape("width=\linewidth"),"height=1in"],
-                                               arguments='Curso:'))
+                                               options=[NoEscape("width=\linewidth"),
+                                                        "height=1in"],
+                                               arguments='Curso: '))
             case 'direct debit':
                 pass
             case 'LOPD':
                 with self.first_page.create(Head("R")) as right_header:
                     with right_header.create(MiniPage(width=NoEscape(r"0.5\textwidth"),
-                                                    pos='c', align='l')) as title_wrapper:
-                        self.generate_invoice_id()
+                                                      pos='c',
+                                                      align='l')) as title_wrapper:
                         title_wrapper.append(LargeText(bold("Cláusula LOPD")))
                         title_wrapper.append(LineBreak())
                         title_wrapper.append(LineBreak())
@@ -300,8 +420,8 @@ class PdfGen():
             case 'image posting':
                 with self.first_page.create(Head("R")) as right_header:
                     with right_header.create(MiniPage(width=NoEscape(r"0.5\textwidth"),
-                                                    pos='c', align='l')) as title_wrapper:
-                        self.generate_invoice_id()
+                                                      pos='c',
+                                                      align='l')) as title_wrapper:
                         title_wrapper.append(LargeText(bold("Autorización para")))
                         title_wrapper.append(LineBreak())
                         title_wrapper.append(LineBreak())
@@ -310,35 +430,46 @@ class PdfGen():
             case 'school outings':
                 with self.first_page.create(Head("R")) as right_header:
                     with right_header.create(MiniPage(width=NoEscape(r"0.5\textwidth"),
-                                                    pos='c', align='l')) as title_wrapper:
-                        self.generate_invoice_id()
+                                                      pos='c',
+                                                      align='l')) as title_wrapper:
                         title_wrapper.append(LargeText(bold("Autorización Salidas Escolares")))
             case 'health report':
                 with self.first_page.create(Head("R")) as right_header:
                     with right_header.create(MiniPage(width=NoEscape(r"0.5\textwidth"),
-                                                    pos='c', align='l')) as title_wrapper:
-                        self.generate_invoice_id()
+                                                      pos='c',
+                                                      align='l')) as title_wrapper:
                         title_wrapper.append(LargeText(bold("Información de Salud - Alergias")))
                         title_wrapper.append(LineBreak())
                         title_wrapper.append(LineBreak())
                         with title_wrapper.create(Form()):
                             title_wrapper.append(Command('noindent'))
                             title_wrapper.append(Command('TextField',
-                                               options=[NoEscape("width=\linewidth"),"height=1in"],
-                                               arguments='Curso:'))
+                                               options=[NoEscape("width=\linewidth"),
+                                                        "height=1in"],
+                                               arguments='Curso: '))
 
         self.doc.append(VerticalSpace('8ex'))
+
+    def generate_invoice_id(self) -> str:
+        '''
+        Get current invoice number formated
+        Example: FU-2223-001
+        '''
+        self.current_associate_data['invoice_num'] = f'{self.series}-{self.current_academic_year}-{self.current_invoice_num:03}'
+        self.current_invoice_num += 1
+        self.current_associate_data['date'] = self.invoice_date.strftime("%d/%m/%y")
 
     def footer(self,):
         """
         Generate footer. For the time being, with LOPD & School adress
         """
         match self.mode:
-            case 'invoice':
+            case 'invoice' | 'extract':
                 with self.first_page.create(Foot("L")) as footer:
                     footer.append(FootnoteText(f"{LOPD}\n\n\n{COLEGIO_DATOS}"))
-            case 'extract':
-                pass
+            # case 'extract':
+            #     with self.first_page.create(Foot("L")) as footer:
+            #         footer.append(FootnoteText(f"{LOPD}\n\n\n{COLEGIO_DATOS}"))
             case 'enrollment':
                 with self.first_page.create(Foot("L")) as footer:
                     footer.append(FootnoteText(f"{COLEGIO_NOMBRE}"))
@@ -357,30 +488,212 @@ class PdfGen():
                     footer.append(FootnoteText(f"{INFO_DATOS_MEDICOS}\n\n\n{COLEGIO_DATOS}"))
 
     def body(self):
-        case 'invoice':
-            self.generate_associate_table()
-            self.doc.preamble.append(self.first_page)
-            self.generate_invoice_table()
-            self.generate_additional_details()
-        case 'extract':
-            self.generate_associate_table()
-            self.doc.preamble.append(self.first_page)
-            self.generate_detailed_calendar()
-        case 'enrollment':
-            self.student_section()
-            self.parents_section()
-            self.LOPD_section()
-        case 'direct debit':
-            pass
-        case 'LOPD':
-            self.LOPD_coop_section()
-        case 'image posting':
-            self.image_posting_table()
-            self.image_posting_LOPD()
-        case 'school outings':
-            self.parent_autorization()
-        case 'health report':
-            
+        match self.mode:
+            case 'invoice':
+                self.generate_associate_table()
+                # self.doc.preamble.append(self.first_page)
+                self.generate_invoice_table()
+                self.generate_additional_details()
+            case 'extract':
+                self.generate_associate_table()
+                # self.doc.preamble.append(self.first_page)
+                self.generate_detailed_calendar()
+            case 'enrollment':
+                self.student_section()
+                self.parents_section()
+                self.LOPD_section()
+            case 'direct debit':
+                pass
+            case 'LOPD':
+                self.LOPD_coop_section()
+            case 'image posting':
+                self.image_posting_table()
+                self.image_posting_LOPD()
+            case 'school outings':
+                self.parent_autorization()
+            case 'health report':
+                self.health_info()
+
+    def generate_associate_table(self):
+        """
+        Add associate information to file as table
+        """
+        with self.doc.create(Tabular('l|l',
+                                     row_height=1.2)) as associate_table:
+            associate_table.add_row([bold("Nombre:"), self.current_associate_data['name']])
+            associate_table.add_hline()
+            associate_table.add_row([bold("NIF:"), self.current_associate_data['NIF']])
+            associate_table.add_hline()
+            associate_table.add_row([bold("Dirección:"), self.current_associate_data['adress']])
+            associate_table.add_hline()
+
+        self.doc.append(VerticalSpace('8ex'))
+
+    def generate_invoice_table(self):
+        """
+        Generate a table with the extract for current invoice
+        """
+        with self.doc.create(LongTabu("X[3l] X[c] X[c] X[c]",
+                                      row_height=1.5)) as invoice_table:
+            invoice_table.add_row(["concepto",
+                                   "precio unitario",
+                                   "cantidad",
+                                   "subtotal"],
+                                  mapper=bold,
+                                  color="lightgray")
+            invoice_table.add_empty_row()
+
+            extract_final = self.generate_extract()
+            for row in extract_final:
+                invoice_table.add_hline()
+                invoice_table.add_row(row)
+
+            self.doc.append(VerticalSpace('10ex'))
+
+    def generate_extract(self) -> list[tuple]:
+        """
+        Generate current extract data into a list of rows (tuples).
+
+        Returns:
+            list[tuple]: _description_
+        """
+        '''
+        concepts = ["Atención temprana", "Acompañamiento",
+                    "Extracurricular 1", "Extracurricular 2",
+                    "Extracurricular 3", "Extracurricular 4",
+                    "Comedor", "Cuota", "Formaciones",
+                    "Talleres, actividades y campamentos", "Otros"]
+        quantity = [3, 5, 1, 0, 0, 0, 10, 2, "15€", "20€"]
+        data = dict(zip(concepts,quantity))
+        '''
+        basic_concepts = ["CUOTA",
+                          "COMEDOR",
+                          "ATENCIÓN_TEMPRANA",
+                          "JUDO",
+                          "CIENCIA",
+                          "TEATRO",
+                          "ROBOTIX",
+                          "ACOMPAÑAMIENTO",
+                          "FORMACIONES",
+                          "TALLERES_ACTIVIDADES_CAMPAMENTOS"]
+        test_quantity = [3, (5, 2), (1, 0), 0, 0, 0, 10, "6€", "15€", "20€"]
+        use = dict(zip(basic_concepts,
+                       test_quantity))
+
+        extract = []
+        total = 0
+        for (concept, quantity) in use.items():
+            if isinstance(quantity, tuple):
+                subtotal_list = []
+                for child_quantity in quantity:
+                    if concept.upper() in ["COMEDOR", "ATENCIÓN_TEMPRANA"] and child_quantity != 0:
+                        subtotal_list.append(min(UNIT_PRICE[f'{concept}_MAX'],
+                                                 child_quantity*UNIT_PRICE[concept]))
+                subtotal = sum(subtotal_list)
+                extract.append((concept.lower().replace('_', ' '),
+                                f"{UNIT_PRICE[concept]:.2f} €",
+                                f"{quantity}",
+                                f"{subtotal:.2f} €"))
+            elif isinstance(quantity, int):
+                if concept.upper() in ["COMEDOR", "ATENCIÓN_TEMPRANA"] and child_quantity != 0:
+                    subtotal.append(min(UNIT_PRICE[f'{concept}_MAX'],
+                                        child_quantity*UNIT_PRICE[concept]))
+                subtotal = quantity*UNIT_PRICE[concept]
+                extract.append((concept.lower().replace('_', ' '),
+                                f"{UNIT_PRICE[concept]:.2f} €",
+                                f"{quantity}",
+                                f"{subtotal:.2f} €"))
+
+            elif isinstance(quantity, str):
+                subtotal = int(quantity[:-1])
+                extract.append((concept.lower().replace('_', ' '),
+                                "",
+                                "",
+                                f"{subtotal:.2f} €"))
+
+            if subtotal != 0:
+                total += subtotal
+
+        extract_tax = [(bold("Base Imponible"), "", "", bold(f"{total:.2f} €")),
+                       (bold("IVA (exento)"), "", "", bold(f"{0:.2f} €")),
+                       (bold("Total"), "", "", bold(f"{total:.2f} €"))]
+        extract.extend(extract_tax)
+
+        return extract
+
+    def generate_additional_details(self):
+        """
+        Add details. For now, payment formula & IVA exemption.
+        """
+        with self.doc.create(Section('', numbering=False)):
+            self.doc.append("FORMA DE PAGO: Domiciliación Bancaria\n")
+            self.doc.append("Exención de IVA según el 20.9 de la Ley 37/1992 de 28 de diciembre.")
+
+    def generate_detailed_calendar(self):
+        """
+        Generate a calendar table with fields
+        according to kids assistance.
+        """
+        child_attendance_matrices_dict = self.get_child_attendance_rows()
+
+        calendar_tabu_spec = f'| X[2c] | {(7*"X[3c] | ")[:-1]}'
+        with self.doc.create(LongTabu(calendar_tabu_spec,
+                                      row_height=1.5)) as extract_table:
+            extract_table.add_hline()
+            extract_table.add_row(self.week_days_row,
+                                  mapper=bold,
+                                  color="black")
+
+            for i, week in enumerate(self.matrix_rows_calendar):
+                extract_table.add_hline()
+                extract_table.add_row(week)
+                extract_table.add_hline()
+                for monthly_attendance in child_attendance_matrices_dict.values():
+                    row = [dumps_list(cell) for cell in monthly_attendance[i]]
+                    extract_table.add_row(row)
+                extract_table.add_hline()
+            extract_table.add_hline()
+
+        with self.doc.create(LongTabu(" X[c] | X[7l] ",
+                                      row_height=1)) as legend_table:
+            for activity, color in activities_colors_dict.items():
+                legend_table.add_row([TextColor(color,
+                                                'x'),
+                                      activity])
+
+        # self.doc.append(VerticalSpace('8ex'))
+
+    def get_child_attendance_rows(self) -> dict:
+        """
+        Generate a dict of attendance.
+        This method is a bit obscure in order to improve efficiency:
+        for each kid, we want to generate a monthly row (see monthdayscalendar)
+        attendance TeX object.
+
+        Returns:
+            dict: dict with childs as keys and
+            values a list of len num days of month
+            where each value is a concatenation of
+            assistance colored characters.
+        """
+        E = [np.reshape(np.array(list(chain(self.initial_skip_list,
+                                            [list(map(TextColor,
+                                                      *(self.assigned_colors, daily_attendance)))
+                                             for daily_attendance in zip(*activities_dict.values())],
+                                            self.final_month_skip_list)),
+                                 dtype=object),
+                        (len(self.matrix_calendar), 7))
+             for activities_dict in self.children_data.values()]
+
+        attendance_rows_list = [np.concatenate((np.array([child]*len(self.matrix_calendar),
+                                                         dtype="object")[:, None],
+                                                monthly_attendance),
+                                               axis=1)
+                                for child, monthly_attendance in zip(self.children_data.keys(), E)]
+
+        child_attendance_matrices_dict = dict(zip(self.children_data.keys(), attendance_rows_list))
+
+        return child_attendance_matrices_dict
 
     def student_section(self,):
         with self.doc.create(Section('ALUMN@')):
@@ -396,14 +709,15 @@ class PdfGen():
                               'Domicilio',
                               'Nacionalidad']:
                     self.doc.append(Command('TextField',
-                                            options=[NoEscape("width=\linewidth"),"height=1in"],
-                                            arguments=f'{field}:',))
-    def parent_section(self):
+                                            options=[NoEscape("width=\linewidth"),
+                                                     "height=1in"],
+                                            arguments=f'{field}: ',))
+    def parents_section(self):
         for parent in ['MADRE/TUTORA',
                        'PADRE/TUTOR']:
-            with self.doc.create(Section(parent)) as section:
-                with section.create(Form()):
-                    section.append(Command('noindent'))
+            with self.doc.create(Section(parent)):
+                with self.doc.create(Form()):
+                    self.doc.append(Command('noindent'))
                     for field in ['Nombre',
                                   'Apellidos',
                                   'DNI',
@@ -413,50 +727,57 @@ class PdfGen():
                                   'Correo electrónico',
                                   'Domicilio']:
                         self.doc.append(Command('TextField',
-                                                options=[NoEscape("width=\linewidth"),"height=1in"],
-                                                arguments=f'{field}:',))
+                                                options=[NoEscape("width=\linewidth"),
+                                                         "height=1in"],
+                                                arguments=f'{field}: ',))
                     self.doc.append(Command('TextField',
-                                            options=[NoEscape("width=\linewidth"),"height=1in"],
-                                            arguments='Firma y fecha:'))
+                                            options=[NoEscape("width=\linewidth"),
+                                                     "height=1in"],
+                                            arguments='Firma y fecha: '))
 
     def LOPD_section(self):
         section_name = "CLÁUSULA DE PROTECCIÓN DE DATOS DE CARÁCTER PERSONAL"
-        with self.doc.create(Section(section_name)) as section:
+        with self.doc.create(Section(section_name)):
             self.doc.append(CLAUSULA_PROT_DATOS)
-            with self.doc.create(Subsection('ACEPTO:')) as subsection:
+            with self.doc.create(Subsection('ACEPTO: ')):
                 self.doc.append(CLAUSULA_PROT_DATOS_PERSONAL)
                 with self.doc.create(Form()):
+                    arg1 = "como titular o representante legal del mismo, "
+                    "consiente de forma inequívoca la presente cláusula "
+                    "y política de privacidad de protección de datos de carácter personal:"
                     self.doc.append(Command('noindent'))
                     self.doc.append(Command('TextField',
-                                            options=[NoEscape("width=10cm"),"height=1in"],
+                                            options=[NoEscape("width=10cm"),
+                                                     "height=1in"],
                                             arguments='D/Dª',))
                     self.doc.append(Command('TextField',
-                                            options=[NoEscape("width=10cm"),"height=1in"],
+                                            options=[NoEscape("width=10cm"),
+                                                     "height=1in"],
                                             arguments=', con NIF o pasaporte Nº',))
-                    self.doc.append("como titular o representante legal del mismo, "
-                                    "consiente de forma inequívoca la presente cláusula "
-                                    "y política de privacidad de protección de datos de carácter personal:")
+                    self.doc.append(arg1)
                     self.doc.append(Command('TextField',
-                                            options=[NoEscape("width=\linewidth"),"height=1in"],
-                                            arguments='Firma y fecha:'))
+                                            options=[NoEscape("width=\linewidth"),
+                                                     "height=1in"],
+                                            arguments='Firma y fecha: '))
 
     def LOPD_coop_section(self,):
         section_name = "Protección de Datos de Carácter Personal, Secreto y Confidencialidad"
-        with self.doc.create(Section(section_name)) as section:
+        with self.doc.create(Section(section_name)):
             subsection_name = "Protección de Datos de Carácter Personal"
-            with self.doc.create(Subsection(subsection_name)) as subsection:
+            with self.doc.create(Subsection(subsection_name)):
                 self.doc.append(LOPD_COOP)
             subsection_name = "Deber de secreto y confidencialidad "
-            with self.doc.create(Subsection(subsection_name)) as subsection:
+            with self.doc.create(Subsection(subsection_name)):
                 self.doc.append(CONFIDENCIALIDAD)
             subsection_name = "Política de Protección de Datos"
-            with self.doc.create(Subsection(subsection_name)) as subsection:
+            with self.doc.create(Subsection(subsection_name)):
                 self.doc.append(POL_PROT_DATOS)
             with self.doc.create(Form()):
                     self.doc.append(Command('noindent'))
                     self.doc.append(Command('TextField',
-                                            options=[NoEscape("width=\linewidth"),"height=1in"],
-                                            arguments='Firma y fecha:'))
+                                            options=[NoEscape("width=\linewidth"),
+                                                     "height=1in"],
+                                            arguments='Firma y fecha: '))
             
     def image_posting_table(self):
         with self.doc.create(Tabular('| l | 4l |',
@@ -466,277 +787,263 @@ class PdfGen():
                                      'NOMBRE, APELLIDOS Y DNI'])
             associate_table.add_row([bold("MENOR:"), 
                                      Command('TextField',
-                                             options=[NoEscape("width=\linewidth"),"height=1in"],
-                                             arguments='Firma y fecha:')])
+                                             options=[NoEscape("width=\linewidth"),
+                                                      "height=1in"],
+                                             arguments='Firma y fecha: ')])
             associate_table.add_hline()
             associate_table.add_row([bold("MENOR:"), 
                                      Command('TextField',
-                                             options=[NoEscape("width=\linewidth"),"height=1in"],
-                                             arguments='Firma y fecha:')])
+                                             options=[NoEscape("width=\linewidth"),
+                                                      "height=1in"],
+                                             arguments='Firma y fecha: ')])
             associate_table.add_hline()
             associate_table.add_row([bold("MENOR:"), 
                                      Command('TextField',
-                                             options=[NoEscape("width=\linewidth"),"height=1in"],
-                                             arguments='Firma y fecha:')])
+                                             options=[NoEscape("width=\linewidth"),
+                                                      "height=1in"],
+                                             arguments='Firma y fecha: ')])
             associate_table.add_hline()
             associate_table.add_row([bold("MADRE/TUTORA:"), 
                                      Command('TextField',
-                                             options=[NoEscape("width=\linewidth"),"height=1in"],
-                                             arguments='Firma y fecha:')])
+                                             options=[NoEscape("width=\linewidth"),
+                                                      "height=1in"],
+                                             arguments='Firma y fecha: ')])
             associate_table.add_hline()
             associate_table.add_row([bold("PADRE/TUTOR:"), 
                                      Command('TextField',
-                                             options=[NoEscape("width=\linewidth"),"height=1in"],
-                                             arguments='Firma y fecha:')])
+                                             options=[NoEscape("width=\linewidth"),
+                                                      "height=1in"],
+                                             arguments='Firma y fecha: ')])
             associate_table.add_hline()
 
     def image_posting_LOPD(self):
         self.doc.append(FootnoteText(PUB_IMAG))
         section_name = "Según lo expuesto, solicitamos tu consentimiento expreso para:"
-        with self.doc.create(Section(section_name)) as section:
+        with self.doc.create(Section(section_name)):
             with self.doc.create(Form()):
                 self.doc.append(Command('noindent'))
                 arg1 = "La captación de imágenes y/o voz, vuestros, para su posterior difusión conforme lo "
-                        "descrito en la presente cláusula."
+                "descrito en la presente cláusula."
                 self.doc.append(Command('Checkbox',
                                         options=[NoEscape("width=1ex"),"height=1ex"],
                                         arguments=arg1))
                 arg2 = "La captación de imágenes y/o voz, del/de los menor/es "
-                        "(en tu condición de padre/madre/tutor legal) "
-                        "para su posterior difusión conforme lo descrito "
-                        "en la presente cláusula."
+                "(en tu condición de padre/madre/tutor legal) "
+                "para su posterior difusión conforme lo descrito "
+                "en la presente cláusula."
                 self.doc.append(Command('Checkbox',
-                                        options=[NoEscape("width=1ex"),"height=1ex"],
+                                        options=[NoEscape("width=1ex"),
+                                                 "height=1ex"],
                                         arguments=arg1))
                 with self.doc.create(Form()):
                     self.doc.append(Command('noindent'))
                     self.doc.append(Command('TextField',
-                                            options=[NoEscape("width=\linewidth"),"height=1in"],
-                                            arguments='Fecha:'))
+                                            options=[NoEscape("width=\linewidth"),
+                                                     "height=1in"],
+                                            arguments='Fecha: '))
                     self.doc.append(Command('TextField',
-                                            options=[NoEscape("width=\linewidth"),"height=1in"],
-                                            arguments='Firma Madre/tutora y DNI:'))
+                                            options=[NoEscape("width=\linewidth"),
+                                                     "height=1in"],
+                                            arguments='Firma Madre/tutora y DNI: '))
                     self.doc.append(Command('TextField',
-                                            options=[NoEscape("width=\linewidth"),"height=1in"],
-                                            arguments='Firma Padre/tutor y DNI:'))
+                                            options=[NoEscape("width=\linewidth"),
+                                                     "height=1in"],
+                                            arguments='Firma Padre/tutor y DNI: '))
                     self.doc.append(Command('TextField',
-                                            options=[NoEscape("width=\linewidth"),"height=1in"],
-                                            arguments='Por el Colegio Andolina, firma y DNI:'))
+                                            options=[NoEscape("width=\linewidth"),
+                                                     "height=1in"],
+                                            arguments='Por el Colegio Andolina, firma y DNI: '))
 
     def parent_autorization(self):
         with self.doc.create(Form()):
+            arg1 = "DOY MI AUTORIZACIÓN a cualquier excursión organizada o salida espontánea "
+            "que surja de 9:30 a 14:00 de la mañana, "
+            "a lo largo del presente curso y los sucesivos, salvo revocación expresa."
+            arg2 = "Marcando esta casilla indico que no estoy de acuerdo "
+            "con que se utilicen vehículos particulares "
+            "para el transporte de mi hijo/a."
             self.doc.append(Command('noindent'))
             self.doc.append(Command('TextField',
-                                    options=[NoEscape("width=10cm"),"height=1in"],
+                                    options=[NoEscape("width=10cm"),
+                                             "height=1in"],
                                     arguments='D/Dª',))
             self.doc.append(Command('TextField',
-                                    options=[NoEscape("width=10cm"),"height=1in"],
+                                    options=[NoEscape("width=10cm"),
+                                             "height=1in"],
                                     arguments=', con NIF o pasaporte Nº',))
             self.doc.append(Command('ChoiceMenu',
                                     options=[NoEscape],
                                     arguments=['relación','madre,tutora legal,padre,tutor legal']))
-            self.doc.append("DOY MI AUTORIZACIÓN a cualquier excursión organizada o salida espontánea "
-                            "que surja de 9:30 a 14:00 de la mañana, "
-                            "a lo largo del presente curso y los sucesivos, salvo revocación expresa.")
+            self.doc.append(arg1)
             self.doc.append(Command('Checkbox',
-                                    options=[NoEscape("width=10cm"),"height=1in"],
-                                    arguments={"Marcando esta casilla indico que no estoy de acuerdo "
-                                               "con que se utilicen vehículos particulares "
-                                               "para el transporte de mi hijo/a."}))
+                                    options=[NoEscape("width=10cm"),
+                                             "height=1in"],
+                                    arguments=arg2))
             self.doc.append(Command('noindent'))
             self.doc.append(Command('TextField',
-                                    options=[NoEscape("width=\linewidth"),"height=1in"],
-                                    arguments='Firma y fecha:'))
+                                    options=[NoEscape("width=\linewidth"),
+                                             "height=1in"],
+                                    arguments='Firma y fecha: '))
+
+    def health_info(self):
+        with self.doc.create(Form()):
+            self.doc.append(Command('noindent'))
+            self.doc.append(Command('TextField',
+                                    options=[NoEscape("width=\linewidth"),
+                                             "height=1in"],
+                                    arguments='Nombre del alumno: ',))
+            self.doc.append(Command('TextField',
+                                    options=[NoEscape("width=\linewidth"),
+                                             "height=1in"],
+                                    arguments='Fecha de nacimiento: ',))
+        section = "ENFERMEDADES"
+        arg1 = ["¿Tiene alguna enfermedad que requiera control médico o impida actividad física? ",
+                "Sí=sí,No=no"]
+        with self.doc.create(Section(section)):
+            with self.doc.create(Form()):
+                self.doc.append(Command('noindent'))
+                self.doc.append(Command('Checkbox',
+                                        options=[NoEscape("width=10cm"),
+                                                 "height=1in"],
+                                        arguments=arg1))
+                self.doc.append(Command('TextField',
+                                        options=[NoEscape("width=\linewidth"),
+                                                 "height=1in"],
+                                        arguments='¿Cuál?: ',))
+                self.doc.append(Command('TextField',
+                                        options=[NoEscape("width=\linewidth"),
+                                                 "height=1in"],
+                                        arguments='Comentarios: ',))
+        section = "ALERGIAS"
+        arg1 = ["¿Tiene algún tipo de alergia a medicamentos, alimentos, animales, etc.? ",
+                "Sí=sí,No=no"]
+        arg2 = "En caso afirmativo, escriba sus manifestaciones: "
+        arg3 = "La alergia se debe a: "
+        arg4 = ["¿Recibe tratamiento permanente? ",
+                "Sí=sí,No=no"]
+        with self.doc.create(Section(section)):
+            with self.doc.create(Form()):
+                self.doc.append(Command('noindent'))
+                self.doc.append(Command('Checkbox',
+                                        options=[NoEscape("width=10cm"),
+                                                 "height=1in"],
+                                        arguments=arg1))
+                self.doc.append(Command('TextField',
+                                        options=[NoEscape("width=\linewidth"),
+                                                 "height=1in"],
+                                        arguments=arg2,))
+                self.doc.append(Command('TextField',
+                                        options=[NoEscape("width=\linewidth"),
+                                                 "height=1in"],
+                                        arguments=arg3,))
+                self.doc.append(Command('Checkbox',
+                                        options=[NoEscape("width=10cm"),
+                                                 "height=1in"],
+                                        arguments=arg4))
+                self.doc.append(Command('TextField',
+                                        options=[NoEscape("width=\linewidth"),
+                                                 "height=1in"],
+                                        arguments='Comentarios: ',))
+        section = "INTOLERANCIAS"
+        arg1 = ["¿Tiene algún tipo de alergia a medicamentos, alimentos, animales, etc.? ",
+                "Sí=sí,No=no"]
+        with self.doc.create(Section(section)):
+            with self.doc.create(Form()):
+                self.doc.append(Command('noindent'))
+                self.doc.append(Command('Checkbox',
+                                        options=[NoEscape("width=10cm"),
+                                                 "height=1in"],
+                                        arguments=arg1))
+                self.doc.append(Command('TextField',
+                                        options=[NoEscape("width=\linewidth"),
+                                                 "height=1in"],
+                                        arguments='Comentarios: ',))
+        section = "VACUNAS"
+        arg1 = ["¿Está vacunado del Tétanos? ",
+                "Sí=sí,No=no"]
+        with self.doc.create(Section(section)):
+            with self.doc.create(Form()):
+                self.doc.append(Command('noindent'))
+                self.doc.append(Command('Checkbox',
+                                        options=[NoEscape("width=10cm"),
+                                                 "height=1in"],
+                                        arguments=arg1))
+                self.doc.append(Command('TextField',
+                                        options=[NoEscape("width=\linewidth"),
+                                                 "height=1in"],
+                                        arguments='Comentarios: ',))
+        section = "SI EL ALUMNO TIENE ALGÚN TIPO DE PROBLEMA DE SALUD EN EL COLEGIO RECURRIR A: "
+        arg1 = "Institución-Médico y Teléfono: "
+        arg2 = "Madre-Padre/Familiar y Teléfono: "
+        with self.doc.create(Section(section)):
+            with self.doc.create(Form()):
+                self.doc.append(Command('noindent'))
+                self.doc.append(Command('TextField',
+                                        options=[NoEscape("width=\linewidth"),
+                                                 "height=1in"],
+                                        arguments=arg1,))
+                self.doc.append(Command('TextField',
+                                        options=[NoEscape("width=\linewidth"),
+                                                 "height=1in"],
+                                        arguments=arg2,))
+        section = "INFORMACIÓN IMPORTANTE A DESTACAR: "
+        with self.doc.create(Section(section)):
+            with self.doc.create(Form()):
+                self.doc.append(Command('noindent'))
+                self.doc.append(Command('TextField',
+                                        options=["name=multilinetextbox",
+                                                 "multiline=true",
+                                                 NoEscape("width=\linewidth"),
+                                                 "height=1in"],
+                                        arguments="",))
+        section = "FECHA Y FIRMA DE MADRE, PADRE O TUTOR, DNI: "
+        with self.doc.create(Section(section)):
+            with self.doc.create(Form()):
+                self.doc.append(Command('noindent'))
+                self.doc.append(Command('TextField',
+                                        options=[NoEscape("width=\linewidth"),
+                                                 "height=1in"],
+                                        arguments='Firma y fecha: '))
+                self.doc.append(Command('TextField',
+                                        options=[NoEscape("width=\linewidth"),
+                                                 "height=1in"],
+                                        arguments='DNI: '))
+
+@dataclass
+class Associate:
+    """
+    A class for associates
+    """
+    name: str
+    NIF: str
+    adress: str
+    id: str = ''
 
 
+@dataclass
+class Student:
+    """
+    A class for students
 
-def generate_invoice(**kwargs):
-    '''
-    Generate invoice
-    '''
-    ###################################################################################
-    ############################ Document Geometry Options ############################
-    ###################################################################################
-
-    geometry_options = {
-        "head": "40pt",
-        "margin": "0.5in",
-        "bottom": "1.6in",
-        "includeheadfoot": True
-    }
-    doc = Document(geometry_options=geometry_options)
+    Args:
+        name (str): First name of student
+        associate (str): Legal representative, cooperative member
+        attendance (dict): keys -> activities, values -> list[str]
+            representing the attendance to activity
+    """
+    name: str
+    associate: str
+    attendance: list[dict]
 
 
-    ###################################################################################
-    ########################### Generating first page style ###########################
-    ###################################################################################
+@dataclass
+class Children:
+    """
+    A class for students
 
-    first_page = PageStyle("firstpage")
-
-    # Header image
-    with first_page.create(Head("L")) as header_left:
-        with header_left.create(MiniPage(width=NoEscape(r"0.5\textwidth"),
-                                         pos='c')) as logo_wrapper:
-            logo_file = os.path.join(os.path.dirname(__file__),
-                                     'andolina-logo.png')
-            logo_wrapper.append(StandAloneGraphic(image_options="width=200px",
-                                filename=logo_file))
-
-    # Add document title
-    with first_page.create(Head("R")) as right_header:
-        with right_header.create(MiniPage(width=NoEscape(r"0.5\textwidth"),
-                                 pos='c', align='l')) as title_wrapper:
-            title_wrapper.append(LargeText(bold(f"Número de factura: {kwargs['invoice_num']}")))
-            title_wrapper.append(LineBreak())
-            title_wrapper.append(LineBreak())
-            title_wrapper.append(LargeText(bold(f"Fecha: {kwargs['date']}")))
-
-    # Add footer
-    with first_page.create(Foot("L")) as footer:
-        footer.append(FootnoteText(f"{LOPD}\n\n\n{COLEGIO_DATOS}"))
-        # footer.append(FootnoteText(COLEGIO_DATOS))
-
-    doc.preamble.append(first_page)
-
-    doc.append(VerticalSpace('10ex'))
-
-
-    ###################################################################################
-    ########################### Add associate information #############################
-    ###################################################################################
-
-    with doc.create(Tabular('l|l')) as table:
-        table.add_row([bold("Nombre:"), kwargs['name']])
-        table.add_hline()
-        table.add_row([bold("NIF:"), kwargs['NIF']])
-        table.add_hline()
-        table.add_row([bold("Dirección:"), kwargs['adress']])
-
-    doc.append(VerticalSpace('10ex'))
-
-
-    ###################################################################################
-    ############################## Add invoice details ################################
-    ###################################################################################
-
-    with doc.create(LongTabu("X[3l] X[c] X[c] X[c]",
-                             row_height=1.5)) as data_table:
-        data_table.add_row(["concepto",
-                            "precio unitario",
-                            "cantidad",
-                            "subtotal"],
-                           mapper=bold,
-                           color="lightgray")
-        data_table.add_empty_row()
-
-        # extract_final = generate_extract()
-        # for row in extract_final:
-        #     data_table.add_hline()
-        #     data_table.add_row(row)
-            # if (i % 2) == 0:
-                # data_table.add_row(row, color="lightgray")
-            # else:
-                # data_table.add_row(row)
-
-    # with doc.create(LongTabu("X[3r] X[c] X[c] X[c]",
-    #                          row_height=1.5)) as data_table:
-    #     for row in extract_final[-3:]:
-    #         data_table.add_row(row)
-    #         data_table.add_hline()
-
-    doc.append(VerticalSpace('10ex'))
-
-
-    ###################################################################################
-    ############################### Add other details #################################
-    ###################################################################################
-
-    with doc.create(Section('',numbering=False)):
-        doc.append("FORMA DE PAGO: Domiciliación Bancaria\n")
-        doc.append("Exención de IVA según el 20.9 de la Ley 37/1992 de 28 de diciembre.")
-
-
-    ################################### Format page ###################################
-    doc.change_document_style("firstpage")
-    doc.add_color(name="lightgray", model="gray", description="0.80")
-
-    ################################## Generate pdf ###################################
-    doc.generate_pdf(os.path.join(os.path.dirname(__file__),f"./{kwargs['invoice_num']}"), clean_tex=True)
-
-
-# def generate_extract() -> list[tuple]:
-    '''
-    concepts = ["Atención temprana", "Acompañamiento",
-                "Extracurricular 1", "Extracurricular 2",
-                "Extracurricular 3", "Extracurricular 4",
-                "Comedor", "Cuota", "Formaciones",
-                "Talleres, actividades y campamentos", "Otros"]
-    quantity = [3, 5, 1, 0, 0, 0, 10, 2, "15€", "20€"]
-    data = dict(zip(concepts,quantity))
-    '''
-    basic_concepts = ["CUOTA",
-                      "COMEDOR",
-                      "ATENCIÓN_TEMPRANA",
-                      "JUDO",
-                      "CIENCIA",
-                      "TEATRO",
-                      "ROBOTIX",
-                      "ACOMPAÑAMIENTO",
-                      "FORMACIONES",
-                      "TALLERES_ACTIVIDADES_CAMPAMENTOS"]
-    test_quantity = [3, (5,2), (1,0), 0, 0, 0, 10, "6€", "15€", "20€"]
-    use = dict(zip(basic_concepts,test_quantity))
-
-    extract = []
-    total = 0
-    for (concept,quantity) in use.items():
-        if isinstance(quantity,tuple):
-            subtotal_list = []
-            for child_quantity in quantity:
-                if concept.upper() in ["COMEDOR", "ATENCIÓN_TEMPRANA"] and \
-                   child_quantity != 0:
-                    subtotal_list.append(min(UNIT_PRICE[f'{concept}_MAX'],
-                                         child_quantity*UNIT_PRICE[concept]))
-            subtotal = sum(subtotal_list)
-            extract.append((concept.lower().replace('_',' '),
-                            f"{UNIT_PRICE[concept]:.2f} €",
-                            f"{quantity}",
-                            f"{subtotal:.2f} €"))
-        elif isinstance(quantity,int):
-            if concept.upper() in ["COMEDOR", "ATENCIÓN_TEMPRANA"] and \
-               child_quantity != 0:
-                subtotal.append(min(UNIT_PRICE[f'{concept}_MAX'],
-                                    child_quantity*UNIT_PRICE[concept]))
-            subtotal = quantity*UNIT_PRICE[concept]
-            extract.append((concept.lower().replace('_',' '),
-                            f"{UNIT_PRICE[concept]:.2f} €",
-                            f"{quantity}",
-                            f"{subtotal:.2f} €"))
-
-        elif isinstance(quantity,str):
-            subtotal = int(quantity[:-1])
-            extract.append((concept.lower().replace('_',' '),
-                            "",
-                            "",
-                            f"{subtotal:.2f} €"))
-
-
-        if subtotal != 0:
-            total += subtotal
-
-    extract_tax = [(bold("Base Imponible"),"","",bold(f"{total:.2f} €")),
-                   (bold("IVA (exento)"),"","",bold(f"{0:.2f} €")),
-                   (bold("Total"),"","",bold(f"{total:.2f} €"))]
-    extract.extend(extract_tax)
-
-    return extract
-
-
-def get_invoice_num(today: date) -> str:
-    '''
-    Get current invoice number formated
-    Example: FU-2223-001
-    '''
-    current_year_format = today.year%100
-    invoice_num_in_series = 1
-    return f'FU-{current_year_format}{current_year_format+1}-{invoice_num_in_series:03}'
+    Args:
+        associate (str): Legal representative, cooperative member
+        children (list[Student]): List of Student represented by associate
+    """
+    associate: Associate
+    children: list[Student]
