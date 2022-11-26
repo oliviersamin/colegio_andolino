@@ -132,3 +132,4 @@ dmypy.json
 /andolina/v1/migrations/0013_remove_activity_creator_external_and_more.py
 /andolina/v1/migrations/0014_remove_archive_content_archive_sheets_and_more.py
 /andolina/v1/migrations/0015_sheet_is_archived.py
+/andolina/v1/migrations/0019_alter_activity_public.py

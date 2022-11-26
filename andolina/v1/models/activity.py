@@ -24,7 +24,7 @@ class Activity(models.Model):
     price_per_day = models.FloatField(blank=True, null=True)
     price_per_month = models.FloatField(blank=True, null=True)
     money_earned_by_school = models.FloatField(blank=True, null=True)
-    public = models.CharField(max_length=40, choices=PUBLIC_ACTIVITY, blank=True, null=True)
+    public = models.CharField(max_length=40, choices=PUBLIC_ACTIVITY, blank=False, null=True)
     comment_for_parent = models.TextField(blank=True, null=True)
     edit_permission = models.CharField(max_length=40, choices=PERMISSION_ACTIVITY_CHOICES, blank=True, null=True)
 

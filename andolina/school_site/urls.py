@@ -23,9 +23,6 @@ urlpatterns = [
     path('ask-delete-sheet/<int:sheet_id>', views.AskDeleteSheet.as_view(), name='ask_delete_sheet'),
     path('delete-sheet/<int:sheet_id>', views.DeleteSheet.as_view(), name='delete_sheet'),
     path('my-bills', views.MyBills.as_view(), name='my_bills'),
-    # form validation message pages
-    path('success', views.ValidationFormSuccess.as_view(), name='validation_success'),
-    path('error', views.ValidationFormError.as_view(), name='validation_error'),
 
 ]
 app_name = 'school_site'

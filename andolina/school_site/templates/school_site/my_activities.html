@@ -36,6 +36,11 @@ MY ACTIVITIES PAGE FOR EACH USER
                 <th>
                     <button><a class="home_buttons" href="{% url 'school_site:edit_activity_users' activity_id=activity.id %}">Edit activity users</a></button>
                 </th>
+            {% else %}
+                <th>
+                    <button disabled>Edit activity users</button>
+                </th>
+
             {% endif %}
             {% if activity.sheet.all|are_all_sheets_created %}
                 <th>
@@ -59,6 +64,17 @@ MY ACTIVITIES PAGE FOR EACH USER
                     <button><a class="home_buttons" href="{% url 'school_site:ask_delete_sheet' sheet_id=oldest_sheet_id %}">Delete sheet</a></button>
                 </th>
                 {% endwith %}
+            {% else %}
+                <th>
+                    <button disabled>Edit sheet</button>
+                </th>
+                <th>
+                    <button disabled>Validate sheet</button>
+                </th>
+                <th></th>
+                <th>
+                    <button disabled>Delete sheet</button>
+                </th>
             {% endif %}
         </tr>
         {% endfor %}

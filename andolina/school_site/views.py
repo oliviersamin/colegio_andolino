@@ -1,4 +1,5 @@
 import datetime
+from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.views import generic, View
 from django.contrib.auth.models import User
@@ -89,6 +90,11 @@ class EditProfile(View):
 
     def post(self, request):
         form = ProfileForm(request.POST)
+        success_message = 'Your profile has been updated successfully'
+        error_messages = [
+            'At least one field of the form has not the proper input',
+            'Your profile has not been updated'
+        ]
         if form.is_valid():
             username_fields = [
                 'first_name',
@@ -127,8 +133,11 @@ class EditProfile(View):
                         update_group_fields_profile_form(parent=parent, field=key, new_data=new_data)
                 user.save()
                 parent.save()
-            return redirect('school_site:validation_success')
-        return redirect('school_site:validation_error')
+            messages.add_message(request, messages.SUCCESS, success_message)
+        else:
+            for message in error_messages:
+                messages.add_message(request, messages.ERROR, message)
+        return redirect('school_site:my_profile')
 
 
 class ChildrenActivities(View):
@@ -190,6 +199,11 @@ class EditChild(View):
 
     def post(self, request, child_id):
         form = EditChildForm(request.POST)
+        success_message = 'Your child profil has been updated successfully'
+        error_messages = [
+            'At least one field of the form has not the proper input',
+            'Your child profile has not been updated'
+        ]
         date_format = '%Y-%m-%d'
         if form.is_valid():
             child = Child.objects.get(pk=child_id)
@@ -203,15 +217,17 @@ class EditChild(View):
                 parent = Parent.objects.get(user=request.user)
                 parent.children.add(child)
                 parent.save()
-                return redirect('school_site:validation_success')
-
+                messages.add_message(request, messages.SUCCESS, success_message)
             else:
                 if child.birth_date != form.cleaned_data['birth_date']:
                     child.birth_date = form.cleaned_data['birth_date']
                     child.save()
-                    return redirect('school_site:validation_success')
-                return redirect('school_site:children_activities')
-        return redirect('school_site:validation_error')
+                    messages.add_message(request, messages.SUCCESS, success_message)
+        else:
+            for message in error_messages:
+                messages.add_message(request, messages.ERROR, message)
+
+        return redirect('school_site:children_activities')
 
 
 class MyActivities(View):
@@ -243,12 +259,20 @@ class CreateMyActivity(View):
 
     def post(self, request):
         form = MyActivity(request.POST)
+        success_message = 'The activity has been successfully created'
+        error_messages = [
+            'At least one field of the form has not the proper input',
+            'The activity has not been created'
+        ]
         if form.is_valid():
             activity = form.save(commit=False)
             activity.creator = request.user
             activity.save()
-            return redirect('school_site:validation_success')
-        return redirect('school_site:validation_error')
+            messages.add_message(request, messages.SUCCESS, success_message)
+        else:
+            for message in error_messages:
+                messages.add_message(request,messages.ERROR, message)
+        return redirect('school_site:my_activities')
 
 
 class EditActivity(View):
@@ -270,11 +294,19 @@ class EditActivity(View):
     def post(self, request, activity_id):
         form = self.form(request.POST)
         date_format = '%Y-%m-%d'
+        success_message = 'The activity has been successfully updated'
+        error_messages = [
+            'At least one field of the form has not the proper input',
+            'The activity has not been updated'
+        ]
         if form.is_valid():
             activity = Activity.objects.get(pk=activity_id)
             save_activity_form_fields(form, activity)
-            return redirect('school_site:validation_success')
-        return redirect('school_site:validation_error')
+            messages.add_message(request, messages.SUCCESS, success_message)
+        else:
+            for message in error_messages:
+                messages.add_message(request, messages.ERROR, message)
+        return redirect('school_site:my_activities')
 
 
 class EditActivityUsers(View):
@@ -299,7 +331,11 @@ class EditActivityUsers(View):
 
     def post(self, request, activity_id):
         form = self.form(request.POST)
-        date_format = '%Y-%m-%d'
+        success_message = 'The activity users have been successfully updated'
+        error_messages = [
+            'At least one field of the form has not the proper input',
+            'The activity users have not been updated'
+        ]
         if form.is_valid():
             activity = Activity.objects.get(pk=activity_id)
             if activity.public == 'parents':
@@ -313,51 +349,38 @@ class EditActivityUsers(View):
                     children_id.append(child.user.id)
                 activity.users.set(children_id)
             activity.save()
-            return redirect('school_site:validation_success')
-        return redirect('school_site:validation_error')
-
-
-class AddUsersToActivity(View):
-    template_name = 'school_site/add_users_to_activity.html'
-    form = CreateSheetForm
-
-    def get(self, request, sheet_id):
-        if request.user.is_authenticated:
-            headers_column, rows = users_and_dates_for_sheet_table(sheet_id)
-            sheet = Sheet.objects.get(id=sheet_id)
-            activity = sheet.activity
-            title = 'Presential sheet for '
-            subtitle = activity.name + ' - ' + activity.creator.user.get_full_name() + '/n' + str(sheet.year) + ' - ' + str(sheet.month)
-            dict_initial = set_initial_sheet_fields(sheet)
-            form = self.form(request.POST or None, initial=dict_initial)
-            context = {
-                'headers_column': headers_column,
-                'rows': rows,
-                'form': form,
-                'title': title + subtitle,
-                'selected_buttons': dict_initial['content']
-            }
-            return render(request, self.template_name, context=context)
-        return redirect('school_site:home')
-
-    def post(self, request, sheet_id):
-        form = self.form(request.POST)
-        if form.is_valid():
-            content = parse_checkboxes(request)[2:]
-            # activity = Activity.objects.get(pk=activity_id)
-            sheet = Sheet.objects.get(id=sheet_id)
-            sheet.year = form.cleaned_data['year']
-            sheet.month = form.cleaned_data['month']
-            sheet.activity_id = sheet.activity_id
-            sheet.content = {'on': content}
-            sheet.save()
-            return redirect('school_site:validation_success')
-        return redirect('school_site:validation_error')
+            messages.add_message(request, messages.SUCCESS, success_message)
+        else:
+            for message in error_messages:
+                messages.add_message(request, messages.ERROR, message)
+        return redirect('school_site:my_activities')
 
 
 class CreateSheet(View):
     template_name = 'school_site/create_sheet.html'
     form = CreateSheetForm
+
+    @staticmethod
+    def is_this_school_year_date(year, month):
+        now = datetime.datetime.now()
+        if year == now.year:
+            if now.month in range(9, 13):
+                if month in range(9, 13):
+                    return True
+                return False
+            elif now.month in range(1, 7):
+                if month in range(1, 7):
+                    return True
+                return False
+        elif year == now.year + 1:
+            if month in range(1, 7):
+                return True
+            return False
+        elif year == now.year - 1:
+            if month in range(9, 13):
+                return True
+            return False
+        return False
 
     def get(self, request, activity_id):
         if request.user.is_authenticated:
@@ -368,22 +391,32 @@ class CreateSheet(View):
 
     def post(self, request, activity_id):
         form = self.form(request.POST)
+        success_message = 'The sheet has been successfully created'
+        error_message_already_existing = 'This sheet already exists'
+        error_message_dates_error = [
+            'Only actual school dates can be used to create sheets',
+            'The sheet has not been created'
+        ]
         if form.is_valid():
             # validation to be sure no other sheet has already been created and saved for this activity year and month
             existing_sheet = Sheet.objects.filter(
                 year=form.cleaned_data['year']).filter(
                 month=form.cleaned_data['month']).filter(activity_id=activity_id).first()
             if not existing_sheet:
-                # creation of the new sheet
-                new_sheet = Sheet()
-                new_sheet.year = form.cleaned_data['year']
-                new_sheet.month = form.cleaned_data['month']
-                new_sheet.activity_id = activity_id
-                new_sheet.content = {}
-                new_sheet.save()
-                return redirect('school_site:validation_success')
-            return redirect('school_site:validation_error')
-        return redirect('school_site:validation_error')
+                if self.is_this_school_year_date(form.cleaned_data['year'], form.cleaned_data['month']):
+                    new_sheet = Sheet()
+                    new_sheet.year = form.cleaned_data['year']
+                    new_sheet.month = form.cleaned_data['month']
+                    new_sheet.activity_id = activity_id
+                    new_sheet.content = {}
+                    new_sheet.save()
+                    messages.add_message(request, messages.SUCCESS, success_message)
+                else:
+                    for message in error_message_dates_error:
+                        messages.add_message(request, messages.ERROR, message)
+            elif existing_sheet:
+                messages.add_message(request, messages.ERROR, error_message_already_existing)
+        return redirect('school_site:my_activities')
 
 
 class EditSheet(View):
@@ -414,6 +447,11 @@ class EditSheet(View):
 
     def post(self, request, sheet_id):
         form = self.form(request.POST)
+        success_message = 'The sheet has been successfully updated'
+        error_messages = [
+            'At least one field of the form has not the proper input',
+            'The sheet has not been updated'
+        ]
         if form.is_valid():
             content = parse_checkboxes(request)[2:]
             # activity = Activity.objects.get(pk=activity_id)
@@ -423,8 +461,10 @@ class EditSheet(View):
             sheet.activity_id = sheet.activity_id
             sheet.content = {'on': content}
             sheet.save()
-            return redirect('school_site:validation_success')
-        return redirect('school_site:validation_error')
+            messages.add_message(request, messages.SUCCESS, success_message)
+        else:
+            messages.add_message(request, messages.ERROR, error_messages)
+        return redirect('school_site:my_activities')
 
 
 class AskValidateSheet(View):
@@ -538,20 +578,3 @@ class MyBills(View):
         """
         pass
 
-
-class ValidationFormSuccess(View):
-    template_name = 'school_site/success_validation.html'
-    def get(self, request):
-        context = {}
-        if request.user.is_authenticated:
-            return render(request, self.template_name, context=context)
-        return redirect('school_site:home')
-
-
-class ValidationFormError(View):
-    template_name = 'school_site/error_validation.html'
-    def get(self, request):
-        context = {}
-        if request.user.is_authenticated:
-            return render(request, self.template_name, context=context)
-        return redirect('school_site:home')
