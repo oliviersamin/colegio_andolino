@@ -59,36 +59,24 @@ class Dashboard(View):
         return redirect('school_site:home')
 
 
-class MyProfile(View):
-    """ access the user's profile """
-    template_name = 'school_site/my_profile.html'
-
-    def get(self, request):
-        if request.user.is_authenticated:
-            context = {}
-            user = request.user
-            parent = Parent.objects.get(user=user)
-            return render(request, self.template_name, context=context)
-        return redirect('school_site:home')
-
-
 class EditProfile(View):
     """ Edit the user profile to see / modify fields"""
     template_name = 'school_site/edit_profile.html'
 
-    def get(self, request):
+    def get(self, request, user_id):
         if request.user.is_authenticated:
             context = {}
-            user = request.user
+            user = User.objects.get(id=user_id)
             parent = Parent.objects.get(user=user)
             dict_initial = set_initial_fields_profile_form(user=user, parent=parent)
             form = ProfileForm(request.POST or None, initial=dict_initial)
             context['form'] = form
             context['children'] = parent.child()
+            context['parent'] = parent
             return render(request, self.template_name, context=context)
         return redirect('school_site:home')
 
-    def post(self, request):
+    def post(self, request, user_id):
         form = ProfileForm(request.POST)
         success_message = 'Your profile has been updated successfully'
         error_messages = [
@@ -112,7 +100,7 @@ class EditProfile(View):
                 'is_paying_bills'
             ]
             many_to_many_fields = ['children', 'group']
-            user = request.user
+            user = User.objects.get(id=user_id)
             parent = Parent.objects.get(user__username=user.username)
             for key, value in form.cleaned_data.items():
                 if (key in username_fields) & (value != ''):
@@ -137,7 +125,7 @@ class EditProfile(View):
         else:
             for message in error_messages:
                 messages.add_message(request, messages.ERROR, message)
-        return redirect('school_site:my_profile')
+        return redirect('school_site:children_activities')
 
 
 class ChildrenActivities(View):
@@ -148,9 +136,16 @@ class ChildrenActivities(View):
         context = {}
         if request.user.is_authenticated:
             parent = Parent.objects.get(user=request.user)
+            partner = parent.partner
             children = parent.children.all()
             # context['my_children'] = children
-            context['activities'] = [{'child': child, 'activities': child.user.activities.all()} for child in children]
+            # context['activities'] = [{'child': child, 'activities': child.user.activities.all()} for child in children]
+            context['children'] = [{'child': child, 'activities': child.user.activities.all()} for child in children]
+            context['adults'] = [
+                {'user': parent, 'role': 'parent', 'activities': parent.user.activities.all()},
+                {'user': partner,  'role': 'partner', 'activities': partner.user.activities.all()},
+            ]
+
             return render(request, self.template_name, context=context)
         return redirect('school_site:home')
 
