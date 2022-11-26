@@ -128,9 +128,9 @@ class EditProfile(View):
         return redirect('school_site:children_activities')
 
 
-class ChildrenActivities(View):
+class MyFamily(View):
     """ access the children's user activities """
-    template_name = 'school_site/children_activities.html'
+    template_name = 'school_site/my_family.html'
 
     def get(self, request):
         context = {}
