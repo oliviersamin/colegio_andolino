@@ -495,6 +495,11 @@ class ValidateSheet(View):
         2. add this sheet the corresponding archive
 
         """
+        success_message = [
+            'The sheet has been successfully validated',
+            'The sheet is now archived and is not accessible anymore'
+        ]
+        error_messages = ['The sheet users has not been validated']
         if request.user.is_authenticated:
             sheet = Sheet.objects.get(id=sheet_id)
             try:
@@ -507,10 +512,13 @@ class ValidateSheet(View):
                 sheet.archive = archive
                 sheet.is_archived = True
                 sheet.save()
-                return redirect('school_site:validation_success')
+                for message in success_message:
+                    messages.add_message(request, messages.SUCCESS, message)
             except Exception as e:
-                print(e)
-                return redirect('school_site:validation_error')
+                error_messages.append(e)
+                for message in error_messages:
+                    messages.add_message(request, messages.ERROR, message)
+            return redirect('school_site:my_activities')
         return redirect('school_site:home')
 
 
@@ -528,14 +536,18 @@ class AskDeleteSheet(View):
 
 class DeleteSheet(View):
     def get(self, request, sheet_id):
+        success_message = 'The sheet has been successfully deleted'
+        error_messages = ['The sheet users has not been validated']
         if request.user.is_authenticated:
             try:
                 sheet = Sheet.objects.get(pk=sheet_id)
                 sheet.delete()
-                return redirect('school_site:validation_success')
+                messages.add_message(request, messages.SUCCESS, success_message)
             except Exception as e:
-                print(e)
-                return redirect('school_site:validation_error')
+                error_messages.append(e)
+                for message in error_messages:
+                    messages.add_message(request, messages.ERROR, message)
+            return redirect('school_site:my_activities')
         return redirect('school_site:home')
 
 
