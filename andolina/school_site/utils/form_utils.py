@@ -148,6 +148,10 @@ def create_child_from_new_user(form, user):
     return new_child
 
 
+def get_bill_users_choices(user):
+    pass
+
+
 def users_and_dates_for_sheet_table(sheet_id: int) -> dict:
     sheet = Sheet.objects.get(id=sheet_id)
     users = User.objects.filter(activities=sheet.activity)

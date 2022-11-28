@@ -4,6 +4,7 @@ from .add_child import AddUserAndChild
 from .edit_child import EditChildForm
 from .create_sheet import CreateSheetForm
 from .edit_activity_users import EditActivityUsers
+from .my_bills import GenerateBillForm
 
 __all__ = [
     ProfileForm,
@@ -12,4 +13,5 @@ __all__ = [
     EditChildForm,
     CreateSheetForm,
     EditActivityUsers,
+    GenerateBillForm,
 ]

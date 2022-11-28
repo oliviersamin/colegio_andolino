@@ -1,9 +1,10 @@
 import datetime
+import json
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.views import generic, View
 from django.contrib.auth.models import User
-from .forms.double_entry_table import BaseTable
+from django.db.models import Q
 from v1.models import Child, Parent, Activity, Sheet, External, Archive
 
 from school_site.utils import (
@@ -19,6 +20,7 @@ from school_site.forms import (
     EditChildForm,
     CreateSheetForm,
     EditActivityUsers,
+    GenerateBillForm,
 )
 
 from school_site.utils import (
@@ -164,17 +166,23 @@ class AddChild(View):
     def post(self, request):
         form = AddUserAndChild(request.POST)
         date_format = '%Y-%m-%d'
+        success_message = 'Your child has been created successfully'
+        error_messages = [
+            'At least one field of the form has not the proper input',
+            'Your child has not been created'
+        ]
+
         if form.is_valid():
             user = create_user_from_child_form(form)
             child = create_child_from_new_user(form, user)
             parent = Parent.objects.get(user=request.user)
             parent.children.add(child)
             parent.save()
-            return redirect('school_site:validation_success')
+            messages.add_message(request, messages.SUCCESS, success_message)
         else:
-            for key, value in form.errors.items():
-                print('the field "{}" has the following error: {}'.format(key, value.data[0].messages[0]))
-            return redirect('school_site:validation_error')
+            for message in error_messages:
+                messages.add_message(request, messages.ERROR, message)
+        return redirect('school_site:children_activities')
 
 
 class EditChild(View):
@@ -549,6 +557,7 @@ class DeleteSheet(View):
 class MyBills(View):
     """ access the children's user activities """
     template_name = 'school_site/my_bills.html'
+    form = GenerateBillForm
 
     def get(self, request):
         #TODO: 1. for the request.user get all the activities he has attended or his children or his partner
@@ -560,11 +569,11 @@ class MyBills(View):
         """
         if request.user.is_authenticated:
             context = {}
-            user_activities = get_activities_for_actual_school_year(request.user)
             parent = Parent.objects.get(user=request.user)
-            partner_activities = get_activities_for_actual_school_year(parent.partner.user)
-            children_activities = [get_activities_for_actual_school_year(child.user) for child in parent.children.all()]
-            activities = Activity.objects.all()
+            children = parent.children.all()
+            context['children'] = str(len(children))
+            form = self.form(request.POST or None)
+            context['form'] = form
             return render(request, self.template_name, context=context)
         return redirect('school_site:home')
 
