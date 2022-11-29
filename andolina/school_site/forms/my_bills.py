@@ -2,13 +2,13 @@ from django import forms
 
 
 BILL_USERS_CHOICES = [
-    ('My whole family', 'My whole family'),
-    ('All my children', 'All my children'),
-    ('Only my children', 'Only my children'),
-    ('Each of my children', 'Each of my children'),
-    ('Only my partner', 'Only my partner'),
-    ('Only me', 'Only me'),
-    ('My partner and myself', 'My partner and myself')
+    ('family', 'My whole family'),
+    ('children', 'Only my children'),
+    ('child', 'Only my child'),
+    ('each_child', 'Each of my children'),
+    ('partner', 'Only my partner'),
+    ('me', 'Only me'),
+    ('partner_me', 'My partner and myself')
 ]
 
 YEAR_CHOICES = [(i, str(i)) for i in range(2022, 20122)]
