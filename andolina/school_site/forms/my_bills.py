@@ -21,7 +21,7 @@ class GenerateBillForm(forms.Form):
     to be used for the view
     """
     users = forms.ChoiceField(required=True, label='Bill for', choices= BILL_USERS_CHOICES)
-    whole_actual_school_year = forms.BooleanField(required=True, label='Whole actual school year')
+    whole_actual_school_year = forms.BooleanField(required=False, label='Whole actual school year')
     year = forms.ChoiceField(required=False, label='year', choices=YEAR_CHOICES)
     month = forms.ChoiceField(required=False, label='month', choices=MONTH_CHOICES)
 

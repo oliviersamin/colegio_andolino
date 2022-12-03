@@ -2,10 +2,8 @@
 {% load static %}
 {% block content %}
     <script src="../../static/school_site/js/util_forms.js" defer data-children=" {{ children }}"></script>
-{#    <script src="{% static 'util_forms.js' %}" defer data-children=" {{ children }}"></script>#}
 {% if user.is_authenticated %}
     <p id="test_js"> MY BILLS PAGE FOR EACH USER</p>
-    {{ children }}
    <form action="" method="post">
     {% csrf_token %}
        {% for field in form.non_field_errors %}
@@ -17,12 +15,6 @@
     <input type="submit" value="Submit">
     </form>
 
-{#   <form action="" method="post">#}
-{#    {% csrf_token %}#}
-{#   <label for="users" id="label_users">Users </label>#}
-{#       {{ form.users }}#}
-{#       <input type="submit" value="Submit">#}
-{#    </form>#}
 
     <ul>TO ADD:
         <li>Logic of the bills</li>

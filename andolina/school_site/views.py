@@ -37,7 +37,8 @@ from school_site.utils import (
     set_initial_activity_fields,
     save_activity_form_fields,
     set_initial_sheet_fields,
-    get_activities_for_actual_school_year,
+    get_data_for_month_year,
+    get_data_for_actual_school_year,
 )
 
 
@@ -412,6 +413,7 @@ class CreateSheet(View):
                     new_sheet.month = form.cleaned_data['month']
                     new_sheet.activity_id = activity_id
                     new_sheet.content = {}
+                    new_sheet.is_archived = False
                     new_sheet.save()
                     messages.add_message(request, messages.SUCCESS, success_message)
                 else:
@@ -592,5 +594,77 @@ class MyBills(View):
         'user': 'Paula',
         'activities': [{ ... }]}, ....]
         """
-        pass
+        form = self.form(request.POST)
+        success_message = 'The bill request has been successfully created'
+        error_messages = [
+            'At least one field of the form has not the proper input',
+            'The bill request has not been created'
+        ]
+        if form.is_valid():
+            """
+            send users id and correct sheets with monthly payment or not to external program
+            return [
+            {'user': <user_id>, 
+            'activities': [{
+                  'name': 'test', 
+                  'payment': 'monthly', 
+                  'sheets': {
+                      'year': '2022', 
+                      'month': '11', 
+                      'participation':[1, 7, 13, 24]
+                      }
+                  }, {}, ...]
+            }, 
+            {}, ...
+            ]
+            possibility 1: whole actual year not checked
+            --> form.cleaned_data['whole_actual_school_year'] = False
+            """
+            users = []
+            parent = Parent.objects.get(user=request.user)
+            children = [child.user for child in parent.children.all()]
+            partner = parent.partner
+            # users
+            if form.cleaned_data['users'] == 'family':
+                users = [parent.user, partner.user] + children
+            elif form.cleaned_data['users'] in ['children', 'child', 'each_child']:
+                users = children
+            # elif form.cleaned_data['users'] == 'each_child':
+            #     pass
+            elif form.cleaned_data['users'] == 'partner':
+                users = [partner.user]
+            elif form.cleaned_data['users'] == 'me':
+                users = [parent.user]
+            elif form.cleaned_data['users'] == 'partner_me':
+                users = [parent, partner]
+
+            # date
+            if form.cleaned_data['whole_actual_school_year'] == False:
+                results = []
+                year = form.cleaned_data['year']
+                month = form.cleaned_data['month']
+                for user in users:
+                    results.append(get_data_for_month_year(user, int(month), int(year)))
+            else:
+                results = []
+                for user in users:
+                    results.append(get_data_for_actual_school_year(user))
+            # activity = Activity.objects.get(pk=activity_id)
+            # if activity.public == 'parents':
+            #     parents_id = []
+            #     for parent in form.cleaned_data['parents']:
+            #         parents_id.append(parent.user.id)
+            #     activity.users.set(parents_id)
+            # else:
+            #     children_id = []
+            #     for child in form.cleaned_data['children']:
+            #         children_id.append(child.user.id)
+            #     activity.users.set(children_id)
+            # activity.save()
+            messages.add_message(request, messages.SUCCESS, success_message)
+        else:
+            for message in error_messages:
+                messages.add_message(request, messages.ERROR, message)
+        return redirect('school_site:my_bills')
+
 
