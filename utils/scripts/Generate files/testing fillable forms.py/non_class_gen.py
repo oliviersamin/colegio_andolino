@@ -5,11 +5,12 @@ for invoices or detailed extracts.
 # import stdlib
 import calendar
 from datetime import date
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from itertools import chain
 from json import dumps as jdumps
 from json import loads as jloads
 import locale
+from typing import Literal
 import os
 
 # import external libs
@@ -293,8 +294,9 @@ class Form(Environment):
 
 
 class PdfGen():
-    def __init__(self, mode:str) -> None:
+    def __init__(self, mode:str, data:list) -> None:
         self.mode = mode
+        self.data = data
         # Document Geometry Options
         self.geometry_options = {
             "head": "40pt",
@@ -302,16 +304,31 @@ class PdfGen():
             "bottom": "1.6in",
             "includeheadfoot": True
         }
+        
+        
+        # dates
+        self.invoice_date = date.today()
+        self.year = self.invoice_date.year
+        self.month = self.invoice_date.month
+        current_year_formated = self.year % 100
+        self.current_academic_year = (f"{current_year_formated}"
+                                      f"{current_year_formated + 1}")
 
-    def generate_files(self):
+    def generate_files(self, data, **kwargs):
         match self.mode:
             case 'invoice':
+                # basic file data
+                self.series = kwargs.series
+                self.invoice_num_start = kwargs.invoice_num_start
+                self.current_invoice_num = kwargs.invoice_num_start
+                assert all(isinstance(associate,Associate) for associate in data), f'{TypeError} {data} is not of Associate type'
                 for associate_data in self.associates_data:
-                    self.generate_invoice(associate_data)
+                    self.fill_file(associate_data)
             case 'extract':
-                for associate in self.associates_data:
-                    self.generate_single_detailed_extract(associate_data=associate,
-                                                        kids_data=self.childs_data[associate['name']])
+                assert all(isinstance(student,Students) for student in data), f'{TypeError} {data} is not of Students type'
+                for students in data:
+                    self.fill_file(associate_data=students.associate,
+                                   kids_data=students.children)
             case _:
                 self.fill_file()
             # case 'enrollment':
@@ -1009,16 +1026,19 @@ class PdfGen():
                                                  "height=1in"],
                                         arguments='DNI: '))
 
+
 @dataclass
-class Associate:
+class Person:
+    fullname: str
+    NIF: str
+    adress: str
+
+@dataclass
+class Associate(Person):
     """
     A class for associates
     """
-    name: str
-    NIF: str
-    adress: str
     id: str = ''
-
 
 @dataclass
 class Student:
@@ -1031,15 +1051,14 @@ class Student:
         attendance (dict): keys -> activities, values -> list[str]
             representing the attendance to activity
     """
-    name: str
-    associate: str
+    fullname: str
+    associate: Associate
     attendance: list[dict]
 
-
 @dataclass
-class Children:
+class Students:
     """
-    A class for students
+    A class for students linked to a single associate
 
     Args:
         associate (str): Legal representative, cooperative member
@@ -1047,3 +1066,101 @@ class Children:
     """
     associate: Associate
     children: list[Student]
+
+@dataclass
+class ChildInfo(Person):
+    """Enrollment data
+    """
+    birthdate: str
+    birthplace: str
+    num_siblings: str
+    position_siblings: str
+    nationality: str
+    NIF: str = field(default_factory=lambda: '')
+
+@dataclass
+class Parent(Person):
+    """Associate, parent, legal tutor or legal representant of Andolina
+    """
+    signature: str
+    relation_with_child: Literal['madre','padre','tutora legar','tutor legal','']
+    education: str  # =field(default_factory=lambda: '')
+    occupation: str # =field(default_factory=lambda: '')
+    telephone: str  # =field(default_factory=lambda: '')
+    email: str      # =field(default_factory=lambda: '')
+
+@dataclass
+class ImagePostingAuth:
+    """Image posting authorization LOPD
+    section_name = "Según lo expuesto, solicitamos tu consentimiento expreso para:"
+    arg1 = "La captación de imágenes y/o voz, vuestros, para su posterior difusión conforme lo "
+    "descrito en la presente cláusula."
+    arg2 = "La captación de imágenes y/o voz, del/de los menor/es "
+    "(en tu condición de padre/madre/tutor legal) "
+    "para su posterior difusión conforme lo descrito "
+    "en la presente cláusula."
+    """
+    tutor1: Parent
+    tutor2: Parent
+    auth_Andolina: Parent = Parent(*['']*9)
+    date: str = field(default_factory=lambda: date.today().strftime('%Y-%m-%d'))
+
+@dataclass
+class OutingAuthorization(Parent):
+    """School outing authorization.
+    
+    arg1 = "DOY MI AUTORIZACIÓN a cualquier excursión organizada o salida espontánea "
+    "que surja de 9:30 a 14:00 de la mañana, "
+    "a lo largo del presente curso y los sucesivos, salvo revocación expresa."
+    arg2 = "Marcando esta casilla indico que no estoy de acuerdo "
+    "con que se utilicen vehículos particulares "
+    "para el transporte de mi hijo/a."
+    """
+    important_info: str = field(default_factory=lambda: '')
+    date: str = field(default_factory=lambda: date.today().strftime('%Y-%m-%d'))
+
+    outing_permission: str = field(default_factory=lambda: '')
+    private_vehicle: str = field(default_factory=lambda: '')
+
+@dataclass
+class HealthInfo(Parent):
+    """Health info summary
+    
+    section = "ALERGIAS"
+    arg1 = "¿Tiene algún tipo de alergia a medicamentos, alimentos, animales, etc.? "
+    arg2 = "En caso afirmativo, escriba sus manifestaciones: "
+    arg3 = "La alergia se debe a: "
+    arg4 = "¿Recibe tratamiento permanente? "
+    
+    section = "INTOLERANCIAS"
+    arg1 = "¿Tiene algún tipo de alergia a medicamentos, alimentos, animales, etc.? "
+            
+    section = "VACUNAS"
+    arg1 = "¿Está vacunado del Tétanos? "
+            
+    section = "SI EL ALUMNO TIENE ALGÚN TIPO DE PROBLEMA DE SALUD EN EL COLEGIO RECURRIR A: "
+    arg1 = "Institución-Médico y Teléfono: "
+    arg2 = "Madre-Padre/Familiar y Teléfono: "
+    section = "INFORMACIÓN IMPORTANTE A DESTACAR: "
+    section = "FECHA Y FIRMA DE MADRE, PADRE O TUTOR, DNI: "
+    """
+    important_info_comments: str = field(default_factory=lambda: '')
+    date: str = field(default_factory=lambda: date.today().strftime('%Y-%m-%d'))
+    
+    allergies = Literal['sí','no']
+    manifestations: str = field(default_factory=lambda: '')
+    trigger: str = field(default_factory=lambda: '')
+    treatment = Literal['sí','no']
+    allergies_comments: str = field(default_factory=lambda: '')
+    
+    intolerances = Literal['sí','no']
+    intolerances_comments: str = field(default_factory=lambda: '')
+    
+    vaccines = Literal['sí','no']
+    vaccines_comments: str = field(default_factory=lambda: '')
+    
+    pro_emergency_contact: list = field(default_factory=lambda: ['',''])
+    fam_emergency_contact: list = field(default_factory=lambda: ['',''])
+
+
+    
