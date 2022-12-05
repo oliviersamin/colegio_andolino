@@ -2,7 +2,14 @@
 {% load static %}
 {% block content %}
 {% if user.is_authenticated %}
-{{ user.get_full_name }} dashboard
+{% if first_connection %}
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_ul }}
+        <input type="submit" value="Submit">
+    </form>
+
+{% endif %}
     <ul>TO ADD:
         <li>ARCHIVE VERIFICATION: creation if not existing...</li>
         <li>bills creation</li>

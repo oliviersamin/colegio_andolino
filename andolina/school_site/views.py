@@ -58,10 +58,71 @@ class Dashboard(View):
     template_name = 'school_site/dashboard.html'
 
     def get(self, request):
-        context = {}
+        context = {'first_connection': False}
         if request.user.is_authenticated:
+            try:
+                parent = Parent.objects.get(user=request.user)
+            except Exception as e:
+                # dict_initial = {'username': request.user.username}
+                # form = ProfileForm(request.POST or None, initial=dict_initial)
+                # context['first_connection'] = True
+                # context['form'] = form
+                new_parent = Parent()
+                new_parent.user_id = request.user.id
+                new_parent.save()
             return render(request, self.template_name, context=context)
         return redirect('school_site:home')
+
+    # def post(self, request):
+    #     form = ProfileForm(request.POST)
+    #     success_message = 'Your profile has been updated successfully'
+    #     error_messages = [
+    #         'At least one field of the form has not the proper input',
+    #         'Your profile has not been updated'
+    #     ]
+    #     if form.is_valid():
+    #         username_fields = [
+    #             'first_name',
+    #             'last_name',
+    #         ]
+    #         parent_fields = [
+    #             'phone',
+    #             'mobile',
+    #             'address',
+    #             # 'children',
+    #             'school_status',
+    #             # 'groups',
+    #             'school_email',
+    #             'bank_account',
+    #             'is_paying_bills'
+    #         ]
+    #         many_to_many_fields = ['children', 'group']
+    #         user = User.objects.get(id=request.user.id)
+    #         parent = Parent.objects.get(user__username=user.username)
+    #         for key, value in form.cleaned_data.items():
+    #             if (key in username_fields) & (value != ''):
+    #                 setattr(user, key, form.cleaned_data[key])
+    #                 user.username = update_username_with_form(user.first_name, user.last_name)
+    #             # if form.cleaned_data['email']:
+    #             #     user.email = form.cleaned_data['email']
+    #             elif key == 'email':
+    #                 setattr(user, key, value)
+    #             elif key in parent_fields:
+    #                 setattr(parent, key, value)
+    #             elif key in many_to_many_fields:
+    #                 if key == 'children':
+    #                     new_data = get_children_instance_from_form_field(value)
+    #                     update_children_fields_profile_form(parent=parent, field=key, new_data=new_data)
+    #                 elif key == 'group':
+    #                     new_data = get_group_instance_from_form_field(value)
+    #                     update_group_fields_profile_form(parent=parent, field=key, new_data=new_data)
+    #             user.save()
+    #             parent.save()
+    #         messages.add_message(request, messages.SUCCESS, success_message)
+    #     else:
+    #         for message in error_messages:
+    #             messages.add_message(request, messages.ERROR, message)
+    #     return redirect('school_site:dashboard')
 
 
 class EditProfile(View):
@@ -146,10 +207,15 @@ class MyFamily(View):
             # context['my_children'] = children
             # context['activities'] = [{'child': child, 'activities': child.user.activities.all()} for child in children]
             context['children'] = [{'child': child, 'activities': child.user.activities.all()} for child in children]
-            context['adults'] = [
-                {'user': parent, 'role': 'parent', 'activities': parent.user.activities.all()},
-                {'user': partner,  'role': 'partner', 'activities': partner.user.activities.all()},
-            ]
+            if partner:
+                context['adults'] = [
+                    {'user': parent, 'role': 'parent', 'activities': parent.user.activities.all()},
+                    {'user': partner,  'role': 'partner', 'activities': partner.user.activities.all()},
+                ]
+            else:
+                context['adults'] = [
+                    {'user': parent, 'role': 'parent', 'activities': parent.user.activities.all()},
+                ]
 
             return render(request, self.template_name, context=context)
         return redirect('school_site:home')
@@ -197,7 +263,8 @@ class AddPartner(View):
             context = {}
             dict_initial = {}
             parent = Parent.objects.get(user=request.user)
-            dict_initial['user'] = [getattr(parent, item).id for item in dir(parent) if item == 'partner'][0]
+            if parent.partner:
+                dict_initial['user'] = [getattr(parent, item).id for item in dir(parent) if item == 'partner'][0]
             context['form'] = self.form(request.POST or None, initial=dict_initial)
             return render(request, self.template_name, context=context)
         return redirect('school_site:home')

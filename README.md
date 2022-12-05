@@ -72,3 +72,6 @@ This feature has just been added to check that we can upload a document from loc
    4. Database hosted online by ElephantSQL for tests only, 20 MB of free data max
    5. No API ready
 
+### 3. Release 1.3:
+   #### feature/django-server-api:
+   1. admin usage documentation [here](documentation/admin_usage_documentation.md)
