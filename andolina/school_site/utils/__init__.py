@@ -16,6 +16,7 @@ from .form_utils import (
     users_and_dates_for_sheet_table,
     get_current_month_dates_headers,
     set_initial_sheet_fields,
+    create_parent_from_new_user,
 )
 from .common import (
     get_data_for_month_year,
@@ -42,4 +43,5 @@ __all__ = [
     set_initial_sheet_fields,
     get_data_for_month_year,
     get_data_for_actual_school_year,
+    create_parent_from_new_user,
 ]

@@ -21,6 +21,7 @@ from school_site.forms import (
     CreateSheetForm,
     EditActivityUsers,
     GenerateBillForm,
+    AddPartnerForm,
 )
 
 from school_site.utils import (
@@ -39,6 +40,7 @@ from school_site.utils import (
     set_initial_sheet_fields,
     get_data_for_month_year,
     get_data_for_actual_school_year,
+    create_parent_from_new_user,
 )
 
 
@@ -178,6 +180,44 @@ class AddChild(View):
             child = create_child_from_new_user(form, user)
             parent = Parent.objects.get(user=request.user)
             parent.children.add(child)
+            parent.save()
+            messages.add_message(request, messages.SUCCESS, success_message)
+        else:
+            for message in error_messages:
+                messages.add_message(request, messages.ERROR, message)
+        return redirect('school_site:children_activities')
+
+
+class AddPartner(View):
+    template_name = 'school_site/add_partner.html'
+    form = AddPartnerForm
+
+    def get(self, request):
+        if request.user.is_authenticated:
+            context = {}
+            dict_initial = {}
+            parent = Parent.objects.get(user=request.user)
+            dict_initial['user'] = [getattr(parent, item).id for item in dir(parent) if item == 'partner'][0]
+            context['form'] = self.form(request.POST or None, initial=dict_initial)
+            return render(request, self.template_name, context=context)
+        return redirect('school_site:home')
+
+    def post(self, request):
+        form = AddPartnerForm(request.POST)
+        success_message = 'Your partner has been added successfully'
+        error_messages = [
+            'At least one field of the form has not the proper input',
+            'Your partner has not been added'
+        ]
+
+        if form.is_valid():
+            if form.cleaned_data['is_partner_already_created']:
+                partner = Parent.objects.get(id=int(form.cleaned_data['user']))
+            else:
+                partner_user = create_user_from_child_form(form)
+                partner = create_parent_from_new_user(form, partner_user)
+            parent = Parent.objects.get(user=request.user)
+            parent.partner = partner
             parent.save()
             messages.add_message(request, messages.SUCCESS, success_message)
         else:

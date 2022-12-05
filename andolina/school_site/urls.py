@@ -10,6 +10,7 @@ urlpatterns = [
     path('profile/edit/<int:user_id>', views.EditProfile.as_view(), name='edit_profile'),
     path('my-family', views.MyFamily.as_view(), name='children_activities'),
     path('add-child', views.AddChild.as_view(), name='add_child'),
+    path('add-partner', views.AddPartner.as_view(), name='add_partner'),
     path('edit-child/<int:child_id>', views.EditChild.as_view(), name='edit_child'),
     path('my-activities', views.MyActivities.as_view(), name='my_activities'),
     path('create-my-activity', views.CreateMyActivity.as_view(), name='create_my_activity'),

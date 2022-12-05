@@ -148,6 +148,13 @@ def create_child_from_new_user(form, user):
     return new_child
 
 
+def create_parent_from_new_user(form, user):
+    new_parent = Parent()
+    new_parent.user_id = User.objects.get(username=user.username).id
+    new_parent.save()
+    return new_parent
+
+
 def get_bill_users_choices(user):
     pass
 
