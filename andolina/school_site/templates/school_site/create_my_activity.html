@@ -1,6 +1,7 @@
 {% extends 'school_site/my_activities.html' %}
 {% load static %}
 {% block create_my_activity %}
+    <script src="../../static/school_site/js/util_forms.js" defer data-children=" {{ children }}"></script>
 {% if user.is_authenticated %}
    <form action="" method="post">
     {% csrf_token %}

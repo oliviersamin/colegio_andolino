@@ -2,14 +2,19 @@
 {% load static %}
 {% block content %}
 {% if user.is_authenticated %}
-{% if first_connection %}
-    <form action="" method="post">
-        {% csrf_token %}
-        {{ form.as_ul }}
-        <input type="submit" value="Submit">
-    </form>
 
-{% endif %}
+   <table>
+        <tr>
+            <th>Activity name</th>
+            <th>Author</th>
+            <th>days/hours</th>
+            <th>Price</th>
+            <th>Details</th>
+        </tr>
+
+    </table>
+
+
 {% else %}
 PAGE NOT AVAILABLE
 {% endif %}

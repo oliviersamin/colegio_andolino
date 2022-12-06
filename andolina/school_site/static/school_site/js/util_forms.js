@@ -73,6 +73,30 @@ function hideShowParentList() {
 
 }
 
+function hideShowDate() {
+  const dateField = document.getElementById('id_date')
+  const all_year = document.getElementById('id_is_all_year')
+  const value = all_year.options[all_year.selectedIndex].value
+  const days = document.getElementById('id_days_hour')
+
+  if (value == 'true'){
+    dateField.style.display = 'none'
+    dateField.previousElementSibling.style.display = 'none'
+    dateField.nextElementSibling.style.display = 'none'
+    days.style.display = 'block'
+    days.previousElementSibling.style.display = 'block'
+    days.nextElementSibling.style.display = 'block'
+  }
+  else {
+    dateField.style.display = 'block'
+    dateField.previousElementSibling.style.display = 'block'
+    dateField.nextElementSibling.style.display = 'block'
+    days.style.display = 'none'
+    days.previousElementSibling.style.display = 'none'
+    days.nextElementSibling.style.display = 'none'
+  }
+}
+
 // to be executed when the whole page is loaded
 window.onload = function initialize_form(){
   if (document.URL.includes('my-bills')) {
@@ -84,5 +108,13 @@ window.onload = function initialize_form(){
     hideShowParentList()
     const parents_checkbox = document.getElementById("id_is_partner_already_created");
     parents_checkbox.addEventListener("click", hideShowParentList);
+  }
+
+  else if (document.URL.includes('create-my-activity')) {
+    hideShowDate()
+    const dateField = document.getElementById('id_date')
+    const daysField = document.getElementById('id_days_hour')
+    const all_year = document.getElementById('id_is_all_year')
+    all_year.addEventListener('click', hideShowDate)
   }
 }

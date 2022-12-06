@@ -9,6 +9,10 @@ def get_user_activities(user, archive):
 
 def get_all_family_activities(user):
     parent = Parent.objects.get(user=user)
+    partner = parent.partner
+    children = parent.children
+    family_filters = Q()
+    # activities =
     if parent.partner:
         pass
 

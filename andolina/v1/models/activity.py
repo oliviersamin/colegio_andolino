@@ -18,9 +18,15 @@ class Activity(models.Model):
     )
     users = models.ManyToManyField(User, related_name='activities', blank=True)
     nb_places_available = models.PositiveSmallIntegerField(blank=True, null=True)
-    is_inscription_open = models.BooleanField(blank=True, null=True)
-    is_all_year = models.BooleanField(blank=True, null=True)
+    is_inscription_open = models.BooleanField(blank=True, null=True, default=True)
+    is_all_year = models.BooleanField(blank=True, null=True, default=True)
     date = models.DateField(blank=True, null=True, help_text="date of the activity if it is not perform all year")
+    days_hour = models.CharField(
+        max_length=40,
+        help_text="format: day1/start_hour-stop_hour, day2/hours example: Monday/15:30-16:30, Wednesday/15:30-16:30",
+        blank=True,
+        null=True)
+    details = models.TextField(help_text="Explain to parents what is this activity", null=True, blank=True)
     price_per_day = models.FloatField(blank=True, null=True)
     price_per_month = models.FloatField(blank=True, null=True)
     money_earned_by_school = models.FloatField(blank=True, null=True)

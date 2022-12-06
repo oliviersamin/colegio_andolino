@@ -63,10 +63,6 @@ class Dashboard(View):
             try:
                 parent = Parent.objects.get(user=request.user)
             except Exception as e:
-                # dict_initial = {'username': request.user.username}
-                # form = ProfileForm(request.POST or None, initial=dict_initial)
-                # context['first_connection'] = True
-                # context['form'] = form
                 new_parent = Parent()
                 new_parent.user_id = request.user.id
                 new_parent.save()
