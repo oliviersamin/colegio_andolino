@@ -3,7 +3,6 @@
 {% load utils_form %}
 {% block content %}
 {% if user.is_authenticated %}
-MY ACTIVITIES PAGE FOR EACH USER
     <table>
         <tr>
             <th>Name</th>
@@ -80,45 +79,12 @@ MY ACTIVITIES PAGE FOR EACH USER
         {% endfor %}
     </table>
 
-    TO DO:
-    <ul>
-    <li>ARCHIVES DES MOIS PRECEDENTS (FEUILLES DE PARTICIPATION...)</li>
-        <li>creation automatique des archives chaque mois. Les utilisateurs envoient leur feuilles dans l archive du mois correspondant</li>
-    <li>Formulaire pour choisir l activite et le mois de lannee scolaire en cours</li>
-    </ul>
 
     <div id="buttons">
         <button><a class="home_buttons" href="{%url 'school_site:create_my_activity'%}">Create a new activity</a></button>
     </div>
 
     {% block create_my_activity %}{% endblock %}
-
-    <div id="archives">
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Year</th>
-            <th>Month</th>
-            <th></th>
-            <th></th>
-            <th>Actions</th>
-            <th></th>
-            <th></th>
-            <th></th>
-        </tr>
-        {% for archive in archives %}
-        <tr>
-            <th>{{ archive.name }}</th>
-            <th>{{ archive.type }}</th>
-            <th>{{ archive.year }}</th>
-            <th>{{ archive.month }}</th>
-            <th>
-                <button><a class="home_buttons" href="{% url 'school_site:edit_archive' archive_id=archive.id %}">Edit activity</a></button>
-            </th>
-        </tr>
-        {% endfor %}
-    </table>
 
     </div>
 

@@ -2,7 +2,6 @@
 {% load static %}
 {% block content %}
 {% if user.is_authenticated %}
-MY FAMILY ACTIVITIES
     {% for item in activities %}
         {{ item.child }} activities are:
     {% for activity in item.activities %}
@@ -77,9 +76,6 @@ MY FAMILY ACTIVITIES
     </div>
 
     {% block edit_profile %}{% endblock %}
-    <ul>TO ADD:
-        <li></li>
-    </ul>
 
 {% else %}
 PAGE NOT AVAILABLE
