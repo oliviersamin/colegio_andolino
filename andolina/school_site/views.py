@@ -281,8 +281,17 @@ class AddPartner(View):
             if form.cleaned_data['is_partner_already_created']:
                 partner = Parent.objects.get(id=int(form.cleaned_data['user']))
             else:
-                partner_user = create_user_from_child_form(form)
-                partner = create_parent_from_new_user(form, partner_user)
+                try:
+                    partner_user = create_user_from_child_form(form)
+                    partner = create_parent_from_new_user(form, partner_user)
+                except:
+                    last_names = form.cleaned_data['last_name'].split(' ')
+                    username = [form.cleaned_data['first_name']] + last_names
+                    username = '.'.join(username).lower()
+                    partner_user = User.objects.get(username=username)
+                    partner = Parent()
+                    partner.user = partner_user
+                    partner.save()
             parent = Parent.objects.get(user=request.user)
             parent.partner = partner
             parent.save()
