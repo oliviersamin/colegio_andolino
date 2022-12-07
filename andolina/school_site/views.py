@@ -238,8 +238,17 @@ class AddChild(View):
         ]
 
         if form.is_valid():
-            user = create_user_from_child_form(form)
-            child = create_child_from_new_user(form, user)
+            try:
+                user = create_user_from_child_form(form)
+            except:
+                last_names = form.cleaned_data['last_name'].split(' ')
+                username = [form.cleaned_data['first_name']] + last_names
+                username = '.'.join(username).lower()
+                user = User.objects.get(username=username)
+            try:
+                child = create_child_from_new_user(form, user)
+            except:
+                child = Child.objects.get(user=user)
             parent = Parent.objects.get(user=request.user)
             parent.children.add(child)
             parent.save()
