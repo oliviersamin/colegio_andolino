@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from v1.constants import PUBLIC_ACTIVITY
 from school_site.constants import PERMISSION_ACTIVITY_CHOICES
 
+PRICE_CHOICES = [('daily_price', 'daily price'), ('monthly_price', 'monthly price')]
+
 
 class Activity(models.Model):
     """ activity model """
@@ -27,6 +29,7 @@ class Activity(models.Model):
         blank=True,
         null=True)
     details = models.TextField(help_text="Explain to parents what is this activity", null=True, blank=True)
+    price = models.CharField(max_length=40, choices=PRICE_CHOICES, blank=False, null=True, default='monthly_price')
     price_per_day = models.FloatField(blank=True, null=True)
     price_per_month = models.FloatField(blank=True, null=True)
     money_earned_by_school = models.FloatField(blank=True, null=True)

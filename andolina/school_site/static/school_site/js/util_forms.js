@@ -73,6 +73,27 @@ function hideShowParentList() {
 
 }
 
+function hideShowPrice() {
+    const price = document.getElementById('id_price')
+    const value = price.options[price.selectedIndex].value
+    const month = document.getElementById('id_price_per_month')
+    const day = document.getElementById('id_price_per_day')
+
+  if (value == 'daily_price') {
+    month.style.display = 'none'
+    month.previousElementSibling.style.display = 'none'
+    day.style.display = 'block'
+    day.previousElementSibling.style.display = 'block'
+  }
+  else if(value == 'monthly_price') {
+    month.style.display = 'block'
+    month.previousElementSibling.style.display = 'block'
+    day.style.display = 'none'
+    day.previousElementSibling.style.display = 'none'
+  }
+
+}
+
 function hideShowDate() {
   const dateField = document.getElementById('id_date')
   const all_year = document.getElementById('id_is_all_year')
@@ -112,9 +133,12 @@ window.onload = function initialize_form(){
 
   else if (document.URL.includes('create-my-activity')) {
     hideShowDate()
+    hideShowPrice()
     const dateField = document.getElementById('id_date')
     const daysField = document.getElementById('id_days_hour')
     const all_year = document.getElementById('id_is_all_year')
+    const price = document.getElementById('id_price')
     all_year.addEventListener('click', hideShowDate)
+    price.addEventListener('click', hideShowPrice)
   }
 }

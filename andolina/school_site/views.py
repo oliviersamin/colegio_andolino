@@ -58,7 +58,7 @@ class Dashboard(View):
     template_name = 'school_site/dashboard.html'
 
     def get(self, request):
-        context = {'first_connection': False}
+        context = {'activities': Activity.objects.filter(is_inscription_open=True)}
         if request.user.is_authenticated:
             try:
                 parent = Parent.objects.get(user=request.user)
