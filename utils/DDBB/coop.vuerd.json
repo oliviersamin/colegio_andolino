@@ -1,0 +1,772 @@
+{
+  "canvas": {
+    "version": "2.2.11",
+    "width": 2000,
+    "height": 2000,
+    "scrollTop": 0,
+    "scrollLeft": -10,
+    "zoomLevel": 1,
+    "show": {
+      "tableComment": true,
+      "columnComment": true,
+      "columnDataType": true,
+      "columnDefault": true,
+      "columnAutoIncrement": false,
+      "columnPrimaryKey": true,
+      "columnUnique": false,
+      "columnNotNull": true,
+      "relationship": true
+    },
+    "database": "MySQL",
+    "databaseName": "",
+    "canvasType": "ERD",
+    "language": "GraphQL",
+    "tableCase": "pascalCase",
+    "columnCase": "camelCase",
+    "highlightTheme": "VS2015",
+    "bracketType": "none",
+    "setting": {
+      "relationshipDataTypeSync": true,
+      "relationshipOptimization": false,
+      "columnOrder": [
+        "columnName",
+        "columnDataType",
+        "columnNotNull",
+        "columnUnique",
+        "columnAutoIncrement",
+        "columnDefault",
+        "columnComment"
+      ]
+    },
+    "pluginSerializationMap": {}
+  },
+  "table": {
+    "tables": [
+      {
+        "name": "adulto",
+        "comment": "",
+        "columns": [
+          {
+            "name": "nombre",
+            "comment": "",
+            "dataType": "LINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": true,
+              "unique": false,
+              "notNull": true
+            },
+            "ui": {
+              "active": false,
+              "pk": true,
+              "fk": false,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 60,
+              "widthDataType": 76.52906799316406,
+              "widthDefault": 60
+            },
+            "id": "3b5630c0-b442-4659-908d-1680b17067b4"
+          },
+          {
+            "name": "estado",
+            "comment": "socio, presocio, colaborador",
+            "dataType": "LINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": true
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 120,
+              "widthDataType": 76.52906799316406,
+              "widthDefault": 60
+            },
+            "id": "3acd751a-8d09-4ea8-b187-7ac5057c48a9"
+          },
+          {
+            "name": "grupos",
+            "comment": "círculos y grupos de trabajo",
+            "dataType": "LINESTRING",
+            "default": "null",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": false
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 120,
+              "widthDataType": 76.52906799316406,
+              "widthDefault": 60
+            },
+            "id": "b486b322-e3ab-4d58-b1dd-5823bb5670b1"
+          },
+          {
+            "name": "niños",
+            "comment": "lista de hijos",
+            "dataType": "MULTILINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": true
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 77.84207153320312,
+              "widthDataType": 116.01011657714844,
+              "widthDefault": 60
+            },
+            "id": "b9b53447-530d-40b4-9235-906bdde02056"
+          },
+          {
+            "name": "número de cuenta",
+            "comment": "",
+            "dataType": "NUMERIC",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": false
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 114.24211120605469,
+              "widthComment": 60,
+              "widthDataType": 61.111053466796875,
+              "widthDefault": 60
+            },
+            "id": "3523ccb3-bbc1-42ed-9bd9-503c41001a3c"
+          },
+          {
+            "name": "Correo del colegio",
+            "comment": "",
+            "dataType": "LINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": false
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 113.20208740234375,
+              "widthComment": 60,
+              "widthDataType": 76.52906799316406,
+              "widthDefault": 60
+            },
+            "id": "a1d939f0-29c8-4245-898d-0d238c3d9f22"
+          },
+          {
+            "name": "Fecha de alta",
+            "comment": "",
+            "dataType": "DATE",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": false
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 82.36605834960938,
+              "widthComment": 60,
+              "widthDataType": 60,
+              "widthDefault": 60
+            },
+            "id": "8cb2b770-40be-42c4-b7bd-2b29884a9c04"
+          },
+          {
+            "name": "dirección",
+            "comment": "",
+            "dataType": "LINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": false
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 60,
+              "widthDataType": 76.52906799316406,
+              "widthDefault": 60
+            },
+            "id": "22906cf1-b3a5-4e7f-a312-c5f7ff540cdd"
+          },
+          {
+            "name": "teléfono",
+            "comment": "",
+            "dataType": "NUMERIC",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": false
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 60,
+              "widthDataType": 61.111053466796875,
+              "widthDefault": 60
+            },
+            "id": "a07d60ca-1662-4ff1-8a19-1347d3ced325"
+          },
+          {
+            "name": "correo personal",
+            "comment": "",
+            "dataType": "LINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": true
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 98.62907409667969,
+              "widthComment": 60,
+              "widthDataType": 76.52906799316406,
+              "widthDefault": 60
+            },
+            "id": "88ed26cd-1065-4ead-8bdf-344550960657"
+          }
+        ],
+        "ui": {
+          "active": false,
+          "left": 164,
+          "top": 45,
+          "zIndex": 111,
+          "widthName": 60,
+          "widthComment": 60
+        },
+        "visible": true,
+        "id": "457467e5-cb7a-4f91-bd33-9e3fe1f30fd6"
+      },
+      {
+        "name": "voluntariado",
+        "comment": "",
+        "columns": [
+          {
+            "name": "grupo",
+            "comment": "grupo de trabajo o círculo",
+            "dataType": "LINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": true,
+              "unique": false,
+              "notNull": true
+            },
+            "ui": {
+              "active": false,
+              "pk": true,
+              "fk": false,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 120,
+              "widthDataType": 76.52906799316406,
+              "widthDefault": 60
+            },
+            "id": "a7898aea-6bcb-4042-907d-547c56da5665"
+          },
+          {
+            "name": "representante",
+            "comment": "",
+            "dataType": "LINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": false
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 88.51507568359375,
+              "widthComment": 60,
+              "widthDataType": 76.52906799316406,
+              "widthDefault": 60
+            },
+            "id": "b3f49649-a96e-49b5-b041-e44565c58011"
+          },
+          {
+            "name": "lideresa",
+            "comment": "",
+            "dataType": "LINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": false
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 60,
+              "widthDataType": 76.52906799316406,
+              "widthDefault": 60
+            },
+            "id": "c554f8c9-b35d-4762-ac66-4a9b2d8937cb"
+          },
+          {
+            "name": "correo",
+            "comment": "",
+            "dataType": "LINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": false
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 60,
+              "widthDataType": 76.52906799316406,
+              "widthDefault": 60
+            },
+            "id": "1aba099d-a1fd-451e-8495-4ec355719827"
+          },
+          {
+            "name": "nombre",
+            "comment": "",
+            "dataType": "LINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": true
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": true,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 60,
+              "widthDataType": 76.52906799316406,
+              "widthDefault": 60
+            },
+            "id": "50ae9d13-2c9f-4ce3-a4cc-c003b3ea443c"
+          }
+        ],
+        "ui": {
+          "active": true,
+          "left": 124.6671,
+          "top": 454.6667,
+          "zIndex": 112,
+          "widthName": 79.75306701660156,
+          "widthComment": 60
+        },
+        "visible": true,
+        "id": "c15fcdbf-dbb1-4557-883d-75ffed788233"
+      },
+      {
+        "name": "niño",
+        "comment": "",
+        "columns": [
+          {
+            "name": "nombre",
+            "comment": "",
+            "dataType": "LINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": true,
+              "unique": false,
+              "notNull": true
+            },
+            "ui": {
+              "active": false,
+              "pk": true,
+              "fk": false,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 60,
+              "widthDataType": 76.52906799316406,
+              "widthDefault": 60
+            },
+            "id": "fadde3bb-9749-482f-83c1-54bce50ee2a9"
+          },
+          {
+            "name": "edad",
+            "comment": "",
+            "dataType": "INT",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": true
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 60,
+              "widthDataType": 60,
+              "widthDefault": 60
+            },
+            "id": "9dc66737-daf9-4a2c-96e1-a5d713e31c8e"
+          },
+          {
+            "name": "padres",
+            "comment": "",
+            "dataType": "MULTILINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": true
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 60,
+              "widthDataType": 116.01011657714844,
+              "widthDefault": 60
+            },
+            "id": "8a7b06ea-d3d5-44c5-b140-67f34ef911ae"
+          },
+          {
+            "name": "tutor",
+            "comment": "Esther, Momo, Luis, Ali, María, Belen",
+            "dataType": "LINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": false
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 120,
+              "widthDataType": 76.52906799316406,
+              "widthDefault": 60
+            },
+            "id": "0c1a6553-eb95-4638-95f7-6c9400972ca6"
+          },
+          {
+            "name": "nombre",
+            "comment": "",
+            "dataType": "LINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": true
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": true,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 60,
+              "widthDataType": 76.52906799316406,
+              "widthDefault": 60
+            },
+            "id": "9d1bf4dd-2217-487f-b043-3b9f9d3900e3"
+          }
+        ],
+        "ui": {
+          "active": false,
+          "left": 803,
+          "top": 240,
+          "zIndex": 109,
+          "widthName": 60,
+          "widthComment": 60
+        },
+        "visible": true,
+        "id": "661f27ef-aca0-401b-aa04-59e04126f7ed"
+      },
+      {
+        "name": "profesor",
+        "comment": "",
+        "columns": [
+          {
+            "name": "nombre",
+            "comment": "",
+            "dataType": "LINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": true,
+              "unique": false,
+              "notNull": true
+            },
+            "ui": {
+              "active": false,
+              "pk": true,
+              "fk": false,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 60,
+              "widthDataType": 76.52906799316406,
+              "widthDefault": 60
+            },
+            "id": "0a683174-a269-4a9a-afcd-19d6b061df3d"
+          },
+          {
+            "name": "número de cuenta",
+            "comment": "",
+            "dataType": "NUMERIC",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": true
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 114.24211120605469,
+              "widthComment": 60,
+              "widthDataType": 61.111053466796875,
+              "widthDefault": 60
+            },
+            "id": "8710d74f-239b-42a5-aabc-6eff127ce072"
+          },
+          {
+            "name": "correo del colegio",
+            "comment": "",
+            "dataType": "LINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": false
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 111.22608947753906,
+              "widthComment": 60,
+              "widthDataType": 76.52906799316406,
+              "widthDefault": 60
+            },
+            "id": "abf75508-4ec0-4aa4-9e02-7120c09f5786"
+          },
+          {
+            "name": "teléfono",
+            "comment": "",
+            "dataType": "NUMERIC",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": false
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": false,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 60,
+              "widthDataType": 61.111053466796875,
+              "widthDefault": 60
+            },
+            "id": "c0e9a948-b740-470a-8f17-0a00d079e8bb"
+          },
+          {
+            "name": "nombre",
+            "comment": "",
+            "dataType": "LINESTRING",
+            "default": "",
+            "option": {
+              "autoIncrement": false,
+              "primaryKey": false,
+              "unique": false,
+              "notNull": true
+            },
+            "ui": {
+              "active": false,
+              "pk": false,
+              "fk": true,
+              "pfk": false,
+              "widthName": 60,
+              "widthComment": 60,
+              "widthDataType": 76.52906799316406,
+              "widthDefault": 60
+            },
+            "id": "0e324519-0c31-4d77-8dcc-4b472254d4dc"
+          }
+        ],
+        "ui": {
+          "active": false,
+          "left": 815.2216,
+          "top": 518.8892,
+          "zIndex": 110,
+          "widthName": 60,
+          "widthComment": 60
+        },
+        "visible": true,
+        "id": "eb20884c-fe92-455a-9196-4bc7cf047eb2"
+      }
+    ],
+    "indexes": []
+  },
+  "memo": {
+    "memos": []
+  },
+  "relationship": {
+    "relationships": [
+      {
+        "identification": false,
+        "relationshipType": "OneN",
+        "startRelationshipType": "Dash",
+        "start": {
+          "tableId": "457467e5-cb7a-4f91-bd33-9e3fe1f30fd6",
+          "columnIds": [
+            "3b5630c0-b442-4659-908d-1680b17067b4"
+          ],
+          "x": 681.2522277832031,
+          "y": 182,
+          "direction": "right"
+        },
+        "end": {
+          "tableId": "661f27ef-aca0-401b-aa04-59e04126f7ed",
+          "columnIds": [
+            "9d1bf4dd-2217-487f-b043-3b9f9d3900e3"
+          ],
+          "x": 803,
+          "y": 325.75,
+          "direction": "left"
+        },
+        "constraintName": "fk_adulto_to_niño",
+        "visible": true,
+        "id": "e95d0ba6-4107-4c0d-9c9d-36521ccef1c0"
+      },
+      {
+        "identification": false,
+        "relationshipType": "OneOnly",
+        "startRelationshipType": "Dash",
+        "start": {
+          "tableId": "661f27ef-aca0-401b-aa04-59e04126f7ed",
+          "columnIds": [
+            "fadde3bb-9749-482f-83c1-54bce50ee2a9"
+          ],
+          "x": 1034.5050582885742,
+          "y": 411.5,
+          "direction": "bottom"
+        },
+        "end": {
+          "tableId": "eb20884c-fe92-455a-9196-4bc7cf047eb2",
+          "columnIds": [
+            "0e324519-0c31-4d77-8dcc-4b472254d4dc"
+          ],
+          "x": 1024.1071895996092,
+          "y": 518.8892,
+          "direction": "top"
+        },
+        "constraintName": "fk_niño_to_profesor",
+        "visible": true,
+        "id": "d6fecf03-4bc9-4636-9107-f88e14216de5"
+      },
+      {
+        "identification": false,
+        "relationshipType": "OneN",
+        "startRelationshipType": "Dash",
+        "start": {
+          "tableId": "457467e5-cb7a-4f91-bd33-9e3fe1f30fd6",
+          "columnIds": [
+            "3b5630c0-b442-4659-908d-1680b17067b4"
+          ],
+          "x": 422.62611389160156,
+          "y": 319,
+          "direction": "bottom"
+        },
+        "end": {
+          "tableId": "c15fcdbf-dbb1-4557-883d-75ffed788233",
+          "columnIds": [
+            "50ae9d13-2c9f-4ce3-a4cc-c003b3ea443c"
+          ],
+          "x": 350.6891718383789,
+          "y": 454.6667,
+          "direction": "top"
+        },
+        "constraintName": "fk_adulto_to_voluntariado",
+        "visible": true,
+        "id": "8f878677-c4cf-46c8-be8f-2c6949ebff76"
+      }
+    ]
+  }
+}
