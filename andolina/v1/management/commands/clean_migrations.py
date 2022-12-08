@@ -1,6 +1,6 @@
 from django.core.management import BaseCommand
 import os
-
+from pathlib import Path
 
 class Command(BaseCommand):
     help = "Clean all the migrations file and applying all needed migrations"
@@ -12,10 +12,11 @@ class Command(BaseCommand):
         2. launch makemigrations
         3. launch migrate
         """
-        migrations_dir = 'v1/migrations/'
+        grandpa = Path(__file__).parents[2]
+        migrations_dir = os.path.join(grandpa,'migrations/')
         migrations = os.listdir(migrations_dir)
-        filter_to_keep = '__init__.py'
-        [os.system('rm ' + os.path.join(migrations_dir, item)) for item in migrations if item != filter_to_keep]
-        os.system('python manage.py makemigrations')
-        os.system('python manage.py migrate')
-        os.system('python manage.py runserver')
+        filter_to_keep = ['__init__.py', '__pycache__']
+        [os.system('rm ' + os.path.join(migrations_dir, item)) for item in migrations if item not in filter_to_keep]
+        os.system('python andolina/manage.py makemigrations')
+        os.system('python andolina/manage.py migrate')
+        os.system('python andolina/manage.py runserver')
