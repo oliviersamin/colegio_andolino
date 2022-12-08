@@ -6,6 +6,7 @@ for invoices or detailed extracts.
 import calendar
 from datetime import date
 from dataclasses import dataclass, field
+from enum import Enum, auto
 from itertools import chain
 from json import dumps as jdumps
 from json import loads as jloads
@@ -1033,6 +1034,11 @@ class Person:
     NIF: str
     adress: str
 
+class AssociateType(Enum):
+    """Different types of associates."""
+    COLABORADOR = auto()
+    SOCIO = auto()
+
 @dataclass
 class Associate(Person):
     """
@@ -1056,7 +1062,7 @@ class Student:
     attendance: list[dict]
 
 @dataclass
-class Students:
+class StudentsFamily:
     """
     A class for students linked to a single associate
 
@@ -1078,6 +1084,11 @@ class ChildInfo(Person):
     nationality: str
     NIF: str = field(default_factory=lambda: '')
 
+class LegalRelation(Enum):
+    MADRE = auto()
+    PADRE = auto()
+    TUTORA_LEGAL = auto()
+    TUTOR_LEGAL = auto()
 @dataclass
 class Parent(Person):
     """Associate, parent, legal tutor or legal representant of Andolina
@@ -1122,6 +1133,10 @@ class OutingAuthorization(Parent):
     outing_permission: str = field(default_factory=lambda: '')
     private_vehicle: str = field(default_factory=lambda: '')
 
+class Binario(Enum):
+    SI = auto()
+    NO = auto()
+    
 @dataclass
 class HealthInfo(Parent):
     """Health info summary
