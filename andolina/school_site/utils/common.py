@@ -1,6 +1,7 @@
 import datetime
 from django.db.models import Q
 from v1.models import Child, Parent, Archive, Sheet, Activity
+from .generate_bills import PdfGeneration
 
 
 def get_user_activities(user, archive):
@@ -94,3 +95,15 @@ def get_data_for_actual_school_year(user):
     # filters = Q(activity__users=user) & Q(is_archived=True) & dates_filter
     # result['sheets'] = list(Sheet.objects.filter(filters))
     return results
+
+
+def from_data_to_bills(data, request):
+    data = {  # 'invoice_num': get_invoice_num(invoice_date),
+              # 'date': invoice_date.strftime("%d/%m/%y"),
+            'name': request.user.get_full_name(),
+            'NIF': Parent.objects.get(user=request.user).nif,
+            'adress': Parent.objects.get(user=request.user).address}
+
+    instance = PdfGeneration(invoice_num_start=2,
+                             associate_data=[data, data])
+    instance.generate_set_invoices()

@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.Home.as_view(), name='home'),
     # pages after login
     path('dashboard', views.Dashboard.as_view(), name='dashboard'),
+    path('add-to-inscription-list/<int:activity_id>', views.AddInscription.as_view(), name='add_inscription'),
     path('profile/edit/<int:user_id>', views.EditProfile.as_view(), name='edit_profile'),
     path('my-family', views.MyFamily.as_view(), name='children_activities'),
     path('add-child', views.AddChild.as_view(), name='add_child'),

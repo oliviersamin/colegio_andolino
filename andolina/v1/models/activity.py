@@ -1,10 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User
+import datetime
 # from . import Parent, External
 from v1.constants import PUBLIC_ACTIVITY
 from school_site.constants import PERMISSION_ACTIVITY_CHOICES
 
 PRICE_CHOICES = [('daily_price', 'daily price'), ('monthly_price', 'monthly price')]
+AWAITING_USERS = [('TEST', 'TEST')]
 
 
 class Activity(models.Model):
@@ -36,6 +38,7 @@ class Activity(models.Model):
     public = models.CharField(max_length=40, choices=PUBLIC_ACTIVITY, blank=False, null=True)
     comment_for_parent = models.TextField(blank=True, null=True)
     edit_permission = models.CharField(max_length=40, choices=PERMISSION_ACTIVITY_CHOICES, blank=True, null=True)
+    ask_inscription = models.CharField(max_length=100, choices=AWAITING_USERS, blank=True, null=True)
 
     class Meta:
         ordering = ['name', 'public', 'is_inscription_open']
@@ -43,3 +46,12 @@ class Activity(models.Model):
 
     def __str__(self):
         return self.name
+
+    def update_awaiting_users_list(self, user):
+        """
+        get the data and update the list to update the corresponding field
+        """
+        now = datetime.datetime.now()
+        date_format = '%Y-%m-%d %H:%M:%S'
+        displayed_data = user.get_full_name() + ' ' + datetime.datetime.strftime(now, date_format)
+        return AWAITING_USERS.append((user.username, displayed_data))

@@ -16,6 +16,7 @@ PROFILE_FORM_FIELDS = [
     'school_email',
     'bank_account',
     'is_paying_bills',
+    'nif',
 ]
 
 USER_FORM_FIELD = [

@@ -1,8 +1,3 @@
-'''
-Generate pdf files with pylatex
-for invoices or detailed extracts.
-'''
-# import stdlib
 import calendar
 from datetime import date
 from dataclasses import dataclass
@@ -18,85 +13,25 @@ from pylatex import (Document, Foot, FootnoteText, Head, LargeText, LineBreak,
                      LongTabu, MiniPage, PageStyle, Section, StandAloneGraphic,
                      Tabular, VerticalSpace, TextColor)
 from pylatex.utils import NoEscape, bold, dumps_list
+from random import choices
+from school_site.constants import (
+    ACTIVIDADES_ESCOLARES,
+    EXTRAESCOLARES,
+    ACTIVIDADES,
+    COLEGIO_DATOS,
+    EXEMPTION,
+    LOPD,
+    activities_colors_dict,
+    UNIT_PRICE,
+)
+
 
 """
 ENVIRONMENT VARIABLES
 """
-# Billing concepts
-PRECIO_MAX_COMEDOR = int(os.getenv('PRECIO_MAX_COMEDOR', '20'))
-PRECIO_DIA_COMEDOR = int(os.getenv('PRECIO_DIA_COMEDOR', '5'))
-PRECIO_MAX_TEMPRANA = int(os.getenv('PRECIO_MAX_TEMPRANA', '20'))
-PRECIO_DIA_TEMPRANA = int(os.getenv('PRECIO_DIA_TEMPRANA', '5'))
-EXTRAESCOLARES = jloads(os.getenv('EXTRAESCOLARES',
-                                  ('{"JUDO": 25,'
-                                   '"CIENCIA": 20,'
-                                   '"TEATRO": 20,'
-                                   '"ROBOTIX": 20}')))
-ACTIVIDADES_ESCOLARES = ['COLEGIO',
-                         'ATENCIÓN TEMPRANA',
-                         'COMEDOR']
-ACTIVIDADES = ACTIVIDADES_ESCOLARES
-ACTIVIDADES.extend(EXTRAESCOLARES.keys())
-UNIT_PRICES_DICT = {"CUOTA": 325,
-                    "COMEDOR": 5,
-                    "COMEDOR_MAX": 25,
-                    "ATENCIÓN_TEMPRANA": 5,
-                    "ATENCIÓN_TEMPRANA_MAX": 25,
-                    "JUDO": 25,
-                    "CIENCIA": 20,
-                    "TEATRO": 20,
-                    "ROBOTIX": 20}
-UNIT_PRICE = jloads(os.getenv('UNIT_PRICE',
-                              jdumps(UNIT_PRICES_DICT)))
-
-# Information Strings
-COLEGIO_NOMBRE = os.getenv("COLEGIO_NOMBRE",
-                           "Colegio Andolina Sociedad Cooperativa Asturiana")
-COLEGIO_CIF = os.getenv("COLEGIO_NOMBRE",
-                        "F33986522")
-COLEGIO_DIRECCION = os.getenv("COLEGIO_DIRECCION",
-                              ("Camino del Barreo, 203"
-                               "Cefontes (Cabueñes) 33394 Gijón Asturias."))
-COLEGIO_DATOS = os.getenv("COLEGIO_DATOS",
-                          f'{COLEGIO_NOMBRE} - CIF:'
-                          f'{COLEGIO_CIF} - {COLEGIO_DIRECCION}')
-EXEMPTION = os.getenv("EXEMPTION",
-                      ("Exención de IVA según el 20.9 de la Ley 37/1992"
-                       "de 28 de diciembre."))
-LOPD = os.getenv("LOPD",
-                 ("A los efectos previstos en la Ley Orgánica 15/1999, "
-                  "de 13 de diciembre, "
-                  "sobre Protección de Datos de Carácter Personal, "
-                  "se le informa que los datos personales proporcionados "
-                  "se incorporarán a los ficheros de "
-                  "Colegio Andolina Sociedad Cooperativa Asturiana, "
-                  f"con dirección en {COLEGIO_DIRECCION} "
-                  "La finalidad del tratamiento de los datos será "
-                  "la de gestionar los servicios suministrados. "
-                  "Usted tiene derecho al acceso, rectificación, "
-                  "cancelación y "
-                  "oposición en los términos previstos en la Ley, "
-                  "que podrá ejercitar mediante escrito "
-                  "dirigido al responsable de los mismos "
-                  "en la dirección anteriormente indicada "
-                  "o a la dirección de correo electrónico "
-                  "lopd@colegioandolina.org."))
 
 
-COLORS = ["black",
-          "blue",
-          "brown",  # "cyan", "darkgray", "gray",
-          "green",  # "lightgray", "lime", "magenta", "olive",
-          "orange",  # "pink",
-          "purple",
-          "red",
-          "teal",
-          "violet",  # "white",
-          "yellow"]
-activities_colors_dict = dict(zip(ACTIVIDADES, COLORS))
-
-
-class PdfGeneration():
+class PdfGeneration:
     def __init__(self,
                  series: str = 'FU',
                  invoice_num_start: int = 0,
@@ -300,8 +235,7 @@ class PdfGeneration():
         with self.first_page.create(Head("L")) as header_left:
             with header_left.create(MiniPage(width=NoEscape(r"0.5\textwidth"),
                                              pos='c')) as logo_wrapper:
-                logo_file = os.path.join(os.path.dirname(__file__),
-                                         'andolina-logo.png')
+                logo_file = '/home/olivier/Documents/Projets/Andolina/colegio_andolino/andolina/school_site/static/school_site/images/andolina-logo.png'
                 logo_wrapper.append(StandAloneGraphic(image_options="width=200px",
                                                       filename=logo_file))
 
@@ -397,9 +331,7 @@ class PdfGeneration():
         file = f"./{self.current_associate_data['invoice_num']}" if mode == 'invoice' else \
                f"./{self.current_associate_data['invoice_num']}_extract" if mode == 'extract' else \
                filename
-        self.doc.generate_pdf(os.path.join(os.path.dirname(__file__),
-                                           file),
-                              clean_tex=True)
+        self.doc.generate_pdf(os.path.join(os.path.dirname(__file__), file))
 
     def generate_extract(self) -> list[tuple]:
         """
@@ -524,7 +456,6 @@ if __name__ == '__main__':
     # generate_invoice(**data)
     instance = PdfGeneration(invoice_num_start=2,
                              associate_data=[data, data])
-    from random import choices
     child_data = {
         'Asier': dict(zip(ACTIVIDADES, [choices(['x', ''],
                                                 k=instance.num_monthdays)

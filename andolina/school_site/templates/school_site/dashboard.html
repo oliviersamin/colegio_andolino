@@ -6,18 +6,40 @@
    <table>
         <tr>
             <th>Activity name</th>
+            <th>Public</th>
             <th>Author</th>
             <th>days/hours</th>
             <th>Price</th>
             <th>Details</th>
+            <th></th>
+            <th>Actions</th>
+            <th></th>
         </tr>
         {% for activity in activities %}
         <tr>
-        <th>activity.name</th>
-        <th>activity.creator</th>
-        <th>activity.days_hour</th>
-        <th>activity.price_per_month</th>
-        <th>activity.details</th>
+        <th>{{ activity.name }}</th>
+            <th>{{ activity.public }}</th>
+        <th>{{ activity.creator }}</th>
+        <th>{{ activity.days_hour }}</th>
+        <th>{{ activity.price_per_month }}</th>
+        <th>{{ activity.details }}</th>
+            <th>
+                <label for="users">Choose a user:</label>
+                <select name="users" id="users">
+                    {% if activity.public == 'parents'  %}
+                    {% for parent in parents %}
+                      <option value={{parent.user.id}}>{{parent.user.username}}</option>
+                    {% endfor %}
+                    {% elif activity.public == 'children' %}
+                    {% for child in children %}
+                      <option value={{child.id}}>{{child}}</option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+            </th>
+        <th> <button name="button" type="submit" onclick="location.href='{% url "school_site:add_inscription" activity_id=activity.id %}'"> Add to the inscription list</button></th>
+        <th></th>
+        <th>Remove inscription</th>
         </tr>
         {% endfor %}
     </table>

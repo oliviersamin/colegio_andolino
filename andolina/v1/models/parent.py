@@ -18,6 +18,7 @@ class Parent(models.Model):
     school_status = models.CharField(max_length=20, blank=True, null=True, choices=SCHOOL_STATUS)
     # groups = models.CharField(max_length=20, blank=True, null=True, choices=SCHOOL_GROUPS)
     school_email = models.EmailField(blank=True, null=True)
+    nif = models.CharField(max_length=20, blank=True, null=True)
     bank_account = models.CharField(max_length=20, blank=True, null=True)
     is_paying_bills = models.BooleanField(blank=True, null=True, default=False)
     date_start_school = models.DateField(blank=True, null=True)

@@ -11,6 +11,7 @@ from school_site.utils import (
     parse_checkboxes,
     users_and_dates_for_sheet_table,
     get_current_month_dates_headers,
+    from_data_to_bills,
 )
 
 from school_site.forms import (
@@ -58,67 +59,44 @@ class Dashboard(View):
     template_name = 'school_site/dashboard.html'
 
     def get(self, request):
-        context = {'activities': Activity.objects.filter(is_inscription_open=True)}
         if request.user.is_authenticated:
+            context = {'activities': Activity.objects.filter(is_inscription_open=True)}
             try:
                 parent = Parent.objects.get(user=request.user)
             except Exception as e:
                 new_parent = Parent()
                 new_parent.user_id = request.user.id
                 new_parent.save()
+            parent = Parent.objects.get(user=request.user)
+            context['parents'] = [parent]
+            if parent.partner:
+                context['parents'].append(parent.partner.user)
+            if parent.children.all():
+                context['children'] = parent.children.all()
             return render(request, self.template_name, context=context)
         return redirect('school_site:home')
 
-    # def post(self, request):
-    #     form = ProfileForm(request.POST)
-    #     success_message = 'Your profile has been updated successfully'
-    #     error_messages = [
-    #         'At least one field of the form has not the proper input',
-    #         'Your profile has not been updated'
-    #     ]
-    #     if form.is_valid():
-    #         username_fields = [
-    #             'first_name',
-    #             'last_name',
-    #         ]
-    #         parent_fields = [
-    #             'phone',
-    #             'mobile',
-    #             'address',
-    #             # 'children',
-    #             'school_status',
-    #             # 'groups',
-    #             'school_email',
-    #             'bank_account',
-    #             'is_paying_bills'
-    #         ]
-    #         many_to_many_fields = ['children', 'group']
-    #         user = User.objects.get(id=request.user.id)
-    #         parent = Parent.objects.get(user__username=user.username)
-    #         for key, value in form.cleaned_data.items():
-    #             if (key in username_fields) & (value != ''):
-    #                 setattr(user, key, form.cleaned_data[key])
-    #                 user.username = update_username_with_form(user.first_name, user.last_name)
-    #             # if form.cleaned_data['email']:
-    #             #     user.email = form.cleaned_data['email']
-    #             elif key == 'email':
-    #                 setattr(user, key, value)
-    #             elif key in parent_fields:
-    #                 setattr(parent, key, value)
-    #             elif key in many_to_many_fields:
-    #                 if key == 'children':
-    #                     new_data = get_children_instance_from_form_field(value)
-    #                     update_children_fields_profile_form(parent=parent, field=key, new_data=new_data)
-    #                 elif key == 'group':
-    #                     new_data = get_group_instance_from_form_field(value)
-    #                     update_group_fields_profile_form(parent=parent, field=key, new_data=new_data)
-    #             user.save()
-    #             parent.save()
-    #         messages.add_message(request, messages.SUCCESS, success_message)
-    #     else:
-    #         for message in error_messages:
-    #             messages.add_message(request, messages.ERROR, message)
-    #     return redirect('school_site:dashboard')
+
+class AddInscription(View):
+    def get(self, request, activity_id):
+        success_message = 'The user has been added successfully to the inscription list'
+        error_messages = [
+            'At least one field of the form has not the proper input',
+            'Your profile has not been updated'
+        ]
+        if request.user.is_authenticated:
+            context = {}
+            # user = User.objects.get(id=user_id)
+            # parent = Parent.objects.get(user=user)
+            # dict_initial = set_initial_fields_profile_form(user=user, parent=parent)
+            # form = ProfileForm(request.POST or None, initial=dict_initial)
+            # context['form'] = form
+            # context['children'] = parent.child()
+            # context['parent'] = parent
+            messages.add_message(request, messages.SUCCESS, success_message)
+            return redirect('school_site:dashboard')
+        return redirect('school_site:home')
+
 
 
 class EditProfile(View):
@@ -159,7 +137,8 @@ class EditProfile(View):
                 # 'groups',
                 'school_email',
                 'bank_account',
-                'is_paying_bills'
+                'is_paying_bills',
+                'nif',
             ]
             many_to_many_fields = ['children', 'group']
             user = User.objects.get(id=user_id)
@@ -168,8 +147,6 @@ class EditProfile(View):
                 if (key in username_fields) & (value != ''):
                     setattr(user, key, form.cleaned_data[key])
                     user.username = update_username_with_form(user.first_name, user.last_name)
-                # if form.cleaned_data['email']:
-                #     user.email = form.cleaned_data['email']
                 elif key == 'email':
                     setattr(user, key, value)
                 elif key in parent_fields:
@@ -770,18 +747,7 @@ class MyBills(View):
                 results = []
                 for user in users:
                     results.append(get_data_for_actual_school_year(user))
-            # activity = Activity.objects.get(pk=activity_id)
-            # if activity.public == 'parents':
-            #     parents_id = []
-            #     for parent in form.cleaned_data['parents']:
-            #         parents_id.append(parent.user.id)
-            #     activity.users.set(parents_id)
-            # else:
-            #     children_id = []
-            #     for child in form.cleaned_data['children']:
-            #         children_id.append(child.user.id)
-            #     activity.users.set(children_id)
-            # activity.save()
+            from_data_to_bills(results, request)
             messages.add_message(request, messages.SUCCESS, success_message)
         else:
             for message in error_messages:
