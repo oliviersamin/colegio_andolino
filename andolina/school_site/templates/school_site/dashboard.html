@@ -2,7 +2,6 @@
 {% load static %}
 {% block content %}
 {% if user.is_authenticated %}
-
    <table>
         <tr>
             <th>Activity name</th>
@@ -24,20 +23,25 @@
         <th>{{ activity.price_per_month }}</th>
         <th>{{ activity.details }}</th>
             <th>
-                <label for="users">Choose a user:</label>
-                <select name="users" id="users">
+                <form action="add-to-inscription-list/{{activity.id}}" method="POST">
+                {% csrf_token %}
+                <label for="users">participants:</label>
+                <select name="users" id="users" multiple>
                     {% if activity.public == 'parents'  %}
                     {% for parent in parents %}
                       <option value={{parent.user.id}}>{{parent.user.username}}</option>
                     {% endfor %}
                     {% elif activity.public == 'children' %}
                     {% for child in children %}
-                      <option value={{child.id}}>{{child}}</option>
+                      <option value={{child.user.id}}>{{child}}</option>
                     {% endfor %}
                     {% endif %}
                 </select>
+                <button name="button" type="submit" onclick="location.href='{% url "school_site:add_inscription" activity_id=activity.id %}'"> Apply </button>
+                </form>
             </th>
-        <th> <button name="button" type="submit" onclick="location.href='{% url "school_site:add_inscription" activity_id=activity.id %}'"> Add to the inscription list</button></th>
+        <th>
+        </th>
         <th></th>
         <th>Remove inscription</th>
         </tr>

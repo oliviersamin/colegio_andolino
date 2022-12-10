@@ -70,7 +70,7 @@ class Dashboard(View):
             parent = Parent.objects.get(user=request.user)
             context['parents'] = [parent]
             if parent.partner:
-                context['parents'].append(parent.partner.user)
+                context['parents'].append(parent.partner)
             if parent.children.all():
                 context['children'] = parent.children.all()
             return render(request, self.template_name, context=context)
@@ -78,25 +78,20 @@ class Dashboard(View):
 
 
 class AddInscription(View):
-    def get(self, request, activity_id):
-        success_message = 'The user has been added successfully to the inscription list'
-        error_messages = [
-            'At least one field of the form has not the proper input',
-            'Your profile has not been updated'
-        ]
+
+    def post(self, request, activity_id):
+        success_message = 'Your profile has been updated successfully'
         if request.user.is_authenticated:
-            context = {}
-            # user = User.objects.get(id=user_id)
-            # parent = Parent.objects.get(user=user)
-            # dict_initial = set_initial_fields_profile_form(user=user, parent=parent)
-            # form = ProfileForm(request.POST or None, initial=dict_initial)
-            # context['form'] = form
-            # context['children'] = parent.child()
-            # context['parent'] = parent
+            users = request.POST.getlist('users')
+            activity = Activity.objects.get(id=activity_id)
+            # TODO: correct ask_inscription field of Activity to ManyToMany
+
+            for user in users:
+                activity.ask_inscription.add(User.objects.get(id=str(user)))
+            activity.save()
             messages.add_message(request, messages.SUCCESS, success_message)
             return redirect('school_site:dashboard')
         return redirect('school_site:home')
-
 
 
 class EditProfile(View):
