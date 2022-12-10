@@ -1,7 +1,11 @@
 {% extends 'school_site/base.html' %}
 {% load static %}
 {% block content %}
+{% load common %}
 {% if user.is_authenticated %}
+
+    LIST OF ACTIVITIES WITH INSCRIPTION CURRENTLY OPENED
+
    <table>
         <tr>
             <th>Activity name</th>
@@ -23,27 +27,48 @@
         <th>{{ activity.price_per_month }}</th>
         <th>{{ activity.details }}</th>
             <th>
+                {% users_to_be_added family activity.id as members  %}
+                {% if members %}
                 <form action="add-to-inscription-list/{{activity.id}}" method="POST">
                 {% csrf_token %}
-                <label for="users">participants:</label>
-                <select name="users" id="users" multiple>
+                <label for="users_to_add">participants to apply:</label>
+                <select name="users_to_add" id="users_to_add" multiple>
                     {% if activity.public == 'parents'  %}
-                    {% for parent in parents %}
+                    {% for parent in family.parents %}
+                    {% is_user_into_waiting_list parent activity.id as is_waiting %}
+                    {% if not is_waiting %}
                       <option value={{parent.user.id}}>{{parent.user.username}}</option>
+                    {% endif %}
                     {% endfor %}
                     {% elif activity.public == 'children' %}
-                    {% for child in children %}
+                    {% for child in family.children %}
+                    {% is_user_into_waiting_list child activity.id as is_waiting %}
+                    {% if not is_waiting %}
                       <option value={{child.user.id}}>{{child}}</option>
+                    {% endif %}
                     {% endfor %}
                     {% endif %}
                 </select>
                 <button name="button" type="submit" onclick="location.href='{% url "school_site:add_inscription" activity_id=activity.id %}'"> Apply </button>
                 </form>
+                {% endif %}
             </th>
-        <th>
-        </th>
+            <th>
+                {% is_family_member_into_a_waiting_list family activity.id as users_into_awaiting_list%}
+                {% if  users_into_awaiting_list %}
+                <form action="remove-from-inscription-list/{{activity.id}}" method="POST">
+                {% csrf_token %}
+                <label for="users_to_remove">subscribed participants:</label>
+                <select name="users_to_remove" id="users_to_remove" multiple>
+                    {% for member in users_into_awaiting_list %}
+                      <option value={{member.id}}>{{member}}</option>
+                    {% endfor %}
+                </select>
+                <button name="button" type="submit" onclick="location.href='{% url "school_site:remove_inscription" activity_id=activity.id %}'"> Remove </button>
+                </form>
+                {% endif %}
+            </th>
         <th></th>
-        <th>Remove inscription</th>
         </tr>
         {% endfor %}
     </table>

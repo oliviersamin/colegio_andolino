@@ -60,7 +60,10 @@ class Dashboard(View):
 
     def get(self, request):
         if request.user.is_authenticated:
-            context = {'activities': Activity.objects.filter(is_inscription_open=True)}
+            context = {
+                'activities': Activity.objects.filter(is_inscription_open=True),
+                'family': {}
+            }
             try:
                 parent = Parent.objects.get(user=request.user)
             except Exception as e:
@@ -68,11 +71,11 @@ class Dashboard(View):
                 new_parent.user_id = request.user.id
                 new_parent.save()
             parent = Parent.objects.get(user=request.user)
-            context['parents'] = [parent]
+            context['family']['parents'] = [parent]
             if parent.partner:
-                context['parents'].append(parent.partner)
+                context['family']['parents'].append(parent.partner)
             if parent.children.all():
-                context['children'] = parent.children.all()
+                context['family']['children'] = parent.children.all()
             return render(request, self.template_name, context=context)
         return redirect('school_site:home')
 
@@ -80,16 +83,37 @@ class Dashboard(View):
 class AddInscription(View):
 
     def post(self, request, activity_id):
-        success_message = 'Your profile has been updated successfully'
         if request.user.is_authenticated:
-            users = request.POST.getlist('users')
+            users = request.POST.getlist('users_to_add')
             activity = Activity.objects.get(id=activity_id)
-            # TODO: correct ask_inscription field of Activity to ManyToMany
-
             for user in users:
-                activity.ask_inscription.add(User.objects.get(id=str(user)))
+                if User.objects.get(id=str(user)) not in activity.ask_inscription.all():
+                    activity.ask_inscription.add(User.objects.get(id=str(user)))
+                    success_message = '{} has been added into the inscription list for the activity {}'.format(User.objects.get(id=str(user)).get_full_name(), Activity.objects.get(id=activity_id).name)
+                    messages.add_message(request, messages.SUCCESS, success_message)
+                else:
+                    error_message = '{} is already in the inscription list for the activity {}'.format(User.objects.get(id=str(user)).get_full_name(), Activity.objects.get(id=activity_id).name)
+                    messages.add_message(request, messages.ERROR, error_message)
             activity.save()
-            messages.add_message(request, messages.SUCCESS, success_message)
+            return redirect('school_site:dashboard')
+        return redirect('school_site:home')
+
+
+class RemoveInscription(View):
+
+    def post(self, request, activity_id):
+        if request.user.is_authenticated:
+            users = request.POST.getlist('users_to_remove')
+            activity = Activity.objects.get(id=activity_id)
+            for user in users:
+                if User.objects.get(id=str(user)) in activity.ask_inscription.all():
+                    activity.ask_inscription.remove(User.objects.get(id=str(user)))
+                    success_message = '{} has been removed from the inscription list for the activity {}'.format(User.objects.get(id=str(user)).get_full_name(), Activity.objects.get(id=activity_id).name)
+                    messages.add_message(request, messages.SUCCESS, success_message)
+                else:
+                    error_message = '{} is not in the inscription list for the activity {}'.format(User.objects.get(id=str(user)).get_full_name(), Activity.objects.get(id=activity_id).name)
+                    messages.add_message(request, messages.ERROR, error_message)
+            activity.save()
             return redirect('school_site:dashboard')
         return redirect('school_site:home')
 
