@@ -7,6 +7,14 @@ register = template.Library()
 
 
 @register.simple_tag
+def is_any_activity_inscription_opened():
+    if Activity.objects.filter(is_inscription_open=True).first():
+        return True
+    return False
+
+
+
+@register.simple_tag
 def get_all_activities_with_inscription_opened():
     return Activity.objects.filter(is_inscription_open=True)
 
