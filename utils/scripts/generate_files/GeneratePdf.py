@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from itertools import chain
 import locale
-from typing import Literal
+from typing import Literal, Optional
 import os
 
 # import external libs
@@ -19,6 +19,12 @@ from pylatex import (Command, Document, Foot, FootnoteText, Head, HugeText, Larg
                      Tabular, VerticalSpace, TextColor)
 from pylatex.utils import NoEscape, bold, dumps_list
 from pylatex.base_classes import Environment
+
+# import self API
+from data_types import Associate, Student
+from data_types import (
+    Enrollment, # Impreso de matrícula
+)
 
 # Constants
 from constants import (
@@ -60,161 +66,6 @@ class Form(Environment):
 
 
 
-@dataclass
-class Person:
-    fullname: str
-    NIF: str
-    adress: str
-
-class AssociateType(Enum):
-    """Different types of associates."""
-    COLABORADOR = auto()
-    SOCIO = auto()
-
-@dataclass
-class Associate(Person):
-    """
-    A class for associates
-    """
-    id: str = ''
-
-@dataclass
-class Student:
-    """
-    A class for students
-
-    Args:
-        name (str): First name of student
-        associate (str): Legal representative, cooperative member
-        attendance (dict): keys -> activities, values -> list[str]
-            representing the attendance to activity
-    """
-    fullname: str
-    associate: Associate
-    attendance: list[dict]
-
-@dataclass
-class StudentsFamily:
-    """
-    A class for students linked to a single associate
-
-    Args:
-        associate (str): Legal representative, cooperative member
-        children (list[Student]): List of Student represented by associate
-    """
-    associate: Associate
-    children: list[Student]
-
-@dataclass
-class ChildInfo(Person):
-    """Enrollment data
-    """
-    birthdate: str
-    birthplace: str
-    num_siblings: str
-    position_siblings: str
-    nationality: str
-    NIF: str = ''
-
-class LegalRelation(Enum):
-    MADRE = auto()
-    PADRE = auto()
-    TUTORA_LEGAL = auto()
-    TUTOR_LEGAL = auto()
-
-@dataclass
-class Parent(Person):
-    """Associate, parent, legal tutor or legal representant of Andolina
-    """
-    signature: str
-    relation_with_child: Literal['madre','padre','tutora legar','tutor legal','']
-    education: str  # =''
-    occupation: str # =''
-    telephone: str  # =''
-    email: str      # =''
-
-@dataclass
-class Enrollment:
-    academyc_year: str
-    child_info: ChildInfo
-    living_info: Person = field(default_factory=lambda: Person(NIF=''))  # TODO: check if this works
-
-@dataclass
-class ImagePostingAuth:
-    """Image posting authorization LOPD
-    section_name = "Según lo expuesto, solicitamos tu consentimiento expreso para:"
-    arg1 = "La captación de imágenes y/o voz, vuestros, para su posterior difusión conforme lo "
-    "descrito en la presente cláusula."
-    arg2 = "La captación de imágenes y/o voz, del/de los menor/es "
-    "(en tu condición de padre/madre/tutor legal) "
-    "para su posterior difusión conforme lo descrito "
-    "en la presente cláusula."
-    """
-    tutor1: Parent
-    tutor2: Parent
-    auth_Andolina: Parent = Parent(*['']*9)
-    date: str = field(default_factory=lambda: date.today().strftime('%Y-%m-%d'))
-
-@dataclass
-class OutingAuthorization(Parent):
-    """School outing authorization.
-    
-    arg1 = "DOY MI AUTORIZACIÓN a cualquier excursión organizada o salida espontánea "
-    "que surja de 9:30 a 14:00 de la mañana, "
-    "a lo largo del presente curso y los sucesivos, salvo revocación expresa."
-    arg2 = "Marcando esta casilla indico que no estoy de acuerdo "
-    "con que se utilicen vehículos particulares "
-    "para el transporte de mi hijo/a."
-    """
-    important_info: str = ''
-    date: str = field(default_factory=lambda: date.today().strftime('%Y-%m-%d'))
-
-    outing_permission: str = ''
-    private_vehicle: str = ''
-
-class Binario(Enum):
-    SI = auto()
-    NO = auto()
-    
-@dataclass
-class HealthInfo(Parent):
-    """Health info summary
-    
-    section = "ALERGIAS"
-    arg1 = "¿Tiene algún tipo de alergia a medicamentos, alimentos, animales, etc.? "
-    arg2 = "En caso afirmativo, escriba sus manifestaciones: "
-    arg3 = "La alergia se debe a: "
-    arg4 = "¿Recibe tratamiento permanente? "
-    
-    section = "INTOLERANCIAS"
-    arg1 = "¿Tiene algún tipo de alergia a medicamentos, alimentos, animales, etc.? "
-            
-    section = "VACUNAS"
-    arg1 = "¿Está vacunado del Tétanos? "
-            
-    section = "SI EL ALUMNO TIENE ALGÚN TIPO DE PROBLEMA DE SALUD EN EL COLEGIO RECURRIR A: "
-    arg1 = "Institución-Médico y Teléfono: "
-    arg2 = "Madre-Padre/Familiar y Teléfono: "
-    section = "INFORMACIÓN IMPORTANTE A DESTACAR: "
-    section = "FECHA Y FIRMA DE MADRE, PADRE O TUTOR, DNI: "
-    """
-    important_info_comments: str = ''
-    date: str = field(default_factory=lambda: date.today().strftime('%Y-%m-%d'))
-    
-    allergies = Literal['sí','no']
-    manifestations: str = ''
-    trigger: str = ''
-    treatment = Literal['sí','no']
-    allergies_comments: str = ''
-    
-    intolerances = Literal['sí','no']
-    intolerances_comments: str = ''
-    
-    vaccines = Literal['sí','no']
-    vaccines_comments: str = ''
-    
-    pro_emergency_contact: list = field(default_factory=lambda: ['',''])
-    fam_emergency_contact: list = field(default_factory=lambda: ['',''])
 
 
 class TeXfile:
