@@ -22,7 +22,7 @@ from pylatex.base_classes import Environment
 
 # import self API
 from data_types import Associate, Student
-from LaTeX_snippets import TeXfile
+from LaTeX_snippets import Billing, PdfGen
 
 # Constants
 from constants import (
@@ -48,14 +48,21 @@ from constants import (
 
 @dataclass
 class MonthlyQuantity:
-    dining_attendance: tuple(int)
-    early_attendance: tuple(int)
-    num_quotas: int
-    judo_quotas: int
-    ciencia_quotas: int
-    teatro_quotas: int
-    robotix_quotas: int
-    accompaniment: int
+    COMEDOR: tuple[int]
+    ATENCIÓN_TEMPRANA: tuple[int]
+    CUOTA: int
+    JUDO: int
+    CIENCIA: int
+    TEATRO: int
+    ROBOTIX: int
+    # dining_attendance: tuple[int]
+    # early_attendance: tuple[int]
+    # num_quotas: int
+    # judo_quotas: int
+    # ciencia_quotas: int
+    # teatro_quotas: int
+    # robotix_quotas: int
+    accompaniment: float
     trainings: float
     workshops: float
     camps: float
@@ -63,18 +70,16 @@ class MonthlyQuantity:
 @dataclass
 class MonthlyInvoice:
     month: str
+    # year: str
     monthly_quantities: MonthlyQuantity
 
 
-class Invoice(TeXfile):
+class Invoice(PdfGen,Billing):
     def __init__(self,
                  associate: Associate,
                  associate_period: list[MonthlyInvoice],
                  series: str = 'FU',
-                 invoice_num_start: int = 0,
-                 period: str = '11/22',
-                 associate_data: list[dict] = [{'name': 'Ejemplo Ejemplez'}],
-                 child_data: list[dict] = [{}]) -> None:
+                 invoice_num_start: int = 0) -> None:
         """This class generates different kinds of pdf documents using pylatex
 
         Args:
@@ -91,32 +96,21 @@ class Invoice(TeXfile):
                 are dicts activities - attendance.
                 Migrating to dataclass. Defaults to [{}].
         """
-
-        # Document Geometry Options
-        self.geometry_options = {
-            "head": "40pt",
-            "margin": "0.5in",
-            "bottom": "1.6in",
-            "includeheadfoot": True
-        }
-
+        super().__init__()
         # basic file data
         self.series = series
         self.invoice_num_start = invoice_num_start
         self.current_invoice_num = invoice_num_start
-        self.associates_data = associate_data
-        self.childs_data = child_data
-        self.period = period
-        self.associate_period = associate_period
         self.associate = associate
+        self.associate_period = associate_period
 
-        # # dates
-        # self.invoice_date = date.today()
-        # self.year = self.invoice_date.year
-        # self.month = self.invoice_date.month
-        # current_year_formated = self.year % 100
-        # self.current_academic_year = (f"{current_year_formated}"
-        #                               f"{current_year_formated + 1}")
+        # dates
+        self.invoice_date = date.today()
+        self.year = self.invoice_date.year
+        self.month = self.invoice_date.month
+        current_year_formated = self.year % 100
+        self.current_academic_year = (f"{current_year_formated}"
+                                      f"{current_year_formated + 1}")
 
         # # extract data
         # self.initial_skip, self.num_monthdays = calendar.monthrange(self.year,
@@ -142,101 +136,64 @@ class Invoice(TeXfile):
         #                         for activity in ACTIVIDADES]
 
     def generate_set_invoices(self):
-        for associate_data in self.associates_data:
-            self.generate_invoice(associate_data)
+        for month in self.associate_period:
+            self.generate_invoice_id()
+            self.generate_invoice(month)
+        filename = f"{self.associate.name}-{self.invoice_num}"
+        self.generate_file(filename)
 
     def generate_invoice(self,
-                         associate_data):
+                         month: MonthlyInvoice):
         """Generate invoice from associate data.
 
         Args:
             associate_data (_type_): Generate an invoice for current associate.
         """
-        self.current_associate_data = associate_data
-
         # self.mode = 'invoice'
-        self.generate_header()
-        self.generate_footer()
-        self.doc.preamble.append(self.first_page)
+        page = PageStyle('page')
+        self.doc.change_page_style(page.name)
+        self.doc.preamble.append(page)
+        super().add_header(page)
+        super().add_footer(page)
 
-        for monthly_data in self.associate_period:
-            self.generate_associate_table()
+        # unique of this class
+        super().generate_associate_table(self.associate.name,self.associate.NIF,self.associate.adress)
 
-            self.generate_invoice_table(monthly_data)
+        self.generate_invoice_table(month)
 
-            self.generate_additional_details()
-            
-            if monthly_data != self.associate_period[-1]:
-                self.doc.append(NewPage())
-            
-        self.generate_file(mode='invoice')
+        self.generate_additional_details()
+        
+        self.doc.append(NewPage())
+        
+        
+    def document_title(self, title_wrapper: Head("R")) -> None:
+        title_wrapper.append(LargeText(bold(f"Número de factura: {self.invoice_num}")))
+        title_wrapper.append(LineBreak())
+        title_wrapper.append(LineBreak())
+        title_wrapper.append(TextColor('black',
+                                        LargeText(bold(f"Fecha: {self.date}"))))
 
-    def generate_header(self):
+    def footer(self, footer):
         """
-        Generate document and add a header to it
+        Generate footer. For the time being, with LOPD & School adress
         """
-        self.doc = Document(geometry_options=self.geometry_options)
-
-        self.first_page = PageStyle("firstpage")
-
-        # Header image
-        with self.first_page.create(Head("L")) as header_left:
-            with header_left.create(MiniPage(width=NoEscape(r"0.5\textwidth"),
-                                             pos='c')) as logo_wrapper:
-                logo_file = os.path.join(os.path.dirname(__file__),
-                                         'andolina-logo.png')
-                logo_wrapper.append(StandAloneGraphic(image_options="width=200px",
-                                                      filename=logo_file))
-
-        self.generate_invoice_id()
-        # Add document title
-        with self.first_page.create(Head("R")) as right_header:
-            with right_header.create(MiniPage(width=NoEscape(r"0.5\textwidth"),
-                                              pos='c', align='l')) as title_wrapper:
-                title_wrapper.append(LargeText(bold(f"Número de factura: {self.current_associate_data['invoice_num']}")))
-                title_wrapper.append(LineBreak())
-                title_wrapper.append(LineBreak())
-                title_wrapper.append(TextColor('black',
-                                               LargeText(bold(f"Fecha: {self.current_associate_data['date']}"))))
-
-        self.doc.append(VerticalSpace('8ex'))
+        footer.append(FootnoteText(f"{LOPD}\n\n\n{COLEGIO_DATOS}"))
 
     def generate_invoice_id(self) -> str:
         '''
         Get current invoice number formated
         Example: FU-2223-001
         '''
-        self.current_associate_data['invoice_num'] = f'{self.series}-{self.current_academic_year}-{self.current_invoice_num:03}'
+        self.invoice_num = f'{self.series}-{self.current_academic_year}-{self.current_invoice_num:03}'
         self.current_invoice_num += 1
-        self.current_associate_data['date'] = self.invoice_date.strftime("%d/%m/%y")
+        self.date = self.invoice_date.strftime("%d/%m/%y")
 
-    def generate_footer(self):
-        """
-        Generate footer. For the time being, with LOPD & School adress
-        """
-        with self.first_page.create(Foot("L")) as footer:
-            footer.append(FootnoteText(f"{LOPD}\n\n\n{COLEGIO_DATOS}"))
-
-    def generate_associate_table(self):
-        """
-        Add associate information to file as table
-        """
-        with self.doc.create(Tabular('l|l',
-                                     row_height=1.2)) as associate_table:
-            associate_table.add_row([bold("Nombre:"), self.current_associate_data['name']])
-            associate_table.add_hline()
-            associate_table.add_row([bold("NIF:"), self.current_associate_data['NIF']])
-            associate_table.add_hline()
-            associate_table.add_row([bold("Dirección:"), self.current_associate_data['adress']])
-            associate_table.add_hline()
-
-        self.doc.append(VerticalSpace('8ex'))
 
     def generate_invoice_table(self, monthly_data):
         """
         Generate a table with the extract for current invoice
         """
-        with self.doc.create(Section(f'Factura {monthly_data.month}')):
+        with self.doc.create(Section(f'Factura {monthly_data.month}',numbering=False)):
             ...
 
         with self.doc.create(LongTabu("X[3l] X[c] X[c] X[c]",
@@ -254,38 +211,7 @@ class Invoice(TeXfile):
                 invoice_table.add_hline()
                 invoice_table.add_row(row)
 
-            self.doc.append(VerticalSpace('10ex'))
-
-    def generate_additional_details(self):
-        """
-        Add details. For now, payment formula & IVA exemption.
-        """
-        with self.doc.create(Section('', numbering=False)):
-            self.doc.append("FORMA DE PAGO: Domiciliación Bancaria\n")
-            self.doc.append("Exención de IVA según el 20.9 de la Ley 37/1992 de 28 de diciembre.")
-
-    def generate_file(self,
-                      filename: str = 'test',
-                      mode: str = 'invoice'):
-        """Generate pdf file
-
-        Args:
-            filename (str, optional): _description_. Defaults to 'test'.
-            mode (str, optional): Defines if it must generate
-                an invoice or a detailed extract.
-                Defaults to 'invoice'.
-        """
-        # Format page
-        self.doc.change_document_style("firstpage")
-        self.doc.add_color(name="lightgray", model="gray", description="0.80")
-
-        # Generate pdf
-        file = f"./{self.current_associate_data['invoice_num']}" if mode == 'invoice' else \
-               f"./{self.current_associate_data['invoice_num']}_extract" if mode == 'extract' else \
-               filename
-        self.doc.generate_pdf(os.path.join(os.path.dirname(__file__),
-                                           file),
-                              clean_tex=True)
+            self.doc.append(VerticalSpace('2ex'))
 
     def generate_extract(self, monthly_quantities: MonthlyQuantity) -> list[tuple]:
         """
@@ -300,9 +226,10 @@ class Invoice(TeXfile):
         """
         extract = []
         total = 0.
-        for concept in fields(monthly_quantities):
+        for field in fields(monthly_quantities):
+            concept = field.name
             quantity = getattr(monthly_quantities,
-                               concept.name)
+                               concept)
             if isinstance(quantity,tuple):
                 subtotal_list = [0.,]
                 for child_quantity in quantity:
@@ -335,6 +262,11 @@ class Invoice(TeXfile):
 
         return extract
 
+    def additional_details(self):
+        self.doc.append("FORMA DE PAGO: Domiciliación Bancaria\n")
+        self.doc.append("Exención de IVA según el 20.9 de la Ley 37/1992 de 28 de diciembre.")
+
+
 
 if __name__ == '__main__':
     # invoice_date = date.today()
@@ -345,22 +277,11 @@ if __name__ == '__main__':
             'adress': 'C/ Dirección. Código Postal, Localidad, Provincia'}
 
     # generate_invoice(**data)
-    instance = Invoice(invoice_num_start=2,
-                             associate_data=[data, data])
-    from random import choices
-    child_data = {
-        'Asier': dict(zip(ACTIVIDADES, [choices(['x', ''],
-                                                k=instance.num_monthdays)
-                                        for act in ACTIVIDADES])),
-        'Mike': dict(zip(ACTIVIDADES, [choices(['x', ''],
-                                               k=instance.num_monthdays)
-                                       for act in ACTIVIDADES])),
-    }
-    instance.childs_data = child_data
+    instance = Invoice(Associate('mike','ex','123','socio'),
+            [MonthlyInvoice(11,
+                            MonthlyQuantity((2,),(3,),1,0,0,0,1,2.,51.,0.,0.))])
+    
 
     instance.generate_set_invoices()
-    instance.generate_single_detailed_extract(data,
-                                              child_data)
-
 
     

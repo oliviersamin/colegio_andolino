@@ -14,7 +14,7 @@ class Adress:
 
 @dataclass
 class Person:
-    fullname: str
+    name: str
     adress: Adress
     NIF: str
 
