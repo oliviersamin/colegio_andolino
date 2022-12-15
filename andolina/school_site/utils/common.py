@@ -1,8 +1,12 @@
 import datetime
 from django.db.models import Q
 from v1.models import Child, Parent, Archive, Sheet, Activity
-from .generate_bills import PdfGeneration
-
+from .data_types import Person
+from .invoice import (
+    MonthlyInvoice,
+    MonthlyQuantity,
+    Invoice
+    )
 
 def get_user_activities(user, archive):
     pass
@@ -98,12 +102,29 @@ def get_data_for_actual_school_year(user):
 
 
 def from_data_to_bills(data, request):
-    data = {  # 'invoice_num': get_invoice_num(invoice_date),
-              # 'date': invoice_date.strftime("%d/%m/%y"),
-            'name': request.user.get_full_name(),
-            'NIF': Parent.objects.get(user=request.user).nif,
-            'adress': Parent.objects.get(user=request.user).address}
+    # data = {  # 'invoice_num': get_invoice_num(invoice_date),
+    #           # 'date': invoice_date.strftime("%d/%m/%y"),
+    #         'name': request.user.get_full_name(),
+    #         'NIF': Parent.objects.get(user=request.user).nif,
+    #         'adress': Parent.objects.get(user=request.user).address}
+    associate = Person(name=request.user.get_full_name(),
+                       NIF=Parent.objects.get(uset=request.user).nif,
+                       adress=Parent.objects.get(user=request.user).address)
+    associate_extract = [
+        MonthlyInvoice(month=11,
+                       monthly_quantities=MonthlyQuantity(COMEDOR=(2,),
+                                                          ATENCIÓN_TEMPRANA=(3,),
+                                                          CUOTA=1,
+                                                          JUDO=0,
+                                                          CIENCIA=0,
+                                                          TEATRO=0,
+                                                          ROBOTIX=1,
+                                                          accompaniment=2.,
+                                                          trainings=51.,
+                                                          workshops=0.,
+                                                          camps=0.))]
 
-    instance = PdfGeneration(invoice_num_start=2,
-                             associate_data=[data, data])
+    instance = Invoice(associate,associate_extract)
+    
     instance.generate_set_invoices()
+

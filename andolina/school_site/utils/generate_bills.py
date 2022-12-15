@@ -2,8 +2,6 @@ import calendar
 from datetime import date
 from dataclasses import dataclass
 from itertools import chain
-from json import dumps as jdumps
-from json import loads as jloads
 import locale
 import os
 
@@ -14,7 +12,7 @@ from pylatex import (Document, Foot, FootnoteText, Head, LargeText, LineBreak,
                      Tabular, VerticalSpace, TextColor)
 from pylatex.utils import NoEscape, bold, dumps_list
 from random import choices
-from school_site.constants import (
+from constants import (
     ACTIVIDADES_ESCOLARES,
     EXTRAESCOLARES,
     ACTIVIDADES,

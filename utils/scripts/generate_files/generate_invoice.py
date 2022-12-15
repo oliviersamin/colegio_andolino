@@ -19,7 +19,7 @@ from pylatex import (Document, Foot, FootnoteText, Head, LargeText, LineBreak,
                      Tabular, VerticalSpace, TextColor)
 from pylatex.utils import NoEscape, bold, dumps_list
 from random import choices
-from andolina.school_site.constants import (
+from constants import (
     ACTIVIDADES_ESCOLARES,
     EXTRAESCOLARES,
     ACTIVIDADES,
