@@ -68,10 +68,10 @@ class ChildInfo(Person):
 class PreviousSchooling:
     """_summary_
     """
-    previously_schooled: Literal['sí','no']
+    previously_schooled: bool  # Literal['sí','no']
     previous_school : str = ''
-    educational_support: Literal['sí','no', ''] = ''
-    report_compromise: Literal['sí','no', ''] = ''
+    educational_support: bool  # Literal['sí','no', ''] = ''
+    report_compromise: bool  # Literal['sí','no', ''] = ''
 
 
 @dataclass
@@ -94,7 +94,7 @@ class Parent(Person):
 
 @dataclass
 class Enrollment_contact:
-    allow_contact: Literal['sí', 'no']
+    allow_contact: bool  # Literal['sí', 'no']
 
 @dataclass
 class Enrollment:
@@ -126,8 +126,8 @@ class ImagePostingAuth:
     tutor1: Parent
     tutor2: Parent
     children: list[Person]
-    self_authorization: Literal['sí', 'no']
-    children_authorization: Literal['sí', 'no']
+    self_authorization: bool  # Literal['sí','no'] 
+    children_authorization: bool  # Literal['sí','no'] 
     auth_Andolina: str = '' # Parent = Parent(*['']*9)
     date: str = field(default_factory=lambda: date.today().strftime('%d-%m-%Y'))
 
@@ -145,7 +145,7 @@ class OutingAuthorization:
     """
     parent: Parent
     child: Person
-    personal_vehicle_authorization: Literal['sí', 'no']
+    personal_vehicle_authorization: bool  # Literal['sí','no'] 
 
 # Health info / Formulario de Salud, Información de Salud - Alergias
 @dataclass
