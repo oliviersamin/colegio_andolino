@@ -56,10 +56,9 @@ class StudentsFamily:
 
 # Enrollment / impreso de matrícula
 @dataclass
-class ChildInfo():
+class ChildInfo(Person):
     """Enrollment child data
     """
-    child = Person
     birthdate: str
     birthplace: str
     num_siblings: str
