@@ -87,12 +87,19 @@ class AddInscription(View):
             users = request.POST.getlist('users_to_add')
             activity = Activity.objects.get(id=activity_id)
             for user in users:
-                if User.objects.get(id=str(user)) not in activity.ask_inscription.all():
-                    activity.ask_inscription.add(User.objects.get(id=str(user)))
-                    success_message = '{} has been added into the inscription list for the activity {}'.format(User.objects.get(id=str(user)).get_full_name(), Activity.objects.get(id=activity_id).name)
-                    messages.add_message(request, messages.SUCCESS, success_message)
+                if User.objects.get(id=str(user)) not in activity.users.all():
+                    if User.objects.get(id=str(user)) not in activity.ask_inscription.all():
+                        activity.ask_inscription.add(User.objects.get(id=str(user)))
+                        success_message = '{} has been added into the inscription list for the activity {}'.format(
+                            User.objects.get(id=str(user)).get_full_name(), Activity.objects.get(id=activity_id).name)
+                        messages.add_message(request, messages.SUCCESS, success_message)
+                    else:
+                        error_message = '{} is already in the inscription list for the activity {}'.format(
+                            User.objects.get(id=str(user)).get_full_name(), Activity.objects.get(id=activity_id).name)
+                        messages.add_message(request, messages.ERROR, error_message)
                 else:
-                    error_message = '{} is already in the inscription list for the activity {}'.format(User.objects.get(id=str(user)).get_full_name(), Activity.objects.get(id=activity_id).name)
+                    error_message = '{} is already a participant of the activity {}'.format(
+                        User.objects.get(id=str(user)).get_full_name(), Activity.objects.get(id=activity_id).name)
                     messages.add_message(request, messages.ERROR, error_message)
             activity.save()
             return redirect('school_site:dashboard')
@@ -438,9 +445,12 @@ class EditActivityUsers(View):
         if request.user.is_authenticated:
             user = request.user
             activity = Activity.objects.get(pk=activity_id)
+            print('-' * 200)
+            print(activity.users.all())
+            print(activity.ask_inscription.all())
             context = {
-                'parents': Parent.objects.all(),
-                'children': Child.objects.all(),
+                'awaiting_list': activity.ask_inscription.all(),
+                'users': activity.users.all(),
                 'activity': activity
             }
             # dict_initial = set_initial_activity_users_fields(activity=activity, public=activity.public)
@@ -452,28 +462,38 @@ class EditActivityUsers(View):
 
     def post(self, request, activity_id):
         form = self.form(request.POST)
-        success_message = 'The activity users have been successfully updated'
-        error_messages = [
-            'At least one field of the form has not the proper input',
-            'The activity users have not been updated'
-        ]
-        if form.is_valid():
-            activity = Activity.objects.get(pk=activity_id)
-            if activity.public == 'parents':
-                parents_id = []
-                for parent in form.cleaned_data['parents']:
-                    parents_id.append(parent.user.id)
-                activity.users.set(parents_id)
+        activity = Activity.objects.get(pk=activity_id)
+        awaiting_list = request.POST.getlist('awaiting_list')
+        for user_id in awaiting_list:
+            if not User.objects.get(id=user_id) in activity.users.all():
+                activity.users.add(int(user_id))
+                success_message = '{} is added as a user of {}'.format(
+                    User.objects.get(id=user_id).get_full_name(), activity.name
+                )
+                messages.add_message(request, messages.SUCCESS, success_message)
             else:
-                children_id = []
-                for child in form.cleaned_data['children']:
-                    children_id.append(child.user.id)
-                activity.users.set(children_id)
+                error_message = '{} is already a user of {}'.format(
+                    User.objects.get(id=user_id).get_full_name(), activity.name
+                )
+                messages.add_message(request, messages.ERROR, error_message)
+            activity.ask_inscription.remove(int(user_id))
             activity.save()
+        return redirect('school_site:my_activities')
+
+
+class RemoveActivityUsers(View):
+
+    def post(self, request, activity_id):
+        users = request.POST.getlist('users')
+        activity = Activity.objects.get(pk=activity_id)
+        for user_id in users:
+            activity.users.remove(User.objects.get(id=user_id))
+            activity.save()
+            success_message = '{} is added as a user of {}'.format(
+                User.objects.get(id=user_id).get_full_name(), activity.name
+            )
             messages.add_message(request, messages.SUCCESS, success_message)
-        else:
-            for message in error_messages:
-                messages.add_message(request, messages.ERROR, message)
+
         return redirect('school_site:my_activities')
 
 

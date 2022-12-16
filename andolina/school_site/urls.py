@@ -18,6 +18,7 @@ urlpatterns = [
     path('create-my-activity', views.CreateMyActivity.as_view(), name='create_my_activity'),
     path('edit-activity/<int:activity_id>', views.EditActivity.as_view(), name='edit_activity'),
     path('edit-activity-users/<int:activity_id>', views.EditActivityUsers.as_view(), name='edit_activity_users'),
+    path('remove-activity-users/<int:activity_id>', views.RemoveActivityUsers.as_view(), name='remove_activity_users'),
     path('create-sheet/<int:activity_id>', views.CreateSheet.as_view(), name='create_sheet'),
     path('edit-sheet/<int:sheet_id>', views.EditSheet.as_view(), name='edit_sheet'),
     path('ask-validate-sheet/<int:sheet_id>', views.AskValidateSheet.as_view(), name='ask_validate_sheet'),
