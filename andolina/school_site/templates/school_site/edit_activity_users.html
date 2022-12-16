@@ -4,37 +4,33 @@
 {% block content %}
 {% if user.is_authenticated %}
 
-    EDIT ACTIVITY USERS PAGE -
+    USERS IN AWAITING LIST -
 
    <form action="" method="post">
     {% csrf_token %}
-{#    {{ form.as_ul }}#}
-{#       {{ form_child.as_ul }}#}
-   {% if not activity.public|is_public_children %}
-   <label for="parents">Parents </label>
-    <select name="parents" id="parents" multiple>
-        {% for parent in parents %}
-            {% if parent|is_selected_user:activity %}
-              <option value={{ parent.id }} selected >{{parent}} </option>
-            {% else %}
-              <option value={{ parent.id }}>{{parent}}</option>
-            {% endif %}
-        {% endfor %}
-    </select>
-    {% else %}
-   <label for="children">Children </label>
-    <select name="children" id="children" multiple>
-        {% for child in children %}
-            {% if child|is_selected_user:activity %}
-            <option value={{ child.id }} selected >{{child}}</option>
-            {% else %}
-            <option value={{ child.id }}>{{child}}</option>
-            {% endif %}
-        {% endfor %}
-    </select>
-       {% endif %}
-       <input type="submit" value="Submit">
+       <label for="awaiting_list">Users in awaiting_list </label>
+        <select name="awaiting_list" id="awaiting_list" multiple>
+            {% for user in awaiting_list %}
+                  <option value={{ user.id }} selected >{{user}} </option>
+            {% endfor %}
+        </select>
+       <input type="submit" value="Add">
     </form>
+
+    LIST OF ACTUAL USERS
+   <form action="{% url 'school_site:remove_activity_users' activity_id=activity.id %}" method="post">
+    {% csrf_token %}
+       <label for="users">Users already subscribed </label>
+        <select name="users" id="users" multiple>
+            {% for user in users %}
+                  <option value={{ user.id }} selected >{{user}} </option>
+            {% endfor %}
+        </select>
+       <input type="submit" value="Remove">
+    </form>
+
+
+
 {% else %}
 PAGE NOT AVAILABLE
 {% endif %}
