@@ -87,13 +87,18 @@ class AddInscription(View):
             users = request.POST.getlist('users_to_add')
             activity = Activity.objects.get(id=activity_id)
             for user in users:
-                if User.objects.get(id=str(user)) not in activity.ask_inscription.all():
-                    activity.ask_inscription.add(User.objects.get(id=str(user)))
-                    success_message = '{} has been added into the inscription list for the activity {}'.format(User.objects.get(id=str(user)).get_full_name(), Activity.objects.get(id=activity_id).name)
-                    messages.add_message(request, messages.SUCCESS, success_message)
+                if User.objects.get(id=str(user)) not in activity.users.all():
+                    if User.objects.get(id=str(user)) not in activity.ask_inscription.all():
+                        activity.ask_inscription.add(User.objects.get(id=str(user)))
+                        success_message = '{} has been added into the inscription list for the activity {}'.format(User.objects.get(id=str(user)).get_full_name(), Activity.objects.get(id=activity_id).name)
+                        messages.add_message(request, messages.SUCCESS, success_message)
+                    else:
+                        error_message = '{} is already in the inscription list for the activity {}'.format(User.objects.get(id=str(user)).get_full_name(), Activity.objects.get(id=activity_id).name)
                 else:
-                    error_message = '{} is already in the inscription list for the activity {}'.format(User.objects.get(id=str(user)).get_full_name(), Activity.objects.get(id=activity_id).name)
-                    messages.add_message(request, messages.ERROR, error_message)
+                    error_message = '{} is already a participant of the activity {}'.format(
+                        User.objects.get(id=str(user)).get_full_name(), Activity.objects.get(id=activity_id).name)
+
+                messages.add_message(request, messages.ERROR, error_message)
             activity.save()
             return redirect('school_site:dashboard')
         return redirect('school_site:home')
