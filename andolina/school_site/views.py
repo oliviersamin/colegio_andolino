@@ -732,6 +732,11 @@ class MyBills(View):
         'activities': [{ ... }]}, ....]
         """
         form = self.form(request.POST)
+        print('****************')
+        print(f'Form is of type {type(form)}')
+        from pprint import pprint
+        pprint(form)
+        print('****************')
         success_message = 'The bill request has been successfully created'
         error_messages = [
             'At least one field of the form has not the proper input',
