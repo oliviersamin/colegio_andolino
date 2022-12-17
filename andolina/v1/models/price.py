@@ -4,9 +4,9 @@ import datetime
 
 LIMIT_CHOICES = [('minimum', 'minimum'), ('maximum', 'maximum')]
 
-class Price(models.Model):
+class LimitationPrice(models.Model):
     """ price model """
-    activity_to_limit = models.OneToOneField(
+    activity = models.OneToOneField(
         'v1.Activity',
         on_delete=models.CASCADE,
         help_text='prices max or min',
@@ -19,5 +19,5 @@ class Price(models.Model):
     date_updated = models.DateTimeField(auto_now=True, blank=True)
 
     class Meta:
-        ordering = ['activity_to_limit', 'date_created', 'date_updated', 'limit_type', 'value']
-        verbose_name_plural = "Prices"
+        ordering = ['activity', 'date_created', 'date_updated', 'limit_type', 'value']
+        verbose_name_plural = "LimitationPrices"
