@@ -461,40 +461,45 @@ class EditActivityUsers(View):
         return redirect('school_site:home')
 
     def post(self, request, activity_id):
-        form = self.form(request.POST)
-        activity = Activity.objects.get(pk=activity_id)
-        awaiting_list = request.POST.getlist('awaiting_list')
-        for user_id in awaiting_list:
-            if not User.objects.get(id=user_id) in activity.users.all():
-                activity.users.add(int(user_id))
-                success_message = '{} is added as a user of {}'.format(
-                    User.objects.get(id=user_id).get_full_name(), activity.name
-                )
-                messages.add_message(request, messages.SUCCESS, success_message)
-            else:
-                error_message = '{} is already a user of {}'.format(
-                    User.objects.get(id=user_id).get_full_name(), activity.name
-                )
-                messages.add_message(request, messages.ERROR, error_message)
-            activity.ask_inscription.remove(int(user_id))
-            activity.save()
-        return redirect('school_site:my_activities')
+        if request.user.is_authenticated:
+            form = self.form(request.POST)
+            activity = Activity.objects.get(pk=activity_id)
+            awaiting_list = request.POST.getlist('awaiting_list')
+            for user_id in awaiting_list:
+                if not User.objects.get(id=user_id) in activity.users.all():
+                    activity.users.add(int(user_id))
+                    success_message = '{} is added as a user of {}'.format(
+                        User.objects.get(id=user_id).get_full_name(), activity.name
+                    )
+                    messages.add_message(request, messages.SUCCESS, success_message)
+                else:
+                    error_message = '{} is already a user of {}'.format(
+                        User.objects.get(id=user_id).get_full_name(), activity.name
+                    )
+                    messages.add_message(request, messages.ERROR, error_message)
+                activity.ask_inscription.remove(int(user_id))
+                activity.save()
 
+            return redirect('school_site:my_activities')
+        return redirect('school_site:home')
 
 class RemoveActivityUsers(View):
 
     def post(self, request, activity_id):
-        users = request.POST.getlist('users')
-        activity = Activity.objects.get(pk=activity_id)
-        for user_id in users:
-            activity.users.remove(User.objects.get(id=user_id))
-            activity.save()
-            success_message = '{} is added as a user of {}'.format(
-                User.objects.get(id=user_id).get_full_name(), activity.name
-            )
-            messages.add_message(request, messages.SUCCESS, success_message)
 
-        return redirect('school_site:my_activities')
+        if request.user.is_authenticated:
+            users = request.POST.getlist('users')
+            activity = Activity.objects.get(pk=activity_id)
+            for user_id in users:
+                activity.users.remove(User.objects.get(id=user_id))
+                activity.save()
+                success_message = '{} is added as a user of {}'.format(
+                    User.objects.get(id=user_id).get_full_name(), activity.name
+                )
+                messages.add_message(request, messages.SUCCESS, success_message)
+            return redirect('school_site:my_activities')
+
+        return redirect('school_site:home')
 
 
 class CreateSheet(View):

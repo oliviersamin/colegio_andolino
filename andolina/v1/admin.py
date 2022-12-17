@@ -9,6 +9,7 @@ from v1.models import (
     Sheet,
     Archive,
     External,
+    Price,
 )
 from django.contrib import messages
 from rest_framework import filters
@@ -87,6 +88,15 @@ class ExternalAdmin(admin.ModelAdmin):
     list_display = ('external_id', 'full_name')
 
 
+class PriceAdmin(admin.ModelAdmin):
+    """ Implemented to use External model from database """
+    search_fields = ['activity', 'date_created', 'date_updated']
+    filter_backends = (filters.SearchFilter,)
+    list_filter = ('activity', 'date_created', 'date_updated', 'limit_type')
+    list_display = ('activity', 'date_created', 'date_updated')
+
+
+admin.site.register(Price, PriceAdmin)
 admin.site.register(Archive, ArchiveAdmin)
 admin.site.register(Parent, ParentAdmin)
 admin.site.register(Child, ChildAdmin)
