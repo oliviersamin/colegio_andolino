@@ -136,14 +136,10 @@ dmypy.json
 
 # VSCode
 /.vscode
-raw_data/I - PAGOS de Cooperativistas/P -  ACOMPAÑAMIENTO - 2021_22.xlsx
-raw_data/I - PAGOS de Cooperativistas/P -  ATENCIÓN TEMPRANA - 2021_22.xlsx
-raw_data/I - PAGOS de Cooperativistas/P -  COMEDOR - 2021_22.xlsx
-raw_data/I - PAGOS de Cooperativistas/P -  CUOTAS y MATERIAL - 2021_22.xlsx
-raw_data/I - PAGOS de Cooperativistas/P -  EXTRAESCOLARES - 2021_22.xlsx
-raw_data/I - PAGOS de Cooperativistas/P -  FORMACIONES - 2021_22.xlsx
-raw_data/I - PAGOS de Cooperativistas/P -  TALLERES, ACTIVIDADES y CAMPAMENTOS - 2021_22.xlsx
-raw_data/I - PAGOS de Cooperativistas/P -  TESORERÍA - 2021_22.xlsx
-raw_data/I - PAGOS de Cooperativistas/P -  VENTAS, ESPACIOS y OTROS - 2021_22.xlsx
-raw_data/A - Datos de Alumnos/P - Listado de Alumnos - Pagadores 2021_22.xlsx
-raw_data/A - Datos de Alumnos/P - Listado de Alumnos 21_22.xlsx
+raw_data/I - PAGOS de Cooperativistas/
+raw_data/I - PAGOS de Cooperativistas/*
+raw_data/A - Datos de Alumnos/
+raw_data/A - Datos de Alumnos/*
+raw_data/calendarios/
+raw_data/calendarios/*
+raw_data/from_csv.ipynb
