@@ -19,5 +19,5 @@ class Price(models.Model):
     date_updated = models.DateTimeField(auto_now=True, blank=True)
 
     class Meta:
-        ordering = ['activity', 'date_created', 'date_updated', 'limit_type', 'value']
+        ordering = ['activity_to_limit', 'date_created', 'date_updated', 'limit_type', 'value']
         verbose_name_plural = "Prices"
