@@ -7,7 +7,7 @@ from .activity import Activity
 from .sheet import Sheet
 from .archive import Archive
 from .external import External
-from .price import Price
+from .price import LimitationPrice
 
 __all__ = [
     Parent,
@@ -19,5 +19,5 @@ __all__ = [
     Sheet,
     Archive,
     External,
-    Price,
+    LimitationPrice,
 ]
