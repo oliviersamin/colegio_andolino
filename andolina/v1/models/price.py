@@ -6,7 +6,7 @@ LIMIT_CHOICES = [('minimum', 'minimum'), ('maximum', 'maximum')]
 
 class Price(models.Model):
     """ price model """
-    activity = models.OneToOneField(
+    activity_to_limit = models.OneToOneField(
         'v1.Activity',
         on_delete=models.CASCADE,
         help_text='prices max or min',
