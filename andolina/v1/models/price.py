@@ -6,14 +6,12 @@ LIMIT_CHOICES = [('minimum', 'minimum'), ('maximum', 'maximum')]
 
 class Price(models.Model):
     """ price model """
-    activity = models.ForeignKey(
+    activity = models.OneToOneField(
         'v1.Activity',
         on_delete=models.CASCADE,
-        related_name='price_limitation',
         help_text='prices max or min',
         blank=True,
         null=True,
-        unique=True,
     )
     limit_type = models.CharField(max_length=40, choices=LIMIT_CHOICES, blank=False, null=True, default='maximum')
     value = models.FloatField(blank=False, null=True)
