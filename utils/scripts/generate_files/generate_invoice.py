@@ -27,6 +27,7 @@ from constants import (
     EXEMPTION,
     LOPD,
     activities_colors_dict,
+    UNIT_PRICE
 )
 
 

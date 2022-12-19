@@ -1,6 +1,7 @@
 # Importstdlib
 from datetime import date
 import os
+import pathlib
 
 # Import external libraries
 from pylatex import (
@@ -71,7 +72,7 @@ class PdfGen:
                                                 align='l')) as title_wrapper:
                 self.document_title(title_wrapper)
         
-        self.doc.append(VerticalSpace('8ex'))
+        self.doc.append(VerticalSpace('20ex'))
 
     def document_title(self, title_wrapper):
         ...
@@ -106,6 +107,7 @@ class PdfGen:
                 an invoice or a detailed extract.
                 Defaults to 'invoice'.
         """
+        path_to_bills = pathlib.Path(__file__).parent.resolve().joinpath('bills/')
         self.doc.generate_pdf(os.path.join(os.path.dirname(__file__),
                                            filename),
                               clean_tex=True)
