@@ -107,9 +107,8 @@ class PdfGen:
                 an invoice or a detailed extract.
                 Defaults to 'invoice'.
         """
-        path_to_bills = pathlib.Path(__file__).parent.resolve().joinpath('bills/')
-        self.doc.generate_pdf(os.path.join(os.path.dirname(__file__),
-                                           filename),
+        path_to_bills = pathlib.Path(__file__).parent.resolve().joinpath(f'bills/{filename}')
+        self.doc.generate_pdf(path_to_bills,
                               clean_tex=True)
 
 

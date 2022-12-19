@@ -9,7 +9,7 @@ import os
 import numpy as np
 from pylatex import (Document, Foot, FootnoteText, Head, LargeText, LineBreak,
                      LongTabu, MiniPage, PageStyle, Section, StandAloneGraphic,
-                     Tabular, VerticalSpace, TextColor)
+                     Tabular, VerticalSpace, TextColor, NewPage)
 from pylatex.utils import NoEscape, bold, dumps_list
 from random import choices
 from constants import (
@@ -209,7 +209,25 @@ class PdfGeneration:
         """
         self.current_associate_data = associate_data
 
+        self.doc = Document(geometry_options=self.geometry_options)
+        # first = PageStyle('fisrt')
+        # second = PageStyle('second')
+        
         self.mode = 'invoice'
+        self.first_page = PageStyle('first')
+        self.doc.change_page_style(self.first_page.name)
+        self.generate_header()
+        self.generate_footer()
+        self.generate_associate_table()
+        self.doc.preamble.append(self.first_page)
+
+        self.generate_invoice_table()
+
+        self.generate_additional_details()
+        
+        self.doc.append(NewPage())
+        self.first_page = PageStyle('second')
+        self.doc.change_page_style(self.first_page.name)
         self.generate_header()
         self.generate_footer()
         self.generate_associate_table()
@@ -221,19 +239,18 @@ class PdfGeneration:
 
         self.generate_file(mode='invoice')
 
-    def generate_header(self):
+    def generate_header(self, page_name="first"):
         """
         Generate document and add a header to it
         """
-        self.doc = Document(geometry_options=self.geometry_options)
-
-        self.first_page = PageStyle("firstpage")
-
+        
+        # self.first_page = PageStyle(page_name)
+        print(f'{self.first_page = }')
         # Header image
         with self.first_page.create(Head("L")) as header_left:
             with header_left.create(MiniPage(width=NoEscape(r"0.5\textwidth"),
                                              pos='c')) as logo_wrapper:
-                logo_file = '/home/olivier/Documents/Projets/Andolina/colegio_andolino/andolina/school_site/static/school_site/images/andolina-logo.png'
+                logo_file = 'andolina-logo.png'
                 logo_wrapper.append(StandAloneGraphic(image_options="width=200px",
                                                       filename=logo_file))
 
@@ -322,7 +339,7 @@ class PdfGeneration:
                 Defaults to 'invoice'.
         """
         # Format page
-        self.doc.change_document_style("firstpage")
+        # self.doc.change_document_style("firstpage")
         self.doc.add_color(name="lightgray", model="gray", description="0.80")
 
         # Generate pdf

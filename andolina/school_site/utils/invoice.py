@@ -162,7 +162,7 @@ class Invoice(PdfGen,Billing):
             associate_data (_type_): Generate an invoice for current associate.
         """
         # self.mode = 'invoice'
-        page = PageStyle(f'page_{user}')
+        page = PageStyle(f'page{user}')
         self.doc.change_page_style(page.name)
         self.doc.preamble.append(page)
         super().add_header(page)
@@ -188,7 +188,7 @@ class Invoice(PdfGen,Billing):
             associate_data (_type_): Generate an invoice for current associate.
         """
         # self.mode = 'invoice'
-        page = PageStyle(f'page_invoice')
+        page = PageStyle(f'pageinvoice')
         self.doc.change_page_style(page.name)
         
         super().add_header(page)
@@ -245,13 +245,11 @@ class Invoice(PdfGen,Billing):
             invoice_table.add_empty_row()
             if isinstance(extract,list):
                 for row in extract:
-                    print(f'{row = }')
                     invoice_table.add_hline()
                     invoice_table.add_row(row)
             elif isinstance(extract,dict):
                 for key,value in extract.items():
                     row = [key,'',value.price,value.cost]
-                    print(f'{row = }')
                     invoice_table.add_hline()
                     invoice_table.add_row(row)                
             self.doc.append(VerticalSpace('2ex'))
@@ -294,7 +292,6 @@ class Invoice(PdfGen,Billing):
                                       'participation': ['1', '3', '5', '25', '26', '27', '28']}}]}]
 
         """
-        print(self.data)
         user_extract_dict = {}
         activity_extract_dict = {}
         
@@ -307,11 +304,9 @@ class Invoice(PdfGen,Billing):
                 cost = min(price * len(activity_data['sheet']['participation']),
                            activity_data.get('max_price',float('nan')))
                 month = f"{activity_data['sheet']['month']}/{activity_data['sheet']['year']}"
-                print(f'******************\n{cost = }\n******************')
                 user_extract = UserExtract(month,activity,price,cost)
                 user_extract_dict[user] = user_extract_dict.get(user,list()) + [user_extract]
                 
-                # print(f'{activity_extract_dict.get(activity,UserExtract("",activity,price,0)).cost = }')
                 activity_extract = UserExtract('',activity,price,activity_extract_dict.get(activity,UserExtract('',activity,price,0)).cost + cost)
                 activity_extract_dict[activity] = activity_extract
                 
@@ -381,6 +376,29 @@ if __name__ == '__main__':
     #                                    MonthlyQuantity((2,),(3,),1,0,0,0,1,2.,51.,0.,0.))])
     
     # instance.generate_set_invoices()
-
-    import pathlib
-    print(pathlib.Path(__file__).parent.resolve().joinpath('bills/'))
+    data =  [{'user': 'gloria', 
+            'activities': [{'payment': 'daily', 
+                            'price': 14.0, 
+                            'name': 'Nieve', 
+                            'sheet': {'year': 2022, 
+                                      'month': 12, 
+                                      'participation': ['1']}}]}, 
+        {'user': 'miguel', 
+            'activities': [{'payment': 'daily', 
+                            'price': 14.0, 
+                            'name': 'Nieve', 
+                            'sheet': {'year': 2022, 
+                                      'month': 12, 
+                                      'participation': ['1']}}]}, 
+        {'user': 'iro.robredo', 
+            'activities': [{'payment': 'monthly', 
+                            'price': 22.0, 
+                            'name': 'JUDO', 
+                            'sheet': {'year': 2022, 
+                                      'month': 12, 
+                                      'participation': ['1', '3', '5', '25', '26', '27', '28']}}]}]
+    instance = Invoice(Person(name='mike',
+                              adress='calle ex',
+                              NIF='123'),
+                       data)
+    instance.generate_set_invoices()

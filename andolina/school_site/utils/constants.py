@@ -49,7 +49,7 @@ COLEGIO_DATOS = os.getenv("COLEGIO_DATOS",
 PAYMENT_METHOD = os.getenv("PAYMENT_METHOD",
                            "FORMA DE PAGO: Domiciliación Bancaria.")
 EXEMPTION = os.getenv("EXEMPTION",
-                      ("Exención de IVA según el 20.9 de la Ley 37/1992"
+                      ("Exención de IVA según el 20.9 de la Ley 37/1992 "
                        "de 28 de diciembre."))
 LOPD = os.getenv("LOPD",
                  ("A los efectos previstos en la Ley Orgánica 15/1999, "
