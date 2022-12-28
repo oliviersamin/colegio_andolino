@@ -488,3 +488,10 @@ class PackBienvenida:
     family_contact2_number: str = ''
         
     important_info_comments: str = ''
+    
+    DNI_image: Image
+    libro_familia: Image
+    tarjeta_sanitaria: Image
+    
+    
+    
