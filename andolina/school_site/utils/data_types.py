@@ -396,6 +396,8 @@ class HealthReport:
     
 ################################# PACK DE BIENVENIDA MODEL #################################
 
+class Image:
+    ...
 class PackBienvenida:
     academyc_year: str
     
@@ -426,7 +428,7 @@ class PackBienvenida:
     parent1_email: str
     # parent1_signature: Signature
     parent1_city: str
-    parent1_signature: str
+    parent1_signature: Image
     parent1_date: str = date.today().strftime('%d-%m-%Y')
 
     # parent2: Parent
@@ -440,7 +442,7 @@ class PackBienvenida:
     parent2_email: str
     # parent2_signature: Signature
     parent2_city: str
-    parent2_signature: str
+    parent2_signature: Image
     parent2_date: str = date.today().strftime('%d-%m-%Y')
     
     enrollment_contact: bool
