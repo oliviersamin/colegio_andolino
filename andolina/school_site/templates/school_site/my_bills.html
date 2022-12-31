@@ -1,0 +1,22 @@
+{% extends 'school_site/base.html' %}
+{% load static %}
+{% block content %}
+    <script src="../../static/school_site/js/util_forms.js" defer data-children=" {{ children }}"></script>
+{% if user.is_authenticated %}
+    <p id="test_js"> MY BILLS PAGE FOR EACH USER</p>
+   <form action="" method="post">
+    {% csrf_token %}
+       {% for field in form.non_field_errors %}
+        <div class="errors">
+             {{ field }}
+        </div>
+        {% endfor %}
+    {{ form.as_ul }}
+    <input type="submit" value="Submit">
+    </form>
+
+
+{% else %}
+PAGE NOT AVAILABLE
+{% endif %}
+{% endblock %}

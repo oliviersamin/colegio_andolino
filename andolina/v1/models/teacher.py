@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 class Teacher(models.Model):
     """ parent model """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='teacher', on_delete=models.CASCADE)
     phone = models.CharField(max_length=20, blank=True, null=True)
     mobile = models.CharField(max_length=20, blank=True, null=True)
     address = models.CharField(max_length=200, blank=True, null=True)
@@ -26,9 +26,12 @@ class Teacher(models.Model):
         return self.user.last_name
 
     def pupils(self):
-        pupils = self.pupils.all()
+        pupils = self.pupil.all()
         pupils = [pupil.last_name() + ' ' + pupil.first_name() for pupil in pupils]
         return ' - '.join(pupils)
 
     def display_user_details(self):
         return self.user.get_full_name()
+
+    def teacher_id(self):
+        return self.id

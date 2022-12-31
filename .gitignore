@@ -127,3 +127,19 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/andolina/v1/migrations/0011_external.py
+/andolina/v1/migrations/0012_alter_activity_options_remove_activity_creator_and_more.py
+/andolina/v1/migrations/0013_remove_activity_creator_external_and_more.py
+/andolina/v1/migrations/0014_remove_archive_content_archive_sheets_and_more.py
+/andolina/v1/migrations/0015_sheet_is_archived.py
+/andolina/v1/migrations/0019_alter_activity_public.py
+
+# VSCode
+/.vscode
+raw_data/I - PAGOS de Cooperativistas/
+raw_data/I - PAGOS de Cooperativistas/*
+raw_data/A - Datos de Alumnos/
+raw_data/A - Datos de Alumnos/*
+raw_data/calendarios/
+raw_data/calendarios/*
+raw_data/from_csv.ipynb

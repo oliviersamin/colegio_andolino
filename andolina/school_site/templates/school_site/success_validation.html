@@ -1,0 +1,9 @@
+{% extends 'school_site/base.html' %}
+{% load static %}
+{% block content %}
+{% if user.is_authenticated %}
+SUCCESS PAGE - THE ACTION HAS BEEN PERFORMED WITH SUCCESS
+{% else %}
+PAGE NOT AVAILABLE
+{% endif %}
+{% endblock %}

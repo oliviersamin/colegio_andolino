@@ -1,0 +1,37 @@
+{% extends 'school_site/base.html' %}
+{% load static %}
+{% load utils_form %}
+{% block content %}
+{% if user.is_authenticated %}
+
+    USERS IN AWAITING LIST -
+
+   <form action="" method="post">
+    {% csrf_token %}
+       <label for="awaiting_list">Users in awaiting_list </label>
+        <select name="awaiting_list" id="awaiting_list" multiple>
+            {% for user in awaiting_list %}
+                  <option value={{ user.id }} selected >{{user}} </option>
+            {% endfor %}
+        </select>
+       <input type="submit" value="Add">
+    </form>
+
+    LIST OF ACTUAL USERS
+   <form action="{% url 'school_site:remove_activity_users' activity_id=activity.id %}" method="post">
+    {% csrf_token %}
+       <label for="users">Users already subscribed </label>
+        <select name="users" id="users" multiple>
+            {% for user in users %}
+                  <option value={{ user.id }} selected >{{user}} </option>
+            {% endfor %}
+        </select>
+       <input type="submit" value="Remove">
+    </form>
+
+
+
+{% else %}
+PAGE NOT AVAILABLE
+{% endif %}
+{% endblock %}

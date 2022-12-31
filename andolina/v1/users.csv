@@ -1,0 +1,14 @@
+first name,last name1,last name2,password,status,birth_date,tutor,children
+Olivier,SAMIN,,passwd_test,parent,,,gabrielle.SAMIN.GONZALEZ
+Paula,GONZALEZ,DIAZ,passwd_test,parent,,,gabrielle.SAMIN.GONZALEZ
+Gabrielle,SAMIN,GONZALEZ,passwd_test,child,2019-03-13,Monica.Momo,
+Monica,Momo,,passwd_test,teacher,,,
+Iro,ln1,ln2,passwd_test,child,2015-10-27,Monica.Momo,
+Miguel,ln1,ln2,passwd_test,parent,,,gabrielle.SAMIN.GONZALEZ-iro.ln1.ln2
+Gloria,ln1,ln2,passwd_test,parent,,,gabrielle.SAMIN.GONZALEZ-iro.ln1.ln2
+Maya,ln1,,passwd_test,child,2017-10-27,Monica.Momo,
+Max,ln1,,passwd_test,parent,,,maya.ln1
+Julia,ln1,,passwd_test,parent,,,maya.ln1
+Carmen,ln1,ln2,passwd_test,child,2018-10-27,Monica.Momo,
+Laura,ln1,ln2,passwd_test,parent,,,carmen.ln1.ln2
+Esther,ln1,ln2,passwd_test,teacher,,,

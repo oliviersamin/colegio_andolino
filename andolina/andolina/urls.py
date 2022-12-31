@@ -16,18 +16,30 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
+from v1.views import (
+    ParentViewSet,
+    ChildViewSet,
+    TeacherViewSet,
+    GroupViewSet,
+    DocumentViewSet,
+    UserViewSet,
+)
 
 
-# router = routers.SimpleRouter()
-# router.register('clients', ClientsViewSet, basename='clients')
-# router.register('contracts', ContractsViewSet, basename='contracts')
-# router.register('events', EventsViewSet, basename='events')
+router = routers.SimpleRouter()
+router.register('users', UserViewSet, basename='users')
+router.register('parents', ParentViewSet, basename='parents')
+router.register('children', ChildViewSet, basename='children')
+router.register('teachers', TeacherViewSet, basename='teachers')
+router.register('school_groups', GroupViewSet, basename='school_groups')
+router.register('documents', DocumentViewSet, basename='documents')
 
 
 urlpatterns = [
     path('management/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    # path('api/v1/', include(router.urls)),
+    path('api/v1/', include(router.urls)),
     path('api/v1/', include('v1.urls', namespace='v1')),
-
+    path('', include('school_site.urls', namespace='school_site')),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]

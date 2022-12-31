@@ -1,0 +1,17 @@
+###
+1. BIG PICTURE
+    a. The site page using all the data needed is controlled by a method contained in the file 'school_site/views.py'
+    b. The class used is called 'class MyBills(View)' --> the method to look at is the post method
+    c. the function to look at in the post method is called 'from_data_to_bills(results, request)'
+    d. This last method comes from the 'school_site/utils/common.py'
+
+2. DETAILS
+    a. the last method is used to replace the main function of the school_site/utils/generate_bills.py file
+    b. to use the value of an item coming from the form inside the site page, use the following: form.cleaned_data[item]
+
+
+
+1. Commentar en el modelos parent d'El modulo v1 la linea d'onde Hay el nif. 
+2. Usar el clean migrations 
+3. Uncomment thé Line. 
+4. Usar el commando normal de makemigrations y despues de migrate.

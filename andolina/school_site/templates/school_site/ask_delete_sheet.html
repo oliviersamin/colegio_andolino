@@ -1,0 +1,15 @@
+{% extends 'school_site/base.html' %}
+{% load static %}
+{% load utils_form %}
+{% block content %}
+{% if user.is_authenticated %}
+ARE YOU SURE YOU WANT TO DELETE THIS SHEET?
+
+<button><a class="home_buttons" href="{%url 'school_site:delete_sheet' sheet_id %}">YES</a></button>
+
+<button><a class="home_buttons" href="{%url 'school_site:my_activities'%}">NO</a></button>
+
+{% else %}
+PAGE NOT AVAILABLE
+{% endif %}
+{% endblock %}

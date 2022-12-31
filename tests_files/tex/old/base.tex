@@ -1,0 +1,24 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{microtype}
+\SetTracking[no ligatures={f}]{encoding=*}{40}
+\usepackage{graphicx, array}
+\usepackage[headheight=136pt, top=6.5cm]{geometry}
+
+\usepackage{titleps}
+\usepackage{lipsum} %
+
+\newpagestyle{encabezado}{%
+\sethead{\scalebox{0.75}{\includegraphics[scale=.6]{andolina-logo.png}}}{\sffamily\large\raisebox{4ex}{\parbox{10cm}{\centering\lsstyle%
+  Factura\\[2ex]Mes y Año}}}
+\headrule}
+\pagestyle{encabezado}
+
+\begin{document}
+
+\section{Section One}
+\lipsum
+
+\end{document}

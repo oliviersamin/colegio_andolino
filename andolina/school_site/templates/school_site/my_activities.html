@@ -1,0 +1,95 @@
+{% extends 'school_site/base.html' %}
+{% load static %}
+{% load utils_form %}
+{% block content %}
+{% if user.is_authenticated %}
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Public</th>
+            <th>Users</th>
+            <th>Message to the parents</th>
+            <th></th>
+            <th></th>
+            <th>Actions</th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        {% for activity in my_activities %}
+        <tr>
+            <th>{{ activity.name }}</th>
+            <th>{{ activity.public }}</th>
+            <th>
+            <ul>
+                {% for user in activity.users.all %}
+                    <li>{{ user.get_full_name }}</li>
+                {% endfor %}
+            </ul>
+            </th>
+            <th>{{ activity.comment_for_parent }}</th>
+            <th>
+                <button><a class="home_buttons" href="{% url 'school_site:edit_activity' activity_id=activity.id %}">Edit activity</a></button>
+            </th>
+            {% if activity|is_inscription_open %}
+                <th>
+                    <button><a class="home_buttons" href="{% url 'school_site:edit_activity_users' activity_id=activity.id %}">Edit activity users</a></button>
+                </th>
+            {% else %}
+                <th>
+                    <button disabled>Edit activity users</button>
+                </th>
+
+            {% endif %}
+            {% if activity.sheet.all|are_all_sheets_created %}
+                <th>
+                    <button disabled> Create sheet</button>
+                </th>
+            {% else %}
+                <th>
+                    <button><a class="home_buttons" href="{% url 'school_site:create_sheet' activity_id=activity.id %}">Create sheet</a></button>
+                </th>
+            {% endif %}
+            {% if activity.id|is_past_or_present_sheet %}
+                {% with activity.id|is_oldest_sheet as oldest_sheet_id %}
+                <th>
+                    <button><a class="home_buttons" href="{% url 'school_site:edit_sheet' sheet_id=oldest_sheet_id %}">Edit sheet</a></button>
+                </th>
+                <th>
+                    <button><a class="home_buttons" href="{% url 'school_site:ask_validate_sheet' sheet_id=oldest_sheet_id %}">Validate sheet</a></button>
+                </th>
+                <th></th>
+                <th>
+                    <button><a class="home_buttons" href="{% url 'school_site:ask_delete_sheet' sheet_id=oldest_sheet_id %}">Delete sheet</a></button>
+                </th>
+                {% endwith %}
+            {% else %}
+                <th>
+                    <button disabled>Edit sheet</button>
+                </th>
+                <th>
+                    <button disabled>Validate sheet</button>
+                </th>
+                <th></th>
+                <th>
+                    <button disabled>Delete sheet</button>
+                </th>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <div id="buttons">
+        <button><a class="home_buttons" href="{%url 'school_site:create_my_activity'%}">Create a new activity</a></button>
+    </div>
+
+    {% block create_my_activity %}{% endblock %}
+
+    </div>
+
+
+{% else %}
+PAGE NOT AVAILABLE
+{% endif %}
+{% endblock %}

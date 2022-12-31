@@ -6,7 +6,7 @@ from .parent import Parent
 
 class Group(models.Model):
     """ parent model """
-    members = models.ManyToManyField(Parent, related_name='members')
+    members = models.ManyToManyField(Parent, related_name='group')
     name = models.CharField(max_length=20, blank=True, null=True, choices=SCHOOL_GROUPS)
     representative = models.ForeignKey(Parent, related_name='group_rep', on_delete=models.CASCADE)
     leader = models.ForeignKey(Parent, related_name='group_leader', on_delete=models.CASCADE)
@@ -27,3 +27,6 @@ class Group(models.Model):
     def group_members(self):
         members = [member.last_name() + ' ' + member.first_name() for member in self.members.all()]
         return ' - '.join(members)
+
+    def group_id(self):
+        return self.id
