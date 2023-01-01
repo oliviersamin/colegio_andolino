@@ -3,11 +3,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static '/school_site/stylesheets/loggin.css' %}" type="text/css">
+    <link rel="icon"href="{% static 'school_site/images/favicon.ico' %}">
     <title>Login page</title>
-{#    <link rel="stylesheet" href="{% static '/accounts/stylesheets/loggin.css' %}" type="text/css">#}
 </head>
+
 <body>
-{#<img src="{% static 'base_app/images/fond_bibli_resized.png' %}" alt="" class="background">#}
+
+    <div>
+        <img id="logo-loggin" src="{%  static 'school_site/images/logo-2019.png' %}" alt="">
+    </div>
+
 <h2>Login to Andolina intranet</h2>
 <form method="post">
     {% csrf_token %}
@@ -34,8 +40,7 @@
 
     <button class="validation-button" type="submit">Login</button>
 </form>
-<button><a href="{% url 'password_reset' %}">Lost your password</a></button>
-<!--<button class="back_home"><a id="home" href="../../">Page d'accueil</a></button>-->
+<button><a class='login_page' href="{% url 'password_reset' %}">Lost your password</a></button>
 
 </body>
 </html>

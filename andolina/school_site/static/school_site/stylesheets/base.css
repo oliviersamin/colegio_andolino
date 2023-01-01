@@ -1,0 +1,42 @@
+:root {
+  --naranja: rgb(240,120,0);
+  --background: rgba(217,183,111,0.8);
+    --menu-buttons: rgb(0,120,240);
+}
+
+body{
+    font-family: 'Apple Chancery';
+    color: black;
+    text-decoration: none;
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 2%;
+    /*    justify-content: left; */
+    background-color: var(--background);
+
+}
+
+.banner_button{
+  background-color: var(--menu-buttons);
+  border: none;
+  border-radius: 10px;
+  padding: 10px 32px;
+  display: inline-block;
+    margin-bottom: 5%;
+}
+
+.banner_text{
+  font-size: 20px;
+  text-decoration: none;
+
+}
+
+.menu-burger{
+    display: none;
+}
+
+.buttons-burger{
+    display: none;
+}

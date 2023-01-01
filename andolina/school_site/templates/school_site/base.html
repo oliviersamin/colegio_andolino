@@ -1,6 +1,15 @@
 {% load permissions %}
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="{% static '/school_site/stylesheets/base.css' %}" type="text/css">
+<link rel="stylesheet" media="screen and (max-width: 950px)"
+      href="{% static '/school_site/stylesheets/base-small-resolution.css' %}" type="text/css"/>
+<link rel="icon"href="{% static 'school_site/images/favicon.ico' %}">
+
 <body>
 
 {% if user.is_authenticated %}
@@ -14,8 +23,25 @@
             <button class="banner_button"><a class="banner_text" href="{% url 'school_site:my_bills'%}  ">My bills</a></button>
         {% endif %}
         <button class="banner_button"><a class="banner_text" href="{% url 'logout'%}  ">Logout</a></button>
-
     </header>
+
+    <ul class="menu-burger">
+        <li><a class="menuItem" href="{% url 'school_site:dashboard'%}  ">Dashboard</a></li>
+        {% if not user|is_external %}
+            <li><a class="menuItem" href="{% url 'school_site:children_activities'%}  ">My family</a></li>
+        {% endif %}
+        <li><a class="menuItem" href="{% url 'school_site:my_activities'%}  ">My contribution</a></li>
+        {% if not user|is_external %}
+            <li><a class="menuItem" href="{% url 'school_site:my_bills'%}  ">My bills</a></li>
+        {% endif %}
+        <li><a class="menuItem" href="{% url 'logout'%}  ">Logout</a></li>
+    </ul>
+        <button class="buttons-burger">
+            <!-- material icons https://material.io/resources/icons/ -->
+            <i class="menuIcon material-icons">menu</i>
+            <i class="closeIcon material-icons">close</i>
+        </button>
+
 
     {% if messages %}
         <ul class="messages">
@@ -31,6 +57,7 @@
 {% else %}
     PAGE NOT AVAILABLE
 {% endif %}
+<script type="text/javascript" src="{% static 'school_site/js/BurgerMenu.js' %}"></script>
 </body>
 <head>
     <meta charset="UTF-8">

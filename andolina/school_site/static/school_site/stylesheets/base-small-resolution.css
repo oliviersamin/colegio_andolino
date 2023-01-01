@@ -1,0 +1,66 @@
+:root {
+  --naranja: rgb(240,120,0);
+  --background: rgba(217,183,111,0.8);
+    --menu-buttons: rgb(0,120,240);
+    --burger-menu-background: rgba(123,123,123,0.9);
+}
+
+body{
+    font-family: 'Apple Chancery';
+    color: black;
+    text-decoration: none;
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 15%;
+    /*    justify-content: left; */
+    background-color: var(--background);
+
+}
+
+.banner_button{
+  display: none;
+}
+
+
+.buttons-burger{
+    display: initial;
+  position: fixed;
+  z-index: 100;
+  top: 1rem;
+  right: 1rem;
+  padding: 4px;
+  border: black solid 1px;
+  background: rgba(123,123,123,1);
+  cursor: pointer;
+}
+
+.closeIcon {
+  display: none;
+}
+
+.menu-burger{
+  display: initial;
+  position: fixed;
+  transform: translateY(-150%);
+  transition: transform 0.2s;
+  top: 0;
+  left: 40%;
+  right: 0;
+  bottom: 500;
+  z-index: 99;
+  background: var(--burger-menu-background);
+  list-style: none;
+  padding-top: 1rem;
+}
+
+.showMenu {
+  transform: translateY(0);
+}
+
+.menuItem {
+  font-size: 20px;
+  text-decoration: none;
+}
+

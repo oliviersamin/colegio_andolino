@@ -4,13 +4,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static '/school_site/stylesheets/home.css' %}" type="text/css">
+    <link rel="icon"href="{% static 'school_site/images/favicon.ico' %}">
     <title>Home</title>
 </head>
 <body>
+
+    <div>
+        <img id="logo-loggin" src="{%  static 'school_site/images/logo-2019.png' %}" alt="">
+    </div>
+
     <div id="buttons">
-        <button id="login"><a class="home_buttons" href="{%url 'login'%}">
+        <button id="login"><a class='home_page' href="{%url 'login'%}">
             Login</a></button>
     </div>
-    <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+    <div>
+        <p><a class='home_page' href="{% url 'password_reset' %}">Lost password?</a></p>
+    </div>
 </body>
 </html>
