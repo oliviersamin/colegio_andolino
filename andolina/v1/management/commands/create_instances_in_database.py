@@ -160,7 +160,6 @@ class Command(BaseCommand):
         # activity.creator = User.objects.get(username='admin')
         activity.public = activity_data['public']
         activity.save()
-        activity.ask_inscription.set([User.objects.get(username='admin')])
         activity.save()
         # CREATE SHEETS
         files = os.listdir(activity_data['path'])
