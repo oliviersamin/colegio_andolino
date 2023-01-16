@@ -24,11 +24,11 @@ from pylatex import (
 from pylatex.utils import bold
 
 # import self API
-from LaTeX_snippets import Billing, PdfGen
-from data_types import Person
+from .LaTeX_snippets import Billing, PdfGen
+from .data_types import Person
 
 # Constants
-from constants import (
+from .constants import (
     ACTIVIDADES,
     COLEGIO_DATOS,
     EXEMPTION,
