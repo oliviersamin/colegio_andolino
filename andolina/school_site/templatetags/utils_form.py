@@ -69,12 +69,17 @@ def is_inscription_open(activity: object):
 
 
 def get_past_or_present_sheets(activity_id):
+    previous_year_months = [9, 10, 11, 12]
     general_filters = (Q(activity_id=activity_id) & Q(is_archived=False))
     now = datetime.datetime.now()
-    dates_filters = (Q(year=now.year) & Q(month__lte=now.month))
-    filters = dates_filters & general_filters
-    # sheets = Sheet.objects.filter(filters)
-    sheets = Sheet.objects.filter(activity_id=activity_id).filter(month__lte=now.month).filter(year=now.year).filter(is_archived=False)
+    dates_filters_actual_year = Q(year=now.year) & Q(month__lte=now.month)
+    dates_filters_previous_year = Q(year=now.year - 1) & Q(month__in= previous_year_months)
+    filters_actual_year = dates_filters_actual_year & general_filters
+    filters_previous_year = dates_filters_previous_year & general_filters
+    sheets = Sheet.objects.filter(filters_previous_year)
+    if not sheets:
+        sheets = Sheet.objects.filter(filters_actual_year)
+    # sheets = Sheet.objects.filter(activity_id=activity_id).filter(month__lte=now.month).filter(year=now.year).filter(is_archived=False)
     return sheets
 
 
