@@ -2,6 +2,7 @@
 import time
 import datetime
 import os
+from pathlib import Path
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
 from v1.utils import Operation
@@ -12,13 +13,19 @@ from v1.models import(
     Sheet,
 )
 
+BASE_DIR = Path(__file__).resolve().parents[4]
 
 class Command(BaseCommand):
     help = 'create instances into the database'
-    CHILDREN_PATH = '/home/olivier/Documents/Projets/Andolina/colegio_andolino/andolina/v1/raw_data_previous_year/Alumnos.csv'
-    COMEDOR_FOLDER_PATH = '/home/olivier/Documents/Projets/Andolina/colegio_andolino/raw_data/clean/Comedor'
-    EARLY_CARE_FOLDER_PATH = '/home/olivier/Documents/Projets/Andolina/colegio_andolino/raw_data/clean/AtenciónTemprana'
-    ACTIVITIES_PATH = '/home/olivier/Documents/Projets/Andolina/colegio_andolino/andolina/v1/activities.csv'
+    # CHILDREN_PATH = '/home/olivier/Documents/Projets/Andolina/colegio_andolino/andolina/v1/raw_data_previous_year/Alumnos.csv'
+    # COMEDOR_FOLDER_PATH = '/home/olivier/Documents/Projets/Andolina/colegio_andolino/raw_data/clean/Comedor'
+    # EARLY_CARE_FOLDER_PATH = '/home/olivier/Documents/Projets/Andolina/colegio_andolino/raw_data/clean/AtenciónTemprana'
+    # ACTIVITIES_PATH = '/home/olivier/Documents/Projets/Andolina/colegio_andolino/andolina/v1/activities.csv'
+    CHILDREN_PATH = f'{BASE_DIR}/raw_data/clean/Alumnos.csv'
+    # /home/migtrabajo/programming/personal/colegio_andolino/raw_data/clean/Alumnos.csv
+    COMEDOR_FOLDER_PATH = F'{BASE_DIR}/raw_data/clean/Comedor'
+    EARLY_CARE_FOLDER_PATH = F'{BASE_DIR}/raw_data/clean/AtenciónTemprana'
+    ACTIVITIES_PATH = f'{BASE_DIR}/andolina/v1/activities.csv'
     ACTIVITIES = [
         {'name': 'Comedor', 'public': 'children', 'path': COMEDOR_FOLDER_PATH},
         {'name': 'Atencion temprana', 'public': 'children', 'path': EARLY_CARE_FOLDER_PATH},
