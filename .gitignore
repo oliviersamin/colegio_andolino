@@ -143,3 +143,6 @@ raw_data/A - Datos de Alumnos/*
 raw_data/calendarios/
 raw_data/calendarios/*
 raw_data/from_csv.ipynb
+
+# Mac
+.DS_Store
