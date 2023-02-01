@@ -3,8 +3,13 @@ Generate pdf files with pylatex
 for invoices or detailed extracts.
 '''
 # import stdlib
-from datetime import date
+import calendar
+import csv
 from dataclasses import dataclass
+from enum import Enum, auto
+from itertools import chain
+from os import path
+from typing import Dict
 
 # import external libs
 from pylatex import (
@@ -23,11 +28,11 @@ from pylatex import (
 from pylatex.utils import bold
 
 # import self API
-from .LaTeX_snippets import Billing, PdfGen
-from .data_types import Person
+from LaTeX_snippets import Billing, PdfGen
+from data_types import Person
 
 # Constants
-from .constants import (
+from constants import (
     COLEGIO_DATOS,
     EXEMPTION,
     LOPD,
@@ -35,27 +40,110 @@ from .constants import (
     UNIT_PRICE,
 )
 
+class ActivityPayment(Enum):
+    monthly = auto()
+    monthly_max = auto()
+    daily = auto()
+
+@dataclass
+class BillableActivity:
+    name: str
+    participation: tuple[int]
+    payment: ActivityPayment
+    price: float
+    max_price: float=0
+
+    def __post_init__(self):
+        self.quantity = len(self.participation)
+
+    def compute_activity_cost(self) -> float:
+        # concept depending on attendance, such as lunch or early atention
+        if self.payment == ActivityPayment.monthly_max:
+            cost = min(self.price * self.quantity,
+                       self.max_price)
+
+        # monthly paid activities, such as judo
+        if self.payment == ActivityPayment.monthly:
+            cost = self.price * self.quantity
+
+        # Exceptional payment, such as accompaniment or course
+        elif isinstance(self.quantity, float):
+            cost = self.quantity
+
+        return cost
 
 
 @dataclass
-class MonthlyInvoice:
+class MonthBillableData:
+    invoice_date: str
+    invoice_num: int
+    month: int
+    academic_year: str
+    billable_activities: tuple[BillableActivity]
+    series: str='FU'
+
+    def __post_init__(self):
+        self.invoice_id = f'{self.series}-{self.academic_year}-{self.invoice_num}'
+        # self.full_month = f'{self.month}{self.academic_year}'
+        # cal = calendar.Calendar()
+        # locale.setlocale(locale.LC_TIME,
+        #                  'es_ES.UTF-8')
+        self.month_name = calendar.month_name[self.month]
+
+    def generate_extract(self) -> tuple[tuple[str,str,str,str]]:
+        costs = self.compute_cost_tuple()
+        
+        extract = tuple(((billable_activity.name,
+                    f"{billable_activity.price:.2f} €",
+                    f"{billable_activity.quantity}",
+                    f"{cost:.2f} €") 
+                    for (billable_activity,cost) in zip(self.billable_activities,costs)))
+
+        total = sum(costs)
+        extract_tax = ((bold("Base Imponible"), "", "", bold(f"{total:.2f} €")),
+                       (bold("IVA (exento)"), "", "", bold(f"{0:.2f} €")),
+                       (bold("Total"), "", "", bold(f"{total:.2f} €")))
+
+        return chain(extract, extract_tax)
+
+    def compute_cost_tuple(self) -> tuple[float]:
+        return (billable_activity.compute_activity_cost() for billable_activity in self.billable_activities)
+
+@dataclass
+class Remittance:
     month: str
-    # year: str
-    month_quantities: dict
+    academic_year: str
+    month_billable_data_dict: Dict[Person,MonthBillableData]
+    
+    def __post_init__(self):
+        self.full_month = f'{self.month}{self.academic_year}'
+        self.person_cost_tuple = ((person.name,sum(month_billable_data.compute_cost_tuple)) for 
+                                  (person,month_billable_data) in self.month_billable_data_dict.items())
+
+    def to_csv(self):
+        filepath = f'remittance_{self.full_month}.csv'
+        with open(file=filepath,
+                  mode='w',
+                  newline='') as f:
+            writer = csv.writer(f, 
+                                delimiter=',',
+                                quotechar='|',
+                                quoting=csv.QUOTE_MINIMAL)
+            (writer.writerow(person_cost) for person_cost in self.person_cost_tuple)
+        return filepath
+
 
 class Invoice(PdfGen,Billing):
     def __init__(self,
                  associate: Person,
-                 associate_extract: list[MonthlyInvoice],
-                 series: str = 'FU',
-                 invoice_num_start: int = 0) -> None:
+                 associate_extract: MonthBillableData) -> None:
         """This class generates different kinds of pdf documents using pylatex
 
         Args:
             series (str, optional): invoice series. Defaults to 'FU'.
             invoice_num_start (int, optional): invoice number to start with.
                                                Defaults to 0.
-            associate_data (list[dict], optional): each dict represents
+            associate_data (tuple[dict], optional): each dict represents
                 an associate.
                 Migrating to dataclass.
                 Defaults to [{'name': 'Ejemplo Ejemplez'}].
@@ -66,20 +154,17 @@ class Invoice(PdfGen,Billing):
                 Migrating to dataclass. Defaults to [{}].
         """
         super().__init__()
+
         # basic file data
-        self.series = series
-        self.invoice_num_start = invoice_num_start
-        self.current_invoice_num = invoice_num_start
         self.associate = associate
         self.associate_extract = associate_extract
 
         # dates
-        self.invoice_date = date.today()
-        self.year = self.invoice_date.year
-        self.month = self.invoice_date.month
-        current_year_formated = self.year % 100
-        self.current_academic_year = (f"{current_year_formated}"
-                                      f"{current_year_formated + 1}")
+        # self.year = self.associate_extract.invoice_date.year
+        # self.month = self.associate_extract.invoice_date.month
+        # current_year_formated = self.year % 100
+        # self.current_academic_year = (f"{current_year_formated}"
+        #                               f"{current_year_formated + 1}")
 
         # # extract data
         # self.initial_skip, self.num_monthdays = calendar.monthrange(self.year,
@@ -104,15 +189,12 @@ class Invoice(PdfGen,Billing):
         # self.assigned_colors = [ACTIVITIES_COLORS_DICT[activity.upper()]
         #                         for activity in ACTIVIDADES]
 
-    def generate_set_invoices(self):
-        for month_data in self.associate_extract:
-            self.generate_invoice_id()
-            self.generate_invoice(month_data)
-        filename = f"{self.associate.name}-{self.invoice_num}"
+    def to_pdf(self):
+        self.generate_invoice()
+        filename = f"{self.associate.name}-{self.associate_extract.invoice_id}"
         self.generate_file(filename)
 
-    def generate_invoice(self,
-                         month_data: dict):
+    def generate_invoice(self):
         """Generate invoice from associate data.
 
         Args:
@@ -126,9 +208,9 @@ class Invoice(PdfGen,Billing):
         super().add_footer(page)
 
         # unique of this class
-        super().generate_associate_table(self.associate.name,self.associate.NIF,self.associate.adress)
+        super().generate_associate_table(self.associate)
 
-        self.generate_invoice_table(month_data)
+        self.generate_invoice_table()
 
         self.generate_additional_details()
         
@@ -136,11 +218,11 @@ class Invoice(PdfGen,Billing):
         
         
     def document_title(self, title_wrapper: Head("R")) -> None:
-        title_wrapper.append(LargeText(bold(f"Número de factura: {self.invoice_num}")))
+        title_wrapper.append(LargeText(bold(f"Número de factura: {self.associate_extract.invoice_id}")))
         title_wrapper.append(LineBreak())
         title_wrapper.append(LineBreak())
         title_wrapper.append(TextColor('black',
-                                        LargeText(bold(f"Fecha: {self.date}"))))
+                                        LargeText(bold(f"Fecha: {self.associate_extract.invoice_date}"))))
 
     def footer(self, footer):
         """
@@ -148,21 +230,11 @@ class Invoice(PdfGen,Billing):
         """
         footer.append(FootnoteText(f"{LOPD}\n\n\n{COLEGIO_DATOS}"))
 
-    def generate_invoice_id(self) -> str:
-        '''
-        Get current invoice number formated
-        Example: FU-2223-001
-        '''
-        self.invoice_num = f'{self.series}-{self.current_academic_year}-{self.current_invoice_num:03}'
-        self.current_invoice_num += 1
-        self.date = self.invoice_date.strftime("%d/%m/%y")
-
-
-    def generate_invoice_table(self, month_data):
+    def generate_invoice_table(self):
         """
         Generate a table with the extract for current invoice
         """
-        with self.doc.create(Section(f'Factura {month_data.month}',numbering=False)):
+        with self.doc.create(Section(f'Factura {self.associate_extract.month_name}',numbering=False)):
             ...
 
         with self.doc.create(LongTabu("X[3l] X[c] X[c] X[c]",
@@ -175,7 +247,7 @@ class Invoice(PdfGen,Billing):
                                   color="lightgray")
             invoice_table.add_empty_row()
 
-            extract_final = generate_extract(month_data.month_quantities)
+            extract_final = self.associate_extract.generate_extract()
             for row in extract_final:
                 invoice_table.add_hline()
                 invoice_table.add_row(row)
@@ -186,53 +258,6 @@ class Invoice(PdfGen,Billing):
         self.doc.append(PAYMENT_METHOD)
         self.doc.append(NewLine())
         self.doc.append(EXEMPTION)
-
-
-def generate_extract(month_quantities: dict) -> list[tuple]:
-    """
-    Generate current extract data into a list of rows (tuples).
-    
-    Args:
-        month_quantities (MonthlyQuantity): instance where fields are concepts (keys of UNIT_PRICE)
-        and values are the quantities used in a given month by a child.
-
-    Returns:
-        list[tuple]: list of rows in extract
-    """
-    extract = []
-    total = 0.
-    for concept,quantity in month_quantities.items():
-        # concept depending on attendance, such as lunch or early atention
-        if isinstance(quantity,tuple):
-            subtotal = min(len(quantity)*UNIT_PRICE[concept],
-                           UNIT_PRICE[f'{concept}_MAX'])
-            extract.append((concept.lower().replace('_', ' '),
-                            f"{UNIT_PRICE[concept]:.2f} €",
-                            f"{quantity}",
-                            f"{subtotal:.2f} €"))
-        # monthly paid activities, such as judo
-        elif isinstance(quantity,int):
-            subtotal = quantity*UNIT_PRICE[concept]
-            extract.append((concept.lower().replace('_', ' '),
-                            f"{UNIT_PRICE[concept]:.2f} €",
-                            f"{quantity}",
-                            f"{subtotal:.2f} €"))
-        # Exceptional payment, such as accompaniment or course
-        elif isinstance(quantity, float):
-            subtotal = quantity
-            extract.append((concept.lower().replace('_', ' '),
-                            "",
-                            "",
-                            f"{quantity:.2f} €"))
-    
-        total += subtotal
-
-    extract_tax = [(bold("Base Imponible"), "", "", bold(f"{total:.2f} €")),
-                   (bold("IVA (exento)"), "", "", bold(f"{0:.2f} €")),
-                   (bold("Total"), "", "", bold(f"{total:.2f} €"))]
-    extract.extend(extract_tax)
-
-    return extract
 
 
 if __name__ == '__main__':
@@ -248,10 +273,23 @@ if __name__ == '__main__':
                 'workshops',
                 'camps',]
     instance = Invoice(Person('mike','ex','123'),
-                       [MonthlyInvoice(month=11,
-                                       month_quantities=dict(zip(concepts,
-                                                                 ((2,),(3,),1,0,0,0,1,2.,51.,0.,0.))))])
+                       MonthBillableData(invoice_date='11-22',
+                                          invoice_num=1,
+                                          month=11,
+                                          academic_year='2223',
+                                          billable_activities=(
+                                              BillableActivity(name='cuota mensual hijo1',
+                                                               participation=(1,2,3),
+                                                               payment=ActivityPayment.monthly,
+                                                               price=325,),
+                                              BillableActivity(name='atencion temprana',
+                                                               participation=(1,2,3),
+                                                               payment=ActivityPayment.monthly_max,
+                                                               price=1,
+                                                               max_price=15),
+                                              
+                                          )))
     
-    instance.generate_set_invoices()
+    instance.to_pdf()
 
     

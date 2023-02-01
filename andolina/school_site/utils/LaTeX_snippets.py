@@ -20,6 +20,8 @@ from pylatex.utils import (
     bold
     )
 
+from data_types import Person
+
 GEOMETRY_OPTIONS = {
     "head": "40pt",
     "margin": "0.5in",
@@ -109,17 +111,17 @@ class PdfGen:
 
 
 class Billing:
-    def generate_associate_table(self, name, NIF, adress):
+    def generate_associate_table(self, associate: Person):
         """
         Add associate information to file as table
         """
         with self.doc.create(Tabular('l|l',
                                         row_height=1.2)) as associate_table:
-            associate_table.add_row([bold("Nombre:"), name])
+            associate_table.add_row([bold("Nombre:"), associate.name])
             associate_table.add_hline()
-            associate_table.add_row([bold("NIF:"), NIF])
+            associate_table.add_row([bold("NIF:"), associate.NIF])
             associate_table.add_hline()
-            associate_table.add_row([bold("Dirección:"), adress])
+            associate_table.add_row([bold("Dirección:"), associate.adress])
             associate_table.add_hline()
 
         self.doc.append(VerticalSpace('8ex'))

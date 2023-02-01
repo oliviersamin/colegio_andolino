@@ -3,8 +3,9 @@ from django.db.models import Q
 from v1.models import Child, Parent, Archive, Sheet, Activity
 from .data_types import Person
 from .invoice import (
-    MonthlyInvoice,
-    MonthlyQuantity,
+    MonthBillableData,
+    BillableActivity,
+    ActivityPayment,
     Invoice
     )
 
@@ -58,7 +59,7 @@ def get_data_for_month_year(user, month, year):
     ]
 
     """
-    result = {'user': user, 'activities': []}
+    result = {'user': user, 'activities': [], 'month': f'{month}-{year}'}
     # filters = Q(activity__users=user) & Q(is_archived=True) & Q(month=month) & Q(year=year)
     user_activities = user.activities.all()
     for activity in user_activities:
@@ -110,21 +111,21 @@ def from_data_to_bills(data, request):
     associate = Person(name=request.user.get_full_name(),
                        NIF=Parent.objects.get(uset=request.user).nif,
                        adress=Parent.objects.get(user=request.user).address)
-    associate_extract = [
-        MonthlyInvoice(month=11,
-                       monthly_quantities=MonthlyQuantity(COMEDOR=(2,),
-                                                          ATENCIÓN_TEMPRANA=(3,),
-                                                          CUOTA=1,
-                                                          JUDO=0,
-                                                          CIENCIA=0,
-                                                          TEATRO=0,
-                                                          ROBOTIX=1,
-                                                          accompaniment=2.,
-                                                          trainings=51.,
-                                                          workshops=0.,
-                                                          camps=0.))]
-
-    instance = Invoice(associate,associate_extract)
     
-    instance.generate_set_invoices()
-
+    instance = Invoice(Person('mike','ex','123'),
+                       MonthBillableData(invoice_date='11-22',
+                                         invoice_num=1,
+                                         month=11,
+                                         academic_year='2223',
+                                         billable_activities=(BillableActivity(name='cuota mensual hijo1',
+                                                                               participation=(1,2,3),
+                                                                               payment=ActivityPayment.monthly,
+                                                                               price=325,),
+                                                              BillableActivity(name='atencion temprana',
+                                                                               participation=(1,2,3),
+                                                                               payment=ActivityPayment.monthly_max,
+                                                                               price=1,
+                                                                               max_price=15),
+                                                              )))
+    
+    instance.to_pdf()
