@@ -1,0 +1,3 @@
+[submodule "andolina/django_psdb_engine"]
+	path = andolina/django_psdb_engine
+	url = https://github.com/planetscale/django_psdb_engine.git
