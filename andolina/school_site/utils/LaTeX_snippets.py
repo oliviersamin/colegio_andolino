@@ -1,5 +1,4 @@
 # Importstdlib
-from datetime import date
 import os
 
 # Import external libraries
@@ -7,8 +6,6 @@ from pylatex import (
     Document,
     Head,
     Foot,
-    LargeText,
-    LineBreak,
     MiniPage,
     PageStyle,
     Package,
