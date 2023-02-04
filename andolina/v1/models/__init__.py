@@ -8,6 +8,7 @@ from .sheet import Sheet
 from .archive import Archive
 from .external import External
 from .price import LimitationPrice
+from .monthly_bills import MonthlyBills
 
 __all__ = [
     Parent,
@@ -20,4 +21,5 @@ __all__ = [
     Archive,
     External,
     LimitationPrice,
+    MonthlyBills,
 ]

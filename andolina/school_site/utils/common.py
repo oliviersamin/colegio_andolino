@@ -62,6 +62,8 @@ def get_data_for_month_year(user, month, year):
     result = {'user': user, 'activities': [], 'month': f'{month}-{year}'}
     # filters = Q(activity__users=user) & Q(is_archived=True) & Q(month=month) & Q(year=year)
     user_activities = user.activities.all()
+    payment = ''
+    price = ''
     for activity in user_activities:
         res_activity = {}
         if activity.price_per_month:

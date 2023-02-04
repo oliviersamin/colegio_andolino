@@ -37,6 +37,13 @@ def is_user_into_waiting_list(user, activity_id):
 
 
 @register.simple_tag
+def has_monthly_bills_permission(user):
+    if user.user_permissions.filter(codename='view_monthlybills'):
+        return True
+    return False
+
+
+@register.simple_tag
 def users_to_be_added(family, activity_id):
     into_list = []
     result = []

@@ -23,6 +23,7 @@ from school_site.forms import (
     EditActivityUsers,
     GenerateBillForm,
     AddPartnerForm,
+    GetMonthlyBillsForm,
 )
 
 from school_site.utils import (
@@ -57,6 +58,7 @@ class Home(View):
 class Dashboard(View):
     """ access the user's dashboard when logged in """
     template_name = 'school_site/dashboard.html'
+    form = GetMonthlyBillsForm
 
     def get(self, request):
         if request.user.is_authenticated:
@@ -64,6 +66,8 @@ class Dashboard(View):
                 'activities': Activity.objects.filter(is_inscription_open=True),
                 'family': {}
             }
+            form = self.form(request.POST or None)
+            context['form'] = form
             try:
                 parent = Parent.objects.get(user=request.user)
             except Exception as e:
@@ -78,6 +82,55 @@ class Dashboard(View):
                 context['family']['children'] = parent.children.all()
             return render(request, self.template_name, context=context)
         return redirect('school_site:home')
+
+    def post(self, request):
+        """
+        Get for all users the corresponding bills
+        """
+        users = User.objects.all().exclude(username='admin')
+        form = self.form(request.POST)
+        print('****************')
+        print(f'Form is of type {type(form)}')
+        from pprint import pprint
+        pprint(form)
+        print('****************')
+        success_message = 'The file containing all bills have been succesfully downloaded'
+        error_messages = [
+            'At least one field of the form has not the proper input',
+            'The file has not been downloaded'
+        ]
+        if form.is_valid():
+            """
+            send users id and correct sheets with monthly payment or not to external program
+            return [
+            {'user': <user_id>, 
+            'activities': [{
+                  'name': 'test', 
+                  'payment': 'monthly', 
+                  'sheets': {
+                      'year': '2022', 
+                      'month': '11', 
+                      'participation':[1, 7, 13, 24]
+                      }
+                  }, {}, ...]
+            }, 
+            {}, ...
+            ]
+            possibility 1: whole actual year not checked
+            --> form.cleaned_data['whole_actual_school_year'] = False
+            """
+            bills = []
+            results = []
+            year = form.cleaned_data['year']
+            month = form.cleaned_data['month']
+            for user in users:
+                results.append(get_data_for_month_year(user, int(month), int(year)))
+            # from_data_to_bills(results, request)
+            messages.add_message(request, messages.SUCCESS, success_message)
+        else:
+            for message in error_messages:
+                messages.add_message(request, messages.ERROR, message)
+        return redirect('school_site:my_bills')
 
 
 class AddInscription(View):
@@ -482,6 +535,7 @@ class EditActivityUsers(View):
 
             return redirect('school_site:my_activities')
         return redirect('school_site:home')
+
 
 class RemoveActivityUsers(View):
 

@@ -70,8 +70,22 @@
         </tr>
         {% endfor %}
     </table>
+    {% has_monthly_bills_permission request.user as has_monthly_bills_permission %}
+    {% if has_monthly_bills_permission %}
 
+       <form action="" method="post">
+           {% csrf_token %}
+           {% for field in form.non_field_errors %}
+               <div class="errors">
+                   {{ field }}
+               </div>
+           {% endfor %}
+           FORM TO DOWNLOAD ALL BILLS OF A MONTH
+           {{ form.as_ul }}
+           <input type="submit" value="Download bills">
+       </form>
 
+{% endif %}
 {% else %}
 PAGE NOT AVAILABLE
 {% endif %}

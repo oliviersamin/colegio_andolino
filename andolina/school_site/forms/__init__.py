@@ -6,6 +6,7 @@ from .create_sheet import CreateSheetForm
 from .edit_activity_users import EditActivityUsers
 from .my_bills import GenerateBillForm
 from .add_partner import AddPartnerForm
+from .monthly_bills import GetMonthlyBillsForm
 
 __all__ = [
     ProfileForm,
@@ -16,4 +17,5 @@ __all__ = [
     EditActivityUsers,
     GenerateBillForm,
     AddPartnerForm,
+    GetMonthlyBillsForm,
 ]

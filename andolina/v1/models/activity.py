@@ -36,6 +36,8 @@ class Activity(models.Model):
     price = models.CharField(max_length=40, choices=PRICE_CHOICES, blank=False, null=True, default='monthly_price')
     price_per_day = models.FloatField(blank=True, null=True)
     price_per_month = models.FloatField(blank=True, null=True)
+    has_monthly_max_price = models.BooleanField(blank=True, null=True, default=False)
+    max_price_per_month = models.FloatField(blank=True, null=True)
     money_earned_by_school = models.FloatField(blank=True, null=True)
     public = models.CharField(max_length=40, choices=PUBLIC_ACTIVITY, blank=False, null=True)
     comment_for_parent = models.TextField(blank=True, null=True)

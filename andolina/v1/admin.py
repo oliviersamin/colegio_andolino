@@ -10,6 +10,7 @@ from v1.models import (
     Archive,
     External,
     LimitationPrice,
+    MonthlyBills,
 )
 from django.contrib import messages
 from rest_framework import filters
@@ -96,6 +97,14 @@ class LimitationPriceAdmin(admin.ModelAdmin):
     list_display = ('activity', 'date_created', 'date_updated')
 
 
+class MonthlyBillsAdmin(admin.ModelAdmin):
+    search_fields = ['date']
+    filter_backends = (filters.SearchFilter,)
+    list_filter = ('date', )
+    list_display = ('date', )
+
+
+admin.site.register(MonthlyBills, MonthlyBillsAdmin)
 admin.site.register(LimitationPrice, LimitationPriceAdmin)
 admin.site.register(Archive, ArchiveAdmin)
 admin.site.register(Parent, ParentAdmin)
